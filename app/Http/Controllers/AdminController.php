@@ -671,8 +671,6 @@ class AdminController extends Controller
     //     }
     // }
 
-
-
     public function usageAndAreaVariation($id)
     {
         $data = Data::findOrFail($id);
@@ -708,27 +706,43 @@ class AdminController extends Controller
                 }
             }
 
+            // Verify that Excel files were created
+            $files = File::files($exportDir);
+            if (empty($files)) {
+                return response()->json(['error' => 'No files were generated for export'], 500);
+            }
+
             // Create ZIP file
             $zipFileName = 'UsageAreaVariations.zip';
             $zipFilePath = storage_path("app/public/{$zipFileName}");
             $zip = new ZipArchive;
 
             if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+                Log::error("Failed to open ZIP file at: {$zipFilePath}");
                 return response()->json(['error' => 'Unable to create ZIP file'], 500);
             }
 
-            $files = File::files($exportDir);
             foreach ($files as $file) {
-                $zip->addFile($file->getRealPath(), $file->getFilename());
-            }
-            $zip->close();
+                $realPath = $file->getRealPath();
+                $filename = $file->getFilename();
 
-            // Ensure the ZIP file was created
-            if (!File::exists($zipFilePath)) {
+                if (!$zip->addFile($realPath, $filename)) {
+                    Log::error("Failed to add file to ZIP: {$filename}");
+                }
+            }
+
+            if (!$zip->close()) {
+                Log::error("Failed to finalize the ZIP file at: {$zipFilePath}");
                 return response()->json(['error' => 'Failed to create ZIP file'], 500);
             }
 
-            // Return the ZIP file as a response and clean up after download
+            // Confirm ZIP file exists
+            if (!File::exists($zipFilePath)) {
+                Log::error("ZIP file not found at: {$zipFilePath}");
+                return response()->json(['error' => 'ZIP file could not be created'], 500);
+            }
+
+            // Return the ZIP file as a downloadable response
             return response()->download($zipFilePath)->deleteFileAfterSend();
         } catch (\Exception $e) {
             Log::error("Error exporting usage and area variations: " . $e->getMessage());
