@@ -694,10 +694,11 @@ class AdminController extends Controller
             File::makeDirectory($exportDir, 0755, true);
 
             $exportCount = 0;
+
             foreach ($misRoadNames as $misRoadName) {
                 // Filter variations
-                $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
-                $filteredArea = array_filter($areaVariation, fn($item) => $item->road_name === $misRoadName);
+                $filteredUsage = array_filter($usageVariation, fn($item) => $item['road_name'] === $misRoadName);
+                $filteredArea = array_filter($areaVariation, fn($item) => $item['road_name'] === $misRoadName);
 
                 if (!empty($filteredUsage) || !empty($filteredArea)) {
                     $filePath = "exports/{$misRoadName}_UsageAreaVariation.xlsx";
@@ -707,39 +708,43 @@ class AdminController extends Controller
             }
 
             // Create zip file
-            $zipFileName = "exports_{$id}.zip";
-            $zipFilePath = public_path($zipFileName);
-
             $zip = new ZipArchive();
-            if ($zip->open($zipFilePath, ZipArchive::CREATE) === TRUE) {
-                // Add the entire export directory to the zip
-                $this->addFolderToZip($exportDir, $zip);
-                $zip->close();
-            } else {
-                return response()->json(['error' => 'Failed to create zip file'], 500);
+            $zipFileName = 'exports.zip';
+            $zipFilePath = storage_path("app/public/{$zipFileName}");
+
+            // Remove existing zip file if it exists
+            if (file_exists($zipFilePath)) {
+                unlink($zipFilePath);
             }
 
-            // Return the zip file for download
-            return response()->download($zipFilePath)->deleteFileAfterSend(true);
+            if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+                $files = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($exportDir),
+                    \RecursiveIteratorIterator::LEAVES_ONLY
+                );
+
+                foreach ($files as $file) {
+                    if (!$file->isDir()) {
+                        $relativePath = 'exports/' . substr($file->getRealPath(), strlen($exportDir) + 1);
+                        $zip->addFile($file->getRealPath(), $relativePath);
+                    }
+                }
+
+                $zip->close();
+
+                // Clean up the exported files
+                foreach (File::allFiles($exportDir) as $file) {
+                    File::delete($file);
+                }
+
+                // Return the zip file for download
+                return response()->download($zipFilePath)->deleteFileAfterSend(true);
+            } else {
+                return response()->json(['error' => 'Failed to create ZIP file.'], 500);
+            }
         } catch (\Exception $e) {
             Log::error("Error exporting usage and area variations: " . $e->getMessage());
             return response()->json(['error' => 'An error occurred during export.'], 500);
-        }
-    }
-    private function addFolderToZip($folderPath, $zip, $parentFolder = '')
-    {
-        // Get all files and subdirectories
-        $files = File::files($folderPath);
-        $directories = File::directories($folderPath);
-
-        // Add files to the zip
-        foreach ($files as $file) {
-            $zip->addFile($file, $parentFolder . '/' . basename($file));
-        }
-
-        // Recursively add directories
-        foreach ($directories as $directory) {
-            $this->addFolderToZip($directory, $zip, $parentFolder . '/' . basename($directory));
         }
     }
 }
