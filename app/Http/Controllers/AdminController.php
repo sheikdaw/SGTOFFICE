@@ -873,7 +873,7 @@ class AdminController extends Controller
         $tablePrefix = "{$corporation}_{$zone}_{$ward}_";
 
         // Fetch roads from the database
-        $roads = DB::table($tablePrefix . 'roads')->get();
+        $roads = DB::table($tablePrefix . 'line')->get();
 
         // Convert roads to GeoJSON features
         $features = $roads->map(function ($road) {

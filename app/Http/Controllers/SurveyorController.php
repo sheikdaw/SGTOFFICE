@@ -112,7 +112,7 @@ class SurveyorController extends Controller
             'water_connection' => 'required',
             'phone' => 'required',
             'remarks' => 'nullable',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // Max 2MB image file size
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif' // Max 2MB image file size
         ]);
 
         if ($validator->fails()) {
