@@ -688,7 +688,7 @@ class AdminController extends Controller
 
             // Setup export directory
             $exportDir = storage_path('app/public/exports');
-            $exportDirZip = storage_path('app/public');
+            $exportDirZip = storage_path('app/public/exports.zip');
             if (File::exists($exportDir)) {
                 File::deleteDirectory($exportDir);
             }
