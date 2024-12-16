@@ -910,7 +910,7 @@ $(document).ready(function () {
             $("#road_name").val("");
         }
     });
-    $("#assessment").keyup(function () {
+    $("#old_assessment").keyup(function () {
         // console.log(mis);
         var inputValue = $(this).val();
         console.log(inputValue);
