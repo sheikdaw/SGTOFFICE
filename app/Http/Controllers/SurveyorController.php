@@ -158,6 +158,7 @@ class SurveyorController extends Controller
             'created_at' => now(),
         ];
 
+
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imagePath = public_path('/corporation/' . $data->corporation_name . '/' . $data->zone . '/' . $data->ward . '/images/');
@@ -167,37 +168,20 @@ class SurveyorController extends Controller
                 unlink($imagePath . $polygonData->image);
             }
 
-            if ($image->getSize() > 2 * 1024 * 1024) {
-                // Resize the image using GD
-                $sourceImage = imagecreatefromstring(file_get_contents($image->getRealPath()));
-                $originalWidth = imagesx($sourceImage);
-                $originalHeight = imagesy($sourceImage);
-
-                // Resize maintaining aspect ratio
-                $maxDimension = 1024;
-                $scale = min($maxDimension / $originalWidth, $maxDimension / $originalHeight);
-
-                $newWidth = intval($originalWidth * $scale);
-                $newHeight = intval($originalHeight * $scale);
-
-                $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
-                imagecopyresampled($resizedImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
-
-                // Save the resized image
-                if (!file_exists($imagePath)) {
-                    mkdir($imagePath, 0755, true);
-                }
-                imagepng($resizedImage, $imagePath . $imageName);
-
-                imagedestroy($sourceImage);
-                imagedestroy($resizedImage);
-            } else {
-                $image->move($imagePath, $imageName);
+            if (!file_exists($imagePath)) {
+                mkdir($imagePath, 0755, true);
             }
+
+            // Resize and save the image
+            $resizedImage = Image::make($image)
+                ->resize(1024, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                })
+                ->save($imagePath . $imageName, 90, 'png');
 
             $dataToSave['image'] = '/corporation/' . $data->corporation_name . '/' . $data->zone . '/' . $data->ward . '/images/' . $imageName;
         }
-
 
         if ($polygonData) {
             $polygonDataTable->where('gisid', $validatedData['gisid'])->update($dataToSave);
