@@ -671,6 +671,7 @@ class AdminController extends Controller
     //     }
     // }
 
+    use ZipArchive;
 
     public function usageAndAreaVariation($id)
     {
@@ -694,35 +695,40 @@ class AdminController extends Controller
             }
             File::makeDirectory($exportDir, 0755, true);
 
-            $exportCount = 0;
+            // Generate Excel files for each road name
             foreach ($misRoadNames as $misRoadName) {
                 // Filter variations
                 $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
                 $filteredArea = array_filter($areaVariation, fn($item) => $item->road_name === $misRoadName);
 
                 if (!empty($filteredUsage) || !empty($filteredArea)) {
-                    $filePath = "exports/{$misRoadName}_UsageAreaVariation.xlsx";
-                    Excel::store(new UsageAreaVariationExport($filteredUsage, $filteredArea, $misRoadName), $filePath, 'public');
-                    $exportCount++;
+                    $fileName = "{$misRoadName}_UsageAreaVariation.xlsx";
+                    $filePath = "{$exportDir}/{$fileName}";
+                    Excel::store(new UsageAreaVariationExport($filteredUsage, $filteredArea, $misRoadName), $filePath, 'local');
                 }
             }
 
-            // Create a ZIP file containing all exported files
+            // Create ZIP file
             $zipFileName = 'UsageAreaVariations.zip';
             $zipFilePath = storage_path("app/public/{$zipFileName}");
             $zip = new ZipArchive;
 
-            if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
-                $files = File::files($exportDir);
-                foreach ($files as $file) {
-                    $zip->addFile($file->getRealPath(), $file->getFilename());
-                }
-                $zip->close();
-            } else {
+            if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
                 return response()->json(['error' => 'Unable to create ZIP file'], 500);
             }
 
-            // Return ZIP file as a downloadable response
+            $files = File::files($exportDir);
+            foreach ($files as $file) {
+                $zip->addFile($file->getRealPath(), $file->getFilename());
+            }
+            $zip->close();
+
+            // Ensure the ZIP file was created
+            if (!File::exists($zipFilePath)) {
+                return response()->json(['error' => 'Failed to create ZIP file'], 500);
+            }
+
+            // Return the ZIP file as a response and clean up after download
             return response()->download($zipFilePath)->deleteFileAfterSend();
         } catch (\Exception $e) {
             Log::error("Error exporting usage and area variations: " . $e->getMessage());
