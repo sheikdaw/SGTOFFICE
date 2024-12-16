@@ -190,12 +190,14 @@ class SurveyorController extends Controller
         }
 
         $polygons = DB::table($data->polygon)->get();
+        $points = DB::table($data->points)->get();
         $polygonDatas = DB::table($data->polygondata)->get();
 
         return response()->json([
             'success' => true,
             'message' => $message,
             'polygon' => $polygons,
+            'point' => $points,
             'polygonDatas' => $polygonDatas
         ]);
     }

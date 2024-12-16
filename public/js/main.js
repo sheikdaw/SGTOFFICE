@@ -808,7 +808,7 @@ $(document).ready(function () {
                 if (response.success) {
                     showFlashMessage(response.message, "success");
                     polygonDatas = response.polygonDatas;
-                    refreshLayer(points, lines, response.polygon);
+                    refreshLayer(response.point, lines, response.polygon);
                 }
                 // Re-enable the submit button after success
                 $("#buildingsubmitBtn").prop("disabled", false);
@@ -901,6 +901,30 @@ $(document).ready(function () {
             $("#water_tax").val(matchingData[0].water_tax);
             $("#new_door_no").val(matchingData[0].OLD_door_no);
             $("#road_name").val(matchingData[0].road_name);
+        } else {
+            $("#old_assessment").val("");
+            $("#owner_name").val("");
+            $("#old_door_no").val("");
+            $("#water_tax").val("");
+            $("#new_door_no").val("");
+            $("#road_name").val("");
+        }
+    });
+    $("#assessment").keyup(function () {
+        // console.log(mis);
+        var inputValue = $(this).val();
+        console.log(inputValue);
+        var matchingData = mis.filter(function (row) {
+            return row.old_assessment === inputValue;
+        });
+        if (matchingData.length > 0) {
+            // console.log(matchingData);
+            $("#assessment").val(matchingData[0].assessment);
+            $("#owner_name").val(matchingData[0].owner_name);
+            $("#old_door_no").val(matchingData[0].old_door_no);
+            $("#water_tax").val(matchingData[0].water_tax);
+            $("#new_door_no").val(matchingData[0].OLD_door_no);
+            $("#road_name").val(matchingData[0].road_name);
         }
     });
     $("#addedFeature").change(function () {
@@ -948,6 +972,8 @@ $(document).ready(function () {
                     },
                     success: function (response) {
                         // Handle success response
+                        $points = response.points;
+                        $polygons = response.polygons;
                         refreshLayer(response.points, lines, response.polygons);
                         showFlashMessage(response.message, "success");
                         removeDrawInteractions();
