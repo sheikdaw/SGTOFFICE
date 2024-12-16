@@ -693,60 +693,53 @@ class AdminController extends Controller
             }
             File::makeDirectory($exportDir, 0755, true);
 
-            // Generate Excel files for each road name
+            $exportCount = 0;
             foreach ($misRoadNames as $misRoadName) {
                 // Filter variations
                 $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
                 $filteredArea = array_filter($areaVariation, fn($item) => $item->road_name === $misRoadName);
 
                 if (!empty($filteredUsage) || !empty($filteredArea)) {
-                    $fileName = "{$misRoadName}_UsageAreaVariation.xlsx";
-                    $filePath = "{$exportDir}/{$fileName}";
-                    Excel::store(new UsageAreaVariationExport($filteredUsage, $filteredArea, $misRoadName), $filePath, 'local');
+                    $filePath = "exports/{$misRoadName}_UsageAreaVariation.xlsx";
+                    Excel::store(new UsageAreaVariationExport($filteredUsage, $filteredArea, $misRoadName), $filePath, 'public');
+                    $exportCount++;
                 }
             }
 
-            // Verify that Excel files were created
-            $files = File::files($exportDir);
-            if (empty($files)) {
-                return response()->json(['error' => 'No files were generated for export'], 500);
+            // Create zip file
+            $zipFileName = "exports_{$id}.zip";
+            $zipFilePath = public_path($zipFileName);
+
+            $zip = new ZipArchive();
+            if ($zip->open($zipFilePath, ZipArchive::CREATE) === TRUE) {
+                // Add the entire export directory to the zip
+                $this->addFolderToZip($exportDir, $zip);
+                $zip->close();
+            } else {
+                return response()->json(['error' => 'Failed to create zip file'], 500);
             }
 
-            // Create ZIP file
-            $zipFileName = 'UsageAreaVariations.zip';
-            $zipFilePath = storage_path("app/public/{$zipFileName}");
-            $zip = new ZipArchive;
-
-            if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-                Log::error("Failed to open ZIP file at: {$zipFilePath}");
-                return response()->json(['error' => 'Unable to create ZIP file'], 500);
-            }
-
-            foreach ($files as $file) {
-                $realPath = $file->getRealPath();
-                $filename = $file->getFilename();
-
-                if (!$zip->addFile($realPath, $filename)) {
-                    Log::error("Failed to add file to ZIP: {$filename}");
-                }
-            }
-
-            if (!$zip->close()) {
-                Log::error("Failed to finalize the ZIP file at: {$zipFilePath}");
-                return response()->json(['error' => 'Failed to create ZIP file'], 500);
-            }
-
-            // Confirm ZIP file exists
-            if (!File::exists($zipFilePath)) {
-                Log::error("ZIP file not found at: {$zipFilePath}");
-                return response()->json(['error' => 'ZIP file could not be created'], 500);
-            }
-
-            // Return the ZIP file as a downloadable response
-            return response()->download($zipFilePath)->deleteFileAfterSend();
+            // Return the zip file for download
+            return response()->download($zipFilePath)->deleteFileAfterSend(true);
         } catch (\Exception $e) {
             Log::error("Error exporting usage and area variations: " . $e->getMessage());
             return response()->json(['error' => 'An error occurred during export.'], 500);
+        }
+    }
+    private function addFolderToZip($folderPath, $zip, $parentFolder = '')
+    {
+        // Get all files and subdirectories
+        $files = File::files($folderPath);
+        $directories = File::directories($folderPath);
+
+        // Add files to the zip
+        foreach ($files as $file) {
+            $zip->addFile($file, $parentFolder . '/' . basename($file));
+        }
+
+        // Recursively add directories
+        foreach ($directories as $directory) {
+            $this->addFolderToZip($directory, $zip, $parentFolder . '/' . basename($directory));
         }
     }
 }
