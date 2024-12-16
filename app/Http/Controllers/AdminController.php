@@ -697,8 +697,8 @@ class AdminController extends Controller
 
             foreach ($misRoadNames as $misRoadName) {
                 // Filter variations
-                $filteredUsage = array_filter($usageVariation, fn($item) => $item['road_name'] === $misRoadName);
-                $filteredArea = array_filter($areaVariation, fn($item) => $item['road_name'] === $misRoadName);
+                $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
+                $filteredArea = array_filter($areaVariation, fn($item) => $item->road_name === $misRoadName);
 
                 if (!empty($filteredUsage) || !empty($filteredArea)) {
                     $filePath = "exports/{$misRoadName}_UsageAreaVariation.xlsx";
