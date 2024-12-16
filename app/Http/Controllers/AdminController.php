@@ -707,40 +707,42 @@ class AdminController extends Controller
                 }
             }
 
-            return $this->zipFolder($exportDir, $exportDirZip);
+
+            $zip = new ZipArchive;
+            $zipFileName = 'exports.zip';
+            $zipFilePath = storage_path("app/public/{$zipFileName}");
+
+            if (file_exists($zipFilePath)) {
+                unlink($zipFilePath); // Delete existing zip file if it exists
+            }
+
+            if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+                $exportPath = storage_path('app/public/exports');
+                $files = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($exportPath),
+                    \RecursiveIteratorIterator::LEAVES_ONLY
+                );
+
+                foreach ($files as $file) {
+                    if (!$file->isDir()) {
+                        $zip->addFile($file->getRealPath(), 'exports/' . substr($file->getRealPath(), strlen($exportPath) + 1));
+                    }
+                }
+
+                $zip->close();
+
+                // Clean up the exported files
+                foreach (File::allFiles($exportPath) as $file) {
+                    File::delete($file);
+                }
+
+                return response()->download($zipFilePath)->deleteFileAfterSend(true);
+            } else {
+                return response()->json(['error' => 'Could not create zip file'], 500);
+            }
         } catch (\Exception $e) {
             Log::error("Error exporting usage and area variations: " . $e->getMessage());
             return response()->json(['error' => 'An error occurred during export.'], 500);
-        }
-    }
-    private function zipFolder($folderPath, $zipFilePath)
-    {
-        // Ensure the folder exists
-        if (!File::exists($folderPath)) {
-            return response()->json(['error' => 'Folder to zip does not exist.'], 400);
-        }
-
-        // Ensure no existing ZIP file conflicts
-        if (File::exists($zipFilePath)) {
-            File::delete($zipFilePath);
-        }
-
-        $zip = new \ZipArchive();
-        $result = $zip->open($zipFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-
-        if ($result === true) {
-            $files = File::allFiles($folderPath);
-
-            foreach ($files as $file) {
-                $relativePath = $file->getRelativePathname();
-                $zip->addFile($file->getRealPath(), $relativePath);
-            }
-
-            $zip->close();
-
-            return response()->download($zipFilePath)->deleteFileAfterSend(true);
-        } else {
-            return response()->json(['error' => 'Unable to create zip file. Error code: ' . $result], 500);
         }
     }
 }
