@@ -221,8 +221,8 @@ class SurveyorController extends Controller
             'owner_name' => 'required',
             'present_owner_name' => 'required',
             'old_door_no' => 'required',
-            'new_door_no' => 'required',
-            'water_tax' => 'required',
+            'new_door_no' => 'nullable',
+            'water_tax' => 'nullable',
             'remarks' => 'nullable',
         ];
 

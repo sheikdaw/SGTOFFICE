@@ -370,7 +370,7 @@
                             </select>
                             <div id="bill_usage_error" class=" error-message"></div>
                         </div>
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label for="eb">Eb_number</label>
                             <input type="text" name="eb" class="form-control" id="eb">
                             <div id="eb_error" class=" error-message"></div>
@@ -379,7 +379,7 @@
                             <label for="water_tax">water_tax</label>
                             <input type="text" name="water_tax" class="form-control" id="water_tax">
                             <div id="water_tax_error" class=" error-message"></div>
-                        </div>
+                        </div> --}}
 
                         <div class="form-group">
                             <label for="phone">phone_numnber</label>
