@@ -715,23 +715,32 @@ class AdminController extends Controller
     }
     private function zipFolder($folderPath, $zipFilePath)
     {
-        $zip = new \ZipArchive();
+        // Ensure the folder exists
+        if (!File::exists($folderPath)) {
+            return response()->json(['error' => 'Folder to zip does not exist.'], 400);
+        }
 
-        // Create or overwrite the zip file
-        if ($zip->open($zipFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
-            $files = File::allFiles($folderPath); // Get all files from the folder
+        // Ensure no existing ZIP file conflicts
+        if (File::exists($zipFilePath)) {
+            File::delete($zipFilePath);
+        }
+
+        $zip = new \ZipArchive();
+        $result = $zip->open($zipFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+
+        if ($result === true) {
+            $files = File::allFiles($folderPath);
 
             foreach ($files as $file) {
-                // Add each file to the zip archive
-                $relativePath = $file->getRelativePathname(); // Preserve folder structure
+                $relativePath = $file->getRelativePathname();
                 $zip->addFile($file->getRealPath(), $relativePath);
             }
 
             $zip->close();
 
-            return response()->download($zipFilePath)->deleteFileAfterSend(true); // Optional: download and delete
+            return response()->download($zipFilePath)->deleteFileAfterSend(true);
         } else {
-            return response()->json(['error' => 'Unable to create zip file'], 500);
+            return response()->json(['error' => 'Unable to create zip file. Error code: ' . $result], 500);
         }
     }
 }
