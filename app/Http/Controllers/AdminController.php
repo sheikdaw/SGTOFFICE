@@ -745,4 +745,121 @@ class AdminController extends Controller
             return response()->json(['error' => 'An error occurred during export.'], 500);
         }
     }
+
+
+    public function polygonDownload($id)
+    {
+        $data = Data::findOrFail($id);
+
+        $corporation = $data->corporation_name;
+        $zone = $data->zone;
+        $ward = $data->ward;
+
+        $tablePrefix = "{$corporation}_{$zone}_{$ward}_";
+
+        // Fetch polygons from the database
+        $polygons = DB::table($tablePrefix . 'polygons')->get();
+
+        // Convert polygons to GeoJSON features
+        $features = $polygons->map(function ($polygon) {
+            $coordinates = json_decode($polygon->coordinates, true);
+
+            if (!$coordinates) {
+                return null; // Skip invalid polygons
+            }
+
+            return [
+                'type' => 'Feature',
+                'properties' => [
+                    'OBJECTID' => $polygon->id,
+                    'GIS_ID' => $polygon->gisid,
+                ],
+                'geometry' => [
+                    'type' => 'Polygon',
+                    'coordinates' => $coordinates,
+                ],
+            ];
+        })->filter(); // Remove null entries
+
+        // Prepare GeoJSON structure
+        $geojson = [
+            'type' => 'FeatureCollection',
+            'name' => 'qGISGEOJSON',
+            'crs' => [
+                'type' => 'name',
+                'properties' => [
+                    'name' => 'urn:ogc:def:crs:EPSG::3857',
+                ],
+            ],
+            'features' => $features,
+        ];
+
+        $headers = [
+            'Content-Type' => 'application/geo+json',
+            'Content-Disposition' => 'attachment; filename="' . $tablePrefix . 'polygons.geojson"',
+        ];
+
+        return response()->json($geojson, 200, $headers);
+    }
+
+    public function pointDownload($id)
+    {
+        $data = Data::findOrFail($id);
+
+        $corporation = $data->corporation_name;
+        $zone = $data->zone;
+        $ward = $data->ward;
+
+        $tablePrefix = "{$corporation}_{$zone}_{$ward}_";
+
+        // Fetch points and their associated pointdata in a single query
+        $points = DB::table($tablePrefix . 'points')->get();
+        $pointdataAll = DB::table($tablePrefix . 'pointdata')->get()->groupBy('point_gisid');
+
+        // Convert points to GeoJSON features
+        $features = $points->flatMap(function ($point) use ($pointdataAll) {
+            $coordinates = json_decode($point->coordinates, true);
+
+            if (!$coordinates) {
+                return []; // Skip invalid points
+            }
+
+            $pointdataList = $pointdataAll->get($point->gisid, collect());
+
+            return $pointdataList->map(function ($pointdata) use ($point, $coordinates) {
+                $properties = (array) $pointdata;
+                $properties['OBJECTID'] = $point->id;
+                $properties['GIS_ID'] = $point->gisid;
+
+                return [
+                    'type' => 'Feature',
+                    'properties' => $properties,
+                    'geometry' => [
+                        'type' => 'Point',
+                        'coordinates' => $coordinates,
+                    ],
+                ];
+            });
+        });
+
+        // Prepare GeoJSON structure
+        $geojson = [
+            'type' => 'FeatureCollection',
+            'name' => 'qGISGEOJSON',
+            'crs' => [
+                'type' => 'name',
+                'properties' => [
+                    'name' => 'urn:ogc:def:crs:EPSG::3857',
+                ],
+            ],
+            'features' => $features,
+        ];
+
+        $headers = [
+            'Content-Type' => 'application/geo+json',
+            'Content-Disposition' => 'attachment; filename="' . $tablePrefix . 'points.geojson"',
+        ];
+
+        return response()->json($geojson, 200, $headers);
+    }
 }
