@@ -400,18 +400,19 @@ class SurveyorController extends Controller
             return response()->json(['error' => 'Data not found.'], 404);
         }
 
-        $polygonData = DB::table($data->pointdata)->where('point_gisid', $request->gisid)->first();
-
-        if ($polygonData) {
+        $pointdata = DB::table($data->pointdata)->where('point_gisid', $request->gisid)->first();
+        if ($pointdata) {
             return response()->json([
                 'error' => 'Data found. Please contact the team.',
-                'name' => $polygonData->worker_name ?? 'N/A' // Ensures safe access if worker_name is missing
+                'name' => $pointdata->worker_name ?? 'N/A' // Ensures safe access if worker_name is missing
             ], 403); // Use 403 for forbidden action
         }
 
         // Perform deletion
         DB::table($data->point)->where('gisid', $request->gisid)->delete();
         DB::table($data->polygon)->where('gisid', $request->gisid)->delete();
+        DB::table($data->polygondata)->where('gisid', $request->gisid)->delete();
+
 
         // Fetch updated lists
         $polygons = DB::table($data->polygon)->get();

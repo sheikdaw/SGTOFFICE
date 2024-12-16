@@ -41,20 +41,15 @@ Route::middleware('admin')->group(function () {
     Route::get('and-area/variation/{id}', [AdminController::class, 'usageAndAreaVariation'])->name('admin.usageandarea.variation');
 
     Route::get('final/format/{id}', [AdminController::class, 'finalFormat'])->name('final.format');
-    Route::get('download/polygon/{id}', [AdminController::class, 'downloadPolygon'])->name('download.polygon');
-    Route::get('download/point/{id}', [AdminController::class, 'downloadPoint'])->name('download.point');
-    Route::get('download/lines/{id}', [AdminController::class, 'downloadLines'])->name('download.lines');
+    Route::get('/download-polygons/{id}', [AdminController::class, 'polygonDownload'])->name('admin.downloadPolygons');
+    Route::get('/download-points/{id}', [AdminController::class, 'pointDownload'])->name('admin.downloadPoints');
+    Route::get('/download-lines/{id}', [AdminController::class, 'roadDownload'])->name('admin.downloadLines');
+
     Route::get('surveyor/count/{id}', [AdminController::class, 'surveyorCount'])->name('surveyor.count');
 });
 Route::post('/processImage', [AdminController::class, 'processImage'])->name('process.image');
 
-Route::get('/download-polygons', function () {
-    $filePath = storage_path('app/drone_images/polygons.json');
-    return response()->download($filePath, 'polygons.json', [
-        'Content-Type' => 'application/json',
-        'Content-Disposition' => 'attachment; filename="polygons.json"',
-    ]);
-})->name('download.polygons');
+
 Route::middleware('surveyor')->group(function () {
     Route::get('/surveyor', [SurveyorController::class, 'dashboard'])->name('surveyor.dashboard');
     Route::post('pointdata-upload', [SurveyorController::class, 'uploadPointData'])->name('surveyor.pointdata-upload');

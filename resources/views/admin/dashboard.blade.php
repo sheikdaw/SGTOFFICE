@@ -42,12 +42,15 @@
                                     data-id="{{ $data['id'] }}">Usage and Area Variation</a>
                                 <a href="#" class="btn btn-warning btn-sm final-format"
                                     data-id="{{ $data['id'] }}">Final Format</a>
-                                <a href="#" class="btn btn-info btn-sm download-polygon"
-                                    data-id="{{ $data['id'] }}">Download Polygon</a>
-                                <a href="#" class="btn btn-light btn-sm download-point"
-                                    data-id="{{ $data['id'] }}">Download Point</a>
-                                <a href="#" class="btn btn-dark btn-sm download-lines"
-                                    data-id="{{ $data['id'] }}">Download Lines</a>
+                                <a href="{{ route('admin.downloadPolygons', ['id' => $data['id']]) }}"
+                                    class="btn btn-info btn-sm download-polygon" data-id="{{ $data['id'] }}">Download
+                                    Polygon</a>
+                                <a href="{{ route('admin.downloadPoints', ['id' => $data['id']]) }}"
+                                    class="btn btn-light btn-sm download-point" data-id="{{ $data['id'] }}">Download
+                                    Point</a>
+                                <a href="{{ route('admin.downloadLines', ['id' => $data['id']]) }}"
+                                    class="btn btn-dark btn-sm download-lines" data-id="{{ $data['id'] }}">Download
+                                    Lines</a>
                                 <a href="#" class="btn btn-danger btn-sm surveyor-count"
                                     data-id="{{ $data['id'] }}">Surveyor Count</a>
 
