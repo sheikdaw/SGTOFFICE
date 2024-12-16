@@ -686,6 +686,10 @@ class AdminController extends Controller
             $usageVariation = $this->usageVariations($data)->toArray();
             $misRoadNames = DB::table($data->mis)->pluck('road_name');
 
+            // Pre-index data for faster access
+            $usageByRoad = collect($usageVariation)->groupBy('road_name');
+            $areaByRoad = collect($areaVariation)->groupBy('road_name');
+
             // Setup export directory
             $exportDir = storage_path('app/public/exports');
             if (File::exists($exportDir)) {
@@ -695,15 +699,22 @@ class AdminController extends Controller
 
             $exportCount = 0;
             foreach ($misRoadNames as $misRoadName) {
-                // Filter variations
-                $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
-                $filteredArea = array_filter($areaVariation, fn($item) => $item->road_name === $misRoadName);
+                $filteredUsage = $usageByRoad[$misRoadName] ?? [];
+                $filteredArea = $areaByRoad[$misRoadName] ?? [];
 
                 if (!empty($filteredUsage) || !empty($filteredArea)) {
                     $filePath = "exports/{$misRoadName}_UsageAreaVariation.xlsx";
-                    Excel::store(new UsageAreaVariationExport($filteredUsage, $filteredArea, $misRoadName), $filePath, 'public');
+                    Excel::store(
+                        new UsageAreaVariationExport($filteredUsage, $filteredArea, $misRoadName),
+                        $filePath,
+                        'public'
+                    );
                     $exportCount++;
                 }
+            }
+
+            if ($exportCount === 0) {
+                return response()->json(['error' => 'No data to export'], 404);
             }
 
             // Create zip file
@@ -719,6 +730,9 @@ class AdminController extends Controller
                 return response()->json(['error' => 'Failed to create zip file'], 500);
             }
 
+            // Cleanup export directory
+            File::deleteDirectory($exportDir);
+
             // Return the zip file for download
             return response()->download($zipFilePath)->deleteFileAfterSend(true);
         } catch (\Exception $e) {
@@ -726,6 +740,7 @@ class AdminController extends Controller
             return response()->json(['error' => 'An error occurred during export.'], 500);
         }
     }
+
     private function addFolderToZip($folderPath, $zip, $parentFolder = '')
     {
         // Get all files and subdirectories
@@ -734,7 +749,8 @@ class AdminController extends Controller
 
         // Add files to the zip
         foreach ($files as $file) {
-            $zip->addFile($file, $parentFolder . '/' . basename($file));
+            $relativePath = $parentFolder . '/' . basename($file);
+            $zip->addFile($file, $relativePath);
         }
 
         // Recursively add directories
