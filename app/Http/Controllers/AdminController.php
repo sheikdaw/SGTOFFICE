@@ -862,4 +862,59 @@ class AdminController extends Controller
 
         return response()->json($geojson, 200, $headers);
     }
+    public function roadDownload($id)
+    {
+        $data = Data::findOrFail($id);
+
+        $corporation = $data->corporation_name;
+        $zone = $data->zone;
+        $ward = $data->ward;
+
+        $tablePrefix = "{$corporation}_{$zone}_{$ward}_";
+
+        // Fetch roads from the database
+        $roads = DB::table($tablePrefix . 'roads')->get();
+
+        // Convert roads to GeoJSON features
+        $features = $roads->map(function ($road) {
+            $coordinates = json_decode($road->coordinates, true);
+
+            if (!$coordinates) {
+                return null; // Skip invalid roads
+            }
+
+            return [
+                'type' => 'Feature',
+                'properties' => [
+                    'OBJECTID' => $road->id,
+                    'GIS_ID' => $road->gisid,
+                    'NAME' => $road->road_name ?? null, // Include additional properties
+                ],
+                'geometry' => [
+                    'type' => 'LineString',
+                    'coordinates' => $coordinates,
+                ],
+            ];
+        })->filter(); // Remove null entries
+
+        // Prepare GeoJSON structure
+        $geojson = [
+            'type' => 'FeatureCollection',
+            'name' => 'qGISGEOJSON',
+            'crs' => [
+                'type' => 'name',
+                'properties' => [
+                    'name' => 'urn:ogc:def:crs:EPSG::3857',
+                ],
+            ],
+            'features' => $features,
+        ];
+
+        $headers = [
+            'Content-Type' => 'application/geo+json',
+            'Content-Disposition' => 'attachment; filename="' . $tablePrefix . 'roads.geojson"',
+        ];
+
+        return response()->json($geojson, 200, $headers);
+    }
 }
