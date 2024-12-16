@@ -707,20 +707,20 @@ class AdminController extends Controller
             }
 
             // Create zip file
-            $zipFileName = "exports_{$id}.zip";
-            $zipFilePath = public_path($zipFileName);
+            // $zipFileName = "exports_{$id}.zip";
+            // $zipFilePath = public_path($zipFileName);
 
-            $zip = new ZipArchive();
-            if ($zip->open($zipFilePath, ZipArchive::CREATE) === TRUE) {
-                // Add the entire export directory to the zip
-                $this->addFolderToZip($exportDir, $zip);
-                $zip->close();
-            } else {
-                return response()->json(['error' => 'Failed to create zip file'], 500);
-            }
+            // $zip = new ZipArchive();
+            // if ($zip->open($zipFilePath, ZipArchive::CREATE) === TRUE) {
+            //     // Add the entire export directory to the zip
+            //     $this->addFolderToZip($exportDir, $zip);
+            //     $zip->close();
+            // } else {
+            //     return response()->json(['error' => 'Failed to create zip file'], 500);
+            // }
 
             // Return the zip file for download
-            return response()->download($zipFilePath)->deleteFileAfterSend(true);
+            // return response()->download($zipFilePath)->deleteFileAfterSend(true);
         } catch (\Exception $e) {
             Log::error("Error exporting usage and area variations: " . $e->getMessage());
             return response()->json(['error' => 'An error occurred during export.'], 500);
