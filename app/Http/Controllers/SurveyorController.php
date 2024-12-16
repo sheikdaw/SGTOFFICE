@@ -158,30 +158,28 @@ class SurveyorController extends Controller
             'created_at' => now(),
         ];
 
-
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imagePath = public_path('/corporation/' . $data->corporation_name . '/' . $data->zone . '/' . $data->ward . '/images/');
-            $imageName = $validatedData['gisid'] . '.png';
+            $imageName = $validatedData['gisid'] . '.' . $image->getClientOriginalExtension();
 
+            // Delete the existing image if it exists
             if ($polygonData && $polygonData->image && file_exists($imagePath . $polygonData->image)) {
                 unlink($imagePath . $polygonData->image);
             }
 
+            // Create the directory if it doesn't exist
             if (!file_exists($imagePath)) {
                 mkdir($imagePath, 0755, true);
             }
 
-            // Resize and save the image
-            $resizedImage = Image::make($image)
-                ->resize(1024, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                })
-                ->save($imagePath . $imageName, 90, 'png');
+            // Move the uploaded image to the target directory
+            $image->move($imagePath, $imageName);
 
+            // Save the relative path to the database
             $dataToSave['image'] = '/corporation/' . $data->corporation_name . '/' . $data->zone . '/' . $data->ward . '/images/' . $imageName;
         }
+
 
         if ($polygonData) {
             $polygonDataTable->where('gisid', $validatedData['gisid'])->update($dataToSave);
