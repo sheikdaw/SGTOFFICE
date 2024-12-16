@@ -4,7 +4,8 @@
     <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
         <div class="card" style="width: 500px;">
             <div class="card-header text-center">
-                <img src="{{ asset('img/ccmc.png') }}" alt="{{ __('') }}">
+                <img src="{{ asset('img/ccmc.png') }}" alt="CCMC Logo" class="img-fluid"
+                    style="max-width: 100%; height: auto; max-height: 150px;">
             </div>
             <div class="card-body">
                 <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
