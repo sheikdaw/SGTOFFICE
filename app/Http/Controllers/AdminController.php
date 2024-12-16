@@ -688,6 +688,7 @@ class AdminController extends Controller
 
             // Setup export directory
             $exportDir = storage_path('app/public/exports');
+            $exportDirZip = storage_path('app/public');
             if (File::exists($exportDir)) {
                 File::deleteDirectory($exportDir);
             }
@@ -706,40 +707,31 @@ class AdminController extends Controller
                 }
             }
 
-            // Create zip file
-            // $zipFileName = "exports_{$id}.zip";
-            // $zipFilePath = public_path($zipFileName);
-
-            // $zip = new ZipArchive();
-            // if ($zip->open($zipFilePath, ZipArchive::CREATE) === TRUE) {
-            //     // Add the entire export directory to the zip
-            //     $this->addFolderToZip($exportDir, $zip);
-            //     $zip->close();
-            // } else {
-            //     return response()->json(['error' => 'Failed to create zip file'], 500);
-            // }
-
-            // Return the zip file for download
-            // return response()->download($zipFilePath)->deleteFileAfterSend(true);
+            return $this->zipFolder($exportDir, $exportDirZip);
         } catch (\Exception $e) {
             Log::error("Error exporting usage and area variations: " . $e->getMessage());
             return response()->json(['error' => 'An error occurred during export.'], 500);
         }
     }
-    private function addFolderToZip($folderPath, $zip, $parentFolder = '')
+    private function zipFolder($folderPath, $zipFilePath)
     {
-        // Get all files and subdirectories
-        $files = File::files($folderPath);
-        $directories = File::directories($folderPath);
+        $zip = new \ZipArchive();
 
-        // Add files to the zip
-        foreach ($files as $file) {
-            $zip->addFile($file, $parentFolder . '/' . basename($file));
-        }
+        // Create or overwrite the zip file
+        if ($zip->open($zipFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
+            $files = File::allFiles($folderPath); // Get all files from the folder
 
-        // Recursively add directories
-        foreach ($directories as $directory) {
-            $this->addFolderToZip($directory, $zip, $parentFolder . '/' . basename($directory));
+            foreach ($files as $file) {
+                // Add each file to the zip archive
+                $relativePath = $file->getRelativePathname(); // Preserve folder structure
+                $zip->addFile($file->getRealPath(), $relativePath);
+            }
+
+            $zip->close();
+
+            return response()->download($zipFilePath)->deleteFileAfterSend(true); // Optional: download and delete
+        } else {
+            return response()->json(['error' => 'Unable to create zip file'], 500);
         }
     }
 }
