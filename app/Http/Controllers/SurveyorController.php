@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Laravel\Facades\Image;
+
 use Livewire\Livewire;
 
 class SurveyorController extends Controller
@@ -167,17 +168,36 @@ class SurveyorController extends Controller
             }
 
             if ($image->getSize() > 2 * 1024 * 1024) {
-                $img = Image::make($image)->resize(1024, 1024, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                });
-                $img->save($imagePath . $imageName);
+                // Resize the image using GD
+                $sourceImage = imagecreatefromstring(file_get_contents($image->getRealPath()));
+                $originalWidth = imagesx($sourceImage);
+                $originalHeight = imagesy($sourceImage);
+
+                // Resize maintaining aspect ratio
+                $maxDimension = 1024;
+                $scale = min($maxDimension / $originalWidth, $maxDimension / $originalHeight);
+
+                $newWidth = intval($originalWidth * $scale);
+                $newHeight = intval($originalHeight * $scale);
+
+                $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+                imagecopyresampled($resizedImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
+
+                // Save the resized image
+                if (!file_exists($imagePath)) {
+                    mkdir($imagePath, 0755, true);
+                }
+                imagepng($resizedImage, $imagePath . $imageName);
+
+                imagedestroy($sourceImage);
+                imagedestroy($resizedImage);
             } else {
                 $image->move($imagePath, $imageName);
             }
 
             $dataToSave['image'] = '/corporation/' . $data->corporation_name . '/' . $data->zone . '/' . $data->ward . '/images/' . $imageName;
         }
+
 
         if ($polygonData) {
             $polygonDataTable->where('gisid', $validatedData['gisid'])->update($dataToSave);
