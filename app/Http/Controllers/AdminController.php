@@ -36,7 +36,7 @@ class AdminController extends Controller
             'body' => 'This is a test email to verify the mail configuration in Laravel 11.'
         ];
 
-        Mail::to('recipient@example.com')->send(new TestEmail($details));
+        Mail::to('sheikdawood13579@gmail.com')->send(new TestEmail($details));
 
         return "Email Sent Successfully!";
     }
