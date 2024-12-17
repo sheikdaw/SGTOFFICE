@@ -913,7 +913,7 @@ $(document).ready(function () {
     function handleKeyup(inputField, key, targetField) {
         $(inputField).keyup(function () {
             var inputValue = $(this).val().toLowerCase();
-            console.log(inputValue);
+            // console.log(inputValue);
             var matchingData = mis.filter(function (row) {
                 return (row[key] || "").toLowerCase() === inputValue;
             });

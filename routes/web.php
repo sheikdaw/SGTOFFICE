@@ -7,7 +7,7 @@ use App\Http\Controllers\SurveyorController;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 
-
+Route::get('/send-test-email', [AdminController::class, 'sendTestEmail']);
 
 Route::middleware('guest:admin,surveyor,cbe,taxcollector')->group(function () {
     // Show login form (GET)

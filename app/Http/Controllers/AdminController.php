@@ -24,9 +24,23 @@ use App\Imports\MISImport;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use ZipArchive;
+use App\Mail\TestEmail;
+use Illuminate\Support\Facades\Mail;
 
 class AdminController extends Controller
 {
+    public function sendTestEmail()
+    {
+        $details = [
+            'title' => 'Test Email from SGT Property Survey',
+            'body' => 'This is a test email to verify the mail configuration in Laravel 11.'
+        ];
+
+        Mail::to('recipient@example.com')->send(new TestEmail($details));
+
+        return "Email Sent Successfully!";
+    }
+
     public function dashboard()
     {
         $corporations = CBE::all(); // Fetch all corporations
