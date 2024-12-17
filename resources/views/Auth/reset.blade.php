@@ -55,7 +55,7 @@
                     data: $(this).serialize(),
                     success: function(response) {
                         // Handle success (redirect or show success message)
-                        alert(response.message); // Optionally, display a success message
+                        console(response); // Optionally, display a success message
                         window.location.href = "{{ route('login') }}"; // Redirect to login page
                     },
                     error: function(xhr) {
