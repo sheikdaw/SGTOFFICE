@@ -38,7 +38,7 @@ class forgetMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'email.forget',
+            view: 'emails.forget',
             with: ['mailData' => $this->mailData], // Pass mailData to the view
         );
     }
