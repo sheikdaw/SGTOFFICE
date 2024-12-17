@@ -113,7 +113,7 @@ class AuthController extends Controller
     private function sendResetEmail($user)
     {
         // Generate a password reset token
-        $user->password_reset_token = Str::random(60);
+        $user->password_reset_token = Str::random(6);
         $user->save();
 
         // Send email with the reset token
