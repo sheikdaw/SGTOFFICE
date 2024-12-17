@@ -125,7 +125,7 @@ class AuthController extends Controller
     }
     public function showResetForm($token)
     {
-        return view('auth.reset', ['token' => $token]);
+        return view('Auth.reset', ['token' => $token]);
     }
 
     // Handle the password reset
