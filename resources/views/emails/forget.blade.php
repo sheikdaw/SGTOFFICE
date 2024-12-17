@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>ItsolutionStuff.com</title>
+    <title>SGT DOLUTIONS</title>
 </head>
 
 <body>

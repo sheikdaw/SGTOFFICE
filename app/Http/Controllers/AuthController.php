@@ -93,11 +93,11 @@ class AuthController extends Controller
 
         // If any user type is found, proceed with sending the reset email
         if ($surveyor) {
-            $mailData = [
-                'title' => 'Mail from ItSolutionStuff.com',
-                'body' => 'This is for testing email using SMTP.'
-            ];
-            Mail::to($surveyor->email)->send(new forgetMail($mailData)); // Updated this line
+            // $mailData = [
+            //     'title' => 'Mail from ItSolutionStuff.com',
+            //     'body' => 'This is for testing email using SMTP.'
+            // ];
+            // Mail::to($surveyor->email)->send(new forgetMail($mailData)); // Updated this line
             return $this->sendResetEmail($surveyor);
         } elseif ($cbe) {
             return $this->sendResetEmail($cbe);
