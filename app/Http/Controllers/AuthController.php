@@ -82,7 +82,6 @@ class AuthController extends Controller
     }
     public function forgetEmail(Request $request)
     {
-        // Validate the email input
         $request->validate([
             'email' => 'required|email',
         ]);
