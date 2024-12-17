@@ -9,7 +9,9 @@ use Illuminate\Support\Str;
 use App\Models\Surveyor;
 use App\Models\CBE;
 use App\Models\TaxCollector;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -80,51 +82,87 @@ class AuthController extends Controller
     {
         return view('Auth.forget');
     }
+
     public function forgetEmail(Request $request)
     {
+        // Validate the email input
         $request->validate([
             'email' => 'required|email',
         ]);
 
-        // Check the user types
-        $surveyor = Surveyor::where('email', $request->email)->first();
-        $cbe = CBE::where('email', $request->email)->first();
-        $taxCollector = TaxCollector::where('email', $request->email)->first();
+        // Check if email exists in any user type
+        $user = Surveyor::where('email', $request->email)->first() ??
+            CBE::where('email', $request->email)->first() ??
+            TaxCollector::where('email', $request->email)->first();
 
-        // If any user type is found, proceed with sending the reset email
-        if ($surveyor) {
-            // $mailData = [
-            //     'title' => 'Mail from ItSolutionStuff.com',
-            //     'body' => 'This is for testing email using SMTP.'
-            // ];
-            // Mail::to($surveyor->email)->send(new forgetMail($mailData)); // Updated this line
-            return $this->sendResetEmail($surveyor);
-        } elseif ($cbe) {
-            return $this->sendResetEmail($cbe);
-        } elseif ($taxCollector) {
-            return $this->sendResetEmail($taxCollector);
+        if ($user) {
+            return $this->sendResetEmail($user);
         }
 
         // Return error if no user found
         return response()->json(['error' => 'Email not found'], 404);
     }
 
-
     private function sendResetEmail($user)
     {
         // Generate a password reset token
-        $user->password_reset_token = Str::random(6);
+        $user->password_reset_token = Str::random(40); // Generates a secure 40-character token
         $user->save();
 
-        // Send email with the reset token
+        // Prepare email data
         $resetLink = url('/password/reset/' . $user->password_reset_token);
         $subject = "Password Reset Request";
         $message = "Click here to reset your password: " . $resetLink;
 
-        // Use mail() to send the email (or replace with a more robust mailer)
-        mail($user->email, $subject, $message);
+        // Send email using Laravel's Mail facade
+        Mail::raw($message, function ($mail) use ($user, $subject) {
+            $mail->to($user->email)
+                ->subject($subject);
+        });
 
         // Return success response
-        return response()->json(['message' => 'Email sent']);
+        return response()->json(['message' => 'Reset email sent successfully.']);
+    }
+    public function showResetForm($token)
+    {
+        return view('auth.reset', ['token' => $token]);
+    }
+
+    // Handle the password reset
+    public function resetPassword(Request $request)
+    {
+        // Validate the input
+        $validator = Validator::make($request->all(), [
+            'token' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // Check if the user exists in any of the user types
+        $user = Surveyor::where('email', $request->email)
+            ->where('password_reset_token', $request->token)
+            ->first() ??
+            CBE::where('email', $request->email)
+            ->where('password_reset_token', $request->token)
+            ->first() ??
+            TaxCollector::where('email', $request->email)
+            ->where('password_reset_token', $request->token)
+            ->first();
+
+        if (!$user) {
+            return redirect()->back()->withErrors(['email' => 'Invalid email or token'])->withInput();
+        }
+
+        // Reset the password
+        $user->password = Hash::make($request->password);
+        $user->password_reset_token = null; // Clear the reset token
+        $user->save();
+
+        // Redirect with success message
+        return redirect()->route('login')->with('status', 'Password has been reset successfully!');
     }
 }

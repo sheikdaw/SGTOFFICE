@@ -18,6 +18,9 @@ Route::middleware('guest:admin,surveyor,cbe,taxcollector')->group(function () {
 
     Route::get('forget', [AuthController::class, 'forgetPassword'])->name("forget-password");
     Route::post('forget-Email', [AuthController::class, 'forgetEmail'])->name("forget-Email");
+
+    Route::get('/password/reset/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/password/reset', [AuthController::class, 'resetPassword'])->name('password.update');
 });
 
 
