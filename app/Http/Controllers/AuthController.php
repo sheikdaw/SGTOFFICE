@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\Models\Surveyor;
 use App\Models\CBE;
+use App\Models\password_reset_tokens;
 use App\Models\TaxCollector;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -108,7 +109,19 @@ class AuthController extends Controller
         $user->password_reset_token = Str::random(40); // Generates a secure 40-character token
         $user->save();
 
-        // Prepare email data
+        // Check if a password reset token already exists for the given email
+        $existingToken = password_reset_tokens::where('email', $user->email)->first();
+
+        if ($existingToken) {
+            // Update the existing token
+            $existingToken->update(['token' => $user->password_reset_token]);
+        } else {
+            // Create a new record for the token
+            password_reset_tokens::create([
+                'email' => $user->email,
+                'token' => $user->password_reset_token,
+            ]);
+        } // Prepare email data
         $resetLink = url('/password/reset/' . $user->password_reset_token);
         $subject = "Password Reset Request";
         $message = "Click here to reset your password: " . $resetLink;
@@ -142,21 +155,17 @@ class AuthController extends Controller
         }
 
         // Check if the user exists in any of the user types
-        $user = Surveyor::where('email', $request->email)
-            ->where('password_reset_token', $request->token)
-            ->first() ??
-            CBE::where('email', $request->email)
-            ->where('password_reset_token', $request->token)
-            ->first() ??
-            TaxCollector::where('email', $request->email)
-            ->where('password_reset_token', $request->token)
-            ->first();
+        $ecittoken = password_reset_tokens::where('email', $request->email)
+            ->where('token', $request->token)->first();
+        $user = Surveyor::where('email', $request->email)->first() ??
+            CBE::where('email', $request->email)->first() ??
+            TaxCollector::where('email', $request->email)->first();
 
         if (!$user) {
             return redirect()->back()->withErrors(['email' => 'Invalid email or token'])->withInput();
         }
         $user->password = Hash::make($request->password);
-        $user->password_reset_token = null;
+        // $user->password_reset_token = null;
         $user->save();
         return redirect()->route('login')->with('message', 'Password has been reset successfully!');
     }
