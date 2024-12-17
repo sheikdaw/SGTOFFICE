@@ -17,7 +17,6 @@ class AuthController extends Controller
 {
     protected $guards = ['admin', 'surveyor', 'cbe', 'taxcollector'];
 
-    // Show login form
     public function showLoginForm()
     {
         // $this->validateRules = [
@@ -156,13 +155,9 @@ class AuthController extends Controller
         if (!$user) {
             return redirect()->back()->withErrors(['email' => 'Invalid email or token'])->withInput();
         }
-
-        // Reset the password
         $user->password = Hash::make($request->password);
-        $user->password_reset_token = null; // Clear the reset token
+        $user->password_reset_token = null;
         $user->save();
-
-        // Redirect with success message
-        return redirect()->route('login')->with('status', 'Password has been reset successfully!');
+        return redirect()->route('login')->with('message', 'Password has been reset successfully!');
     }
 }
