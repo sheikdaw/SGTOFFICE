@@ -120,7 +120,7 @@ class AuthController extends Controller
         });
 
         // Return success response
-        return response()->json(['message' => 'Reset email sent successfully.']);
+        return response()->json(['message' => 'Reset email sent successfully.', 'data' => $user]);
     }
     public function showResetForm($token)
     {
