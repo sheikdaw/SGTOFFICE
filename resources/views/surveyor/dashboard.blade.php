@@ -319,7 +319,7 @@
                         </div>
                         <div id="suveyedbtn"></div>
 
-                        <div class="form-group">
+                        <div class="form-group d">
                             <label for="gis">Gis</label>
                             <input type="text" class="form-control" id="pointgis" name="point_gisid" readonly>
                             <div id="point_gisid_error" class=" error-message"></div>
