@@ -14,7 +14,7 @@ Route::middleware('guest:admin,surveyor,cbe,taxcollector')->group(function () {
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
 
     // Handle login form submission (POST)
-    Route::post('loginsubmit', [AuthController::class, 'submitLogin'])->name("submitLogin");
+    Route::post('login', [AuthController::class, 'submitLogin'])->name("submitLogin");
 
     Route::get('forget', [AuthController::class, 'forgetPassword'])->name("forget-password");
     Route::post('forget-Email', [AuthController::class, 'forgetEmail'])->name("forget-Email");
