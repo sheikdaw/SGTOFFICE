@@ -74,19 +74,47 @@ class SurveyorController extends Controller
     }
     public function uploadPolygonData(Request $request)
     {
-        $surveyor = auth()->guard('surveyor')->user();
-
+        $surveyor = $this->getAuthenticatedSurveyor();
         if (!$surveyor) {
-            return response()->json(['error' => 'Surveyor not authenticated.'], 401);
+            return $this->errorResponse('Surveyor not authenticated.', 401);
         }
 
         $data = Data::find($surveyor->data_id);
-
         if (!$data) {
-            return response()->json(['error' => 'Data not found.'], 404);
+            return $this->errorResponse('Data not found.', 404);
         }
 
-        $validator = Validator::make($request->all(), [
+        $validator = $this->validatePolygonData($request);
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors(),
+                'msg' => 'Please fill in all required fields correctly.'
+            ], 422);
+        }
+
+        $validatedData = $validator->validated();
+        $polygonDataTable = DB::table($data->polygondata);
+        $polygonData = $polygonDataTable->where('gisid', $validatedData['gisid'])->first();
+
+        $dataToSave = $this->prepareDataToSave($validatedData, $data, $surveyor->name);
+
+        if ($request->hasFile('image')) {
+            $dataToSave['image'] = $this->handleImageUpload($request, $validatedData, $data, $polygonData);
+        }
+
+        $message = $this->saveOrUpdatePolygonData($polygonDataTable, $polygonData, $validatedData, $dataToSave, $request->input('sqfeet'));
+
+        return $this->successResponse($message, $data);
+    }
+
+    private function getAuthenticatedSurveyor()
+    {
+        return auth()->guard('surveyor')->user();
+    }
+
+    private function validatePolygonData($request)
+    {
+        return Validator::make($request->all(), [
             'gisid' => 'required',
             'number_bill' => 'required',
             'number_shop' => 'required',
@@ -113,94 +141,67 @@ class SurveyorController extends Controller
             'water_connection' => 'required',
             'phone' => 'required',
             'remarks' => 'nullable',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif' // Max 2MB image file size
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif'
         ]);
+    }
 
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors(),
-                'msg' => 'Please fill in all required fields correctly.' // Flash message text
-            ], 422);
-        }
-
-        $validatedData = $validator->validated();
-        $polygonDataTable = DB::table($data->polygondata);
-        $polygonData = $polygonDataTable->where('gisid', $validatedData['gisid'])->first();
-
-        $dataToSave = [
+    private function prepareDataToSave($validatedData, $data, $surveyorName)
+    {
+        return array_merge($validatedData, [
             'data_id' => $data->id,
-            'number_bill' => $validatedData['number_bill'],
-            'number_shop' => $validatedData['number_shop'],
-            'number_floor' => $validatedData['number_floor'],
-            'liftroom' => $validatedData['liftroom'],
-            'headroom' => $validatedData['headroom'],
-            'overhead_tank' => $validatedData['overhead_tank'],
-            'percentage' => $validatedData['percentage'],
-            'new_address' => $validatedData['new_address'],
-            'building_name' => $validatedData['building_name'],
-            'building_usage' => $validatedData['building_usage'],
-            'construction_type' => $validatedData['construction_type'],
-            'road_name' => $validatedData['road_name'],
-            'ugd' => $validatedData['ugd'],
-            'rainwater_harvesting' => $validatedData['rainwater_harvesting'],
-            'parking' => $validatedData['parking'],
-            'ramp' => $validatedData['ramp'],
-            'hoarding' => $validatedData['hoarding'],
-            'cell_tower' => $validatedData['cell_tower'],
-            'solar_panel' => $validatedData['solar_panel'],
-            'water_connection' => $validatedData['water_connection'],
-            'phone' => $validatedData['phone'],
-            'cctv' => $validatedData['cctv'],
-            'basement' => $validatedData['basement'],
-            'building_type' => $validatedData['building_type'],
-            'worker_name' => $surveyor->name,
-            'remarks' => $validatedData['remarks'],
+            'worker_name' => $surveyorName,
             'created_at' => now(),
-        ];
+        ]);
+    }
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imagePath = public_path('/corporation/' . $data->corporation_name . '/' . $data->zone . '/' . $data->ward . '/images/');
-            $imageName = $validatedData['gisid'] . '.' . $image->getClientOriginalExtension();
+    private function handleImageUpload($request, $validatedData, $data, $polygonData)
+    {
+        $image = $request->file('image');
+        $imagePath = public_path("/corporation/{$data->corporation_name}/{$data->zone}/{$data->ward}/images/");
+        $imageName = $validatedData['gisid'] . '.' . $image->getClientOriginalExtension();
 
-            // Delete the existing image if it exists
-            if ($polygonData && $polygonData->image && file_exists($imagePath . $polygonData->image)) {
-                unlink($imagePath . $polygonData->image);
-            }
-
-            // Create the directory if it doesn't exist
-            if (!file_exists($imagePath)) {
-                mkdir($imagePath, 0755, true);
-            }
-
-            // Move the uploaded image to the target directory
-            $image->move($imagePath, $imageName);
-
-            // Save the relative path to the database
-            $dataToSave['image'] = '/corporation/' . $data->corporation_name . '/' . $data->zone . '/' . $data->ward . '/images/' . $imageName;
+        // Delete the existing image
+        if ($polygonData && $polygonData->image && file_exists($imagePath . $polygonData->image)) {
+            unlink($imagePath . $polygonData->image);
         }
 
+        // Ensure the directory exists
+        if (!file_exists($imagePath)) {
+            mkdir($imagePath, 0755, true);
+        }
 
+        $image->move($imagePath, $imageName);
+
+        return "/corporation/{$data->corporation_name}/{$data->zone}/{$data->ward}/images/{$imageName}";
+    }
+
+    private function saveOrUpdatePolygonData($polygonDataTable, $polygonData, $validatedData, $dataToSave, $sqfeet)
+    {
         if ($polygonData) {
             $polygonDataTable->where('gisid', $validatedData['gisid'])->update($dataToSave);
-            $message = 'Polygon data updated successfully.';
-        } else {
-            $polygonDataTable->insert(array_merge($dataToSave, ['gisid' => $validatedData['gisid'], 'sqfeet' => $request->input('sqfeet')]));
-            $message = 'Polygon data saved successfully.';
+            return 'Polygon data updated successfully.';
         }
 
-        $polygons = DB::table($data->polygon)->get();
-        $points = DB::table($data->points)->get();
-        $polygonDatas = DB::table($data->polygondata)->get();
+        $polygonDataTable->insert(array_merge($dataToSave, ['gisid' => $validatedData['gisid'], 'sqfeet' => $sqfeet]));
+        return 'Polygon data saved successfully.';
+    }
 
+    private function successResponse($message, $data)
+    {
         return response()->json([
             'success' => true,
             'message' => $message,
-            'polygon' => $polygons,
-            'point' => $points,
-            'polygonDatas' => $polygonDatas
+            'polygon' => DB::table($data->polygon)->get(),
+            'point' => DB::table($data->points)->get(),
+            'polygonDatas' => DB::table($data->polygondata)->get(),
         ]);
     }
+
+    private function errorResponse($message, $statusCode)
+    {
+        return response()->json(['error' => $message], $statusCode);
+    }
+
 
     public function uploadPointData(Request $request)
     {
