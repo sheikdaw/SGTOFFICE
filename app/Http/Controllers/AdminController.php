@@ -931,4 +931,38 @@ class AdminController extends Controller
 
         return response()->json($geojson, 200, $headers);
     }
+
+    public function finalData($id)
+    {
+        $data = Data::findOrFail($id);
+        $polygons = DB::table($data->polygon)->select('gisid', 'coordinates')->get();
+
+        $allDatas = DB::table("{$data->pointdata} as pd")
+            ->join("{$data->point} as poly", 'poly.gisid', '=', 'pd.point_gisid')
+            ->join("{$data->polygondata} as polyd", 'polyd.gisid', '=', 'pd.point_gisid')
+            ->join("{$data->mis} as mis", 'mis.assessment', '=', 'pd.assessment')
+            ->select(
+                'pd.point_gisid',
+                'poly.coordinates',
+                'polyd.basement',
+                'polyd.road_name',
+                'pd.assessment',
+                'pd.old_assessment',
+                'mis.building_usage as misusage',
+                'pd.bill_usage',
+                'pd.old_door_no',
+                'pd.new_door_no',
+                'pd.owner_name',
+                'pd.floor',
+                'pd.phone_number',
+                'mis.plot_area',
+                'mis.old_door_no as misdoorno',
+                'mis.halfyeartax',
+                'mis.balance',
+                'polyd.number_floor',
+                'polyd.percentage'
+            )
+            ->orderBy('mis.road_name')
+            ->get();
+    }
 }
