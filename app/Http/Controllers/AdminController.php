@@ -266,7 +266,7 @@ class AdminController extends Controller
                 DB::table($tablePrefix . 'points')->insert([
                     'gisid' => $feature['properties']['GIS_ID'] ?? null,
                     'type' => $feature['geometry']['type'] ?? null,
-                    'coordinates' => json_encode($feature['geometry']['coordinates'][0]),
+                    'coordinates' => json_encode($feature['geometry']['coordinates']),
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -297,7 +297,7 @@ class AdminController extends Controller
                 DB::table($tablePrefix . 'polygons')->insert([
                     'gisid' => $count++,
                     'type' => $feature['geometry']['type'] ?? null,
-                    'coordinates' => json_encode($feature['geometry']['coordinates']),
+                    'coordinates' => json_encode($feature['geometry']['coordinates'][0]),
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
