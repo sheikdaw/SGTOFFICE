@@ -977,8 +977,8 @@ $(document).ready(function () {
                     },
                     success: function (response) {
                         // Handle success response
-                        $points = response.points;
-                        $polygons = response.polygons;
+                        points = response.points;
+                        polygons = response.polygons;
                         refreshLayer(response.points, lines, response.polygons);
                         showFlashMessage(response.message, "success");
                         removeDrawInteractions();
