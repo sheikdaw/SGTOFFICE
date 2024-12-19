@@ -250,12 +250,12 @@ class AdminController extends Controller
         $file = $request->file('mis');
         $import = new MisImport($tablePrefix . 'mis');
 
-        try {
-            Excel::import($import, $file);
-        } catch (\Exception $e) {
-            Log::error('Import Error: ' . $e->getMessage());
-            return response()->json(['message' => 'Import failed'], 500);
-        }
+        // try {
+        //     Excel::import($import, $file);
+        // } catch (\Exception $e) {
+        //     Log::error('Import Error: ' . $e->getMessage());
+        //     return response()->json(['message' => 'Import failed'], 500);
+        // }
 
         // Handle Point File Upload
         if ($request->hasFile('point')) {
