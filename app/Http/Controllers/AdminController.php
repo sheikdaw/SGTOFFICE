@@ -85,7 +85,7 @@ class AdminController extends Controller
             'polygon' => 'required',
             'point' => 'required',
             'line' => 'required',
-            'mis' => 'required',
+            'mis' => 'required|file|mimes:xlsx,xls,csv',
             'extend-right' => 'required',
             'extend-left' => 'required',
             'extend-top' => 'required',
