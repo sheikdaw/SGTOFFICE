@@ -808,6 +808,8 @@ $(document).ready(function () {
                 if (response.success) {
                     showFlashMessage(response.message, "success");
                     polygonDatas = response.polygonDatas;
+                    polygons = response.polygon;
+                    points = response.point;
                     refreshLayer(response.point, lines, response.polygon);
                 }
                 // Re-enable the submit button after success
