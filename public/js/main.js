@@ -404,7 +404,7 @@ $(document).ready(function () {
         style: new ol.style.Style({
             image: new ol.style.Circle({
                 radius: 8,
-                fill: new ol.style.Fill({ color: "green" }), // Green fill for the circle
+                fill: new ol.style.Fill({ color: "yellow" }), // Green fill for the circle
                 stroke: new ol.style.Stroke({ color: "white", width: 2 }), // White border
             }),
         }),
