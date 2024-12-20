@@ -2,6 +2,11 @@
 
 @section('content')
     <!--<img src="{{ asset('public/' . $image) }}" width=100px;>-->
+    <div>
+        <input type="text" id="gisIdSearch" placeholder="Enter GIS ID" />
+        <button id="searchButton">Search</button>
+    </div>
+
     <label for="Polygon">Select added Feature:</label>
     <select id="addedFeature">
         <option value="none">Select an option</option>
