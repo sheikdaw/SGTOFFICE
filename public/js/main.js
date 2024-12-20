@@ -363,6 +363,7 @@ $(document).ready(function () {
 
     //surveyors dashboard
     // Ensure extent is parsed correctly as a JavaScript array of floats
+    // Parse the extent data into an array
     var extent = [
         parseFloat(extentData.left),
         parseFloat(extentData.bottom),
@@ -382,17 +383,18 @@ $(document).ready(function () {
             }),
             new ol.layer.Image({
                 source: new ol.source.ImageStatic({
-                    url: imagepath,
-                    imageExtent: extent, // Define extent of the image layer
+                    url: imagepath, // Path to the static image
+                    imageExtent: extent, // Define the extent of the image layer
                 }),
             }),
         ],
         view: new ol.View({
-            center: extentCenter,
+            center: extentCenter, // Center the map on the image
             projection: "EPSG:3857", // Use EPSG:3857 projection (Web Mercator)
-            zoom: 20, // Adjust zoom level as needed
+            zoom: 20, // Initial zoom level
         }),
     });
+
     // Create a new vector source for the user's location
     var userLocationSource = new ol.source.Vector();
 
@@ -402,8 +404,8 @@ $(document).ready(function () {
         style: new ol.style.Style({
             image: new ol.style.Circle({
                 radius: 8,
-                fill: new ol.style.Fill({ color: "green" }),
-                stroke: new ol.style.Stroke({ color: "white", width: 2 }),
+                fill: new ol.style.Fill({ color: "green" }), // Green fill for the circle
+                stroke: new ol.style.Stroke({ color: "white", width: 2 }), // White border
             }),
         }),
     });
@@ -440,11 +442,11 @@ $(document).ready(function () {
     // Use the Geolocation API to watch the user's position
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
-            updateUserLocation,
-            handleLocationError,
+            updateUserLocation, // Success callback
+            handleLocationError, // Error callback
             {
-                enableHighAccuracy: true,
-                maximumAge: 0,
+                enableHighAccuracy: true, // Enable high-accuracy GPS
+                maximumAge: 0, // No cached position
             }
         );
     } else {
