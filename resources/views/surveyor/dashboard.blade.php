@@ -2,13 +2,6 @@
 
 @section('content')
     <!--<img src="{{ asset('public/' . $image) }}" width=100px;>-->
-    <form id="gisForm">
-        <label for="pgisid">Enter GIS ID:</label>
-        <input type="text" id="pgisid" required />
-        <button type="submit">Find Distance</button>
-    </form>
-    <button id="cancelRoute">Clear Route</button>
-
     <label for="Polygon">Select added Feature:</label>
     <select id="addedFeature">
         <option value="none">Select an option</option>

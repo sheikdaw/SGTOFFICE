@@ -363,7 +363,6 @@ $(document).ready(function () {
 
     //surveyors dashboard
     // Ensure extent is parsed correctly as a JavaScript array of floats
-    // Existing extent and map initialization code
     var extent = [
         parseFloat(extentData.left),
         parseFloat(extentData.bottom),
@@ -376,7 +375,7 @@ $(document).ready(function () {
 
     // Initialize the OpenLayers map
     const map = new ol.Map({
-        target: "map",
+        target: "map", // Target the div with id 'map'
         layers: [
             new ol.layer.Tile({
                 source: new ol.source.OSM(), // OpenStreetMap base layer
@@ -390,136 +389,11 @@ $(document).ready(function () {
         ],
         view: new ol.View({
             center: extentCenter,
-            projection: "EPSG:3857",
-            zoom: 20,
+            projection: "EPSG:3857", // Use EPSG:3857 projection (Web Mercator)
+            zoom: 20, // Adjust zoom level as needed
         }),
     });
 
-    // Create vector sources and layers for live location and route
-    const liveLocationSource = new ol.source.Vector({ wrapX: false });
-    const liveLocationLayer = new ol.layer.Vector({
-        source: liveLocationSource,
-    });
-    map.addLayer(liveLocationLayer);
-
-    const routeSource = new ol.source.Vector({ wrapX: false });
-    const routeLayer = new ol.layer.Vector({ source: routeSource });
-    map.addLayer(routeLayer);
-
-    // Flag to track if zoom has been applied
-    let zoomApplied = false;
-
-    // Function to update live location
-    let liveLocationCoord = null;
-    function updateLiveLocation(position) {
-        liveLocationCoord = [
-            position.coords.longitude,
-            position.coords.latitude,
-        ];
-        const feature = new ol.Feature({
-            geometry: new ol.geom.Point(ol.proj.fromLonLat(liveLocationCoord)),
-        });
-
-        feature.setStyle(
-            new ol.style.Style({
-                image: new ol.style.Circle({
-                    radius: 10,
-                    fill: new ol.style.Fill({ color: "red" }),
-                    stroke: new ol.style.Stroke({ color: "#000", width: 2 }),
-                }),
-            })
-        );
-
-        liveLocationSource.clear();
-        liveLocationSource.addFeature(feature);
-
-        if (!zoomApplied) {
-            map.getView().setCenter(ol.proj.fromLonLat(liveLocationCoord));
-            map.getView().setZoom(18);
-            zoomApplied = true;
-        }
-    }
-
-    // Use the Geolocation API to watch the user's location
-    if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
-            updateLiveLocation,
-            (error) => {
-                console.error("Error getting location:", error);
-            },
-            {
-                enableHighAccuracy: true,
-                maximumAge: 10000,
-                timeout: 5000,
-            }
-        );
-    } else {
-        alert("Geolocation is not supported by your browser.");
-    }
-
-    // Function to calculate the distance between two coordinates
-    function calculateDistance(coord1, coord2) {
-        const point1 = ol.proj.fromLonLat(coord1);
-        const point2 = ol.proj.fromLonLat(coord2);
-        return ol.sphere.getDistance(point1, point2); // Distance in meters
-    }
-
-    // Example points (replace with actual GIS data)
-    const points = [
-        { gisid: 1, coordinates: JSON.stringify([77.5946, 12.9716]) }, // Example point
-    ];
-
-    // Handle form submission to find distance
-    document.getElementById("gisForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-        const gisid = document.getElementById("pgisid").value.trim();
-        const point = points.find(
-            (point) => Number(point.gisid) === Number(gisid)
-        );
-
-        if (liveLocationCoord === null) {
-            alert(
-                "Live location is not available. Please enable location services."
-            );
-            return;
-        }
-
-        if (point) {
-            const coords = JSON.parse(point.coordinates);
-            const pointCoords = ol.proj.fromLonLat(coords);
-
-            map.getView().setCenter(pointCoords);
-
-            const distance = calculateDistance(liveLocationCoord, coords);
-            alert(`Distance to GIS ID ${gisid}: ${distance.toFixed(2)} meters`);
-
-            const routeFeature = new ol.Feature({
-                geometry: new ol.geom.LineString([
-                    ol.proj.fromLonLat(liveLocationCoord),
-                    pointCoords,
-                ]),
-            });
-
-            routeFeature.setStyle(
-                new ol.style.Style({
-                    stroke: new ol.style.Stroke({ color: "blue", width: 3 }),
-                })
-            );
-
-            routeSource.clear();
-            routeSource.addFeature(routeFeature);
-        } else {
-            alert("GIS ID not found.");
-        }
-    });
-
-    // Handle cancel route button click
-    document
-        .getElementById("cancelRoute")
-        .addEventListener("click", function () {
-            routeSource.clear();
-            console.log("Route cleared");
-        });
     // Function to create point style
     function createPointStyle(feature) {
         var gisid = feature.get("gisid");
