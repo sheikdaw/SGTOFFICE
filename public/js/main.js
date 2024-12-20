@@ -889,47 +889,37 @@ $(document).ready(function () {
         });
     });
 
-    function updateFields(matchingData) {
-        if (matchingData.length > 0) {
-            $("#assessment").val(matchingData[0].assessment || "");
-            $("#old_assessment").val(matchingData[0].old_assessment || "");
-            $("#owner_name").val(matchingData[0].owner_name || "");
-            $("#old_door_no").val(matchingData[0].old_door_no || "");
-            $("#water_tax").val(matchingData[0].water_tax || "");
-            $("#new_door_no").val(matchingData[0].OLD_door_no || "");
-            $("#road_name").val(matchingData[0].road_name || "");
-        } else {
-            resetFields();
-        }
-    }
-
-    function resetFields() {
-        $("#assessment").val("");
-        $("#old_assessment").val("");
-        $("#owner_name").val("");
-        $("#old_door_no").val("");
-        $("#water_tax").val("");
-        $("#new_door_no").val("");
-        $("#road_name").val("");
-    }
-
-    function handleKeyup(inputField, key, targetField) {
-        $(inputField).keyup(function () {
-            var inputValue = $(this).val().toLowerCase();
-            // console.log(inputValue);
-            var matchingData = mis.filter(function (row) {
-                return (row[key] || "").toLowerCase() === inputValue;
-            });
-            if (targetField) {
-                $(targetField).val(matchingData[0]?.[key] || "");
-            }
-            updateFields(matchingData);
+    $("#assessment").keyup(function () {
+        var inputValue = $(this).val();
+        var matchingData = mis.filter(function (row) {
+            return row.assessment === inputValue;
         });
-    }
 
-    $(document).ready(function () {
-        handleKeyup("#assessment", "assessment");
-        handleKeyup("#old_assessment", "old_assessment");
+        if (matchingData.length > 0) {
+            $("#old_assessment").val(matchingData[0].old_assessment);
+            $("#owner_name").val(matchingData[0].owner_name);
+            $("#old_door_no").val(matchingData[0].old_door_no);
+            $("#water_tax").val(matchingData[0].water_tax);
+            $("#new_door_no").val(matchingData[0].OLD_door_no);
+            $("#road_name").val(matchingData[0].road_name);
+            $("#phone").val(matchingData[0].phone);
+        }
+    });
+    $("#old_assessment").keyup(function () {
+        var inputValue = $(this).val();
+        var matchingData = mis.filter(function (row) {
+            return row.old_assessment === inputValue;
+        });
+
+        if (matchingData.length > 0) {
+            $("#assessment").val(matchingData[0].assessment);
+            $("#owner_name").val(matchingData[0].owner_name);
+            $("#old_door_no").val(matchingData[0].old_door_no);
+            $("#water_tax").val(matchingData[0].water_tax);
+            $("#new_door_no").val(matchingData[0].OLD_door_no);
+            $("#road_name").val(matchingData[0].road_name);
+            $("#phone").val(matchingData[0].phone);
+        }
     });
 
     $("#addedFeature").change(function () {

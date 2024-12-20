@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Imports;
 
 use App\Models\Mis;
@@ -17,24 +18,33 @@ class MisImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
-        return (new Mis)->setTable($this->tableName)->fill([
-            'assessment' => $row['assessment'],
-            'old_assessment' => $row['old_assessment'],
-            'number_floor' => $row['number_floor'],
-            'new_address' => $row['new_address'],
-            'building_usage' => $row['building_usage'],
-            'construction_type' => $row['construction_type'],
-            'road_name' => $row['road_name'],
-            'phone' => $row['phone'],
-            'building_type' => $row['building_type'],
-            'ward' => $row['ward'],
-            'owner_name' => $row['owner_name'],
-            'old_door_no' => $row['old_door_no'],
-            'new_door_no' => $row['new_door_no'],
-            'plot_area' => $row['plot_area'],
-            'watertax' => $row['watertax'],
-            'halfyeartax' => $row['halfyeartax'],
-            'balance' => $row['balance'],
-        ]);
+        try {
+            $mis = new Mis();
+            $mis->setTable($this->tableName);
+
+            $mis->fill([
+                'assessment' => $row['assessment'] ?? null,
+                'old_assessment' => $row['old_assessment'] ?? null,
+                'number_floor' => $row['number_floor'] ?? null,
+                'new_address' => $row['new_address'] ?? null,
+                'building_usage' => $row['building_usage'] ?? null,
+                'construction_type' => $row['construction_type'] ?? null,
+                'road_name' => $row['road_name'] ?? null,
+                'phone' => $row['phone'] ?? null,
+                'building_type' => $row['building_type'] ?? null,
+                'ward' => $row['ward'] ?? null,
+                'owner_name' => $row['owner_name'] ?? null,
+                'old_door_no' => $row['old_door_no'] ?? null,
+                'new_door_no' => $row['new_door_no'] ?? null,
+                'plot_area' => $row['plot_area'] ?? null,
+                'watertax' => $row['watertax'] ?? null,
+                'halfyeartax' => $row['halfyeartax'] ?? null,
+                'balance' => $row['balance'] ?? null,
+            ]);
+
+            $mis->save();
+        } catch (\Exception $e) {
+            Log::error('Row Import Error: ' . $e->getMessage());
+        }
     }
 }
