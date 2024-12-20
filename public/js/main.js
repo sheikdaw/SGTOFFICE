@@ -495,49 +495,49 @@ $(document).ready(function () {
         const extent = foundFeature.getGeometry().getExtent();
         map.getView().fit(extent, { maxZoom: 18, duration: 1000 });
     }
-    $(document).ready(function () {
-        // Handle the search button click
-        $("#searchButton").click(function () {
-            const gisId = $("#gisIdSearch").val().trim(); // Get the entered GIS ID
 
-            if (!gisId) {
-                alert("Please enter a GIS ID."); // Alert if input is empty
-                return;
-            }
+    // Handle the search button click
+    $("#searchButton").click(function () {
+        alert("hi");
+        const gisId = $("#gisIdSearch").val().trim(); // Get the entered GIS ID
 
-            // Find the feature with the matching GIS ID
-            const features = vectorSource.getFeatures();
-            const foundFeature = features.find(
-                (feature) => feature.get("gisid") === gisId
-            );
+        if (!gisId) {
+            alert("Please enter a GIS ID."); // Alert if input is empty
+            return;
+        }
 
-            if (!foundFeature) {
-                alert(`No feature found with GIS ID: ${gisId}`); // Alert if no match is found
-                return;
-            }
+        // Find the feature with the matching GIS ID
+        const features = vectorSource.getFeatures();
+        const foundFeature = features.find(
+            (feature) => feature.get("gisid") === gisId
+        );
 
-            // Highlight the feature by applying a different style
-            const highlightStyle = new ol.style.Style({
-                image: new ol.style.Circle({
-                    radius: 10,
-                    fill: new ol.style.Fill({ color: "yellow" }),
-                    stroke: new ol.style.Stroke({ color: "black", width: 2 }),
-                }),
-                text: new ol.style.Text({
-                    text: gisId,
-                    scale: 1.5,
-                    offsetY: -20,
-                    fill: new ol.style.Fill({ color: "#000000" }),
-                    stroke: new ol.style.Stroke({ color: "#ffffff", width: 3 }),
-                }),
-            });
+        if (!foundFeature) {
+            alert(`No feature found with GIS ID: ${gisId}`); // Alert if no match is found
+            return;
+        }
 
-            foundFeature.setStyle(highlightStyle); // Apply the style to the feature
-
-            // Zoom and center the map on the feature
-            const extent = foundFeature.getGeometry().getExtent();
-            map.getView().fit(extent, { maxZoom: 18, duration: 1000 });
+        // Highlight the feature by applying a different style
+        const highlightStyle = new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 10,
+                fill: new ol.style.Fill({ color: "yellow" }),
+                stroke: new ol.style.Stroke({ color: "black", width: 2 }),
+            }),
+            text: new ol.style.Text({
+                text: gisId,
+                scale: 1.5,
+                offsetY: -20,
+                fill: new ol.style.Fill({ color: "#000000" }),
+                stroke: new ol.style.Stroke({ color: "#ffffff", width: 3 }),
+            }),
         });
+
+        foundFeature.setStyle(highlightStyle); // Apply the style to the feature
+
+        // Zoom and center the map on the feature
+        const extent = foundFeature.getGeometry().getExtent();
+        map.getView().fit(extent, { maxZoom: 18, duration: 1000 });
     });
 
     // Function to create point style
