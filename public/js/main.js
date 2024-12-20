@@ -393,152 +393,63 @@ $(document).ready(function () {
             zoom: 20, // Adjust zoom level as needed
         }),
     });
+    // Create a new vector source for the user's location
+    var userLocationSource = new ol.source.Vector();
 
-    // Create a vector source and layer for the live location
-    const liveLocationSource = new ol.source.Vector({
-        wrapX: false,
+    // Create a vector layer for the user's location
+    var userLocationLayer = new ol.layer.Vector({
+        source: userLocationSource,
+        style: new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 8,
+                fill: new ol.style.Fill({ color: "green" }),
+                stroke: new ol.style.Stroke({ color: "white", width: 2 }),
+            }),
+        }),
     });
-    const liveLocationLayer = new ol.layer.Vector({
-        source: liveLocationSource,
-    });
-    map.addLayer(liveLocationLayer); // Add live location layer to the map
 
-    // Create a vector source and layer for the route
-    const routeSource = new ol.source.Vector({
-        wrapX: false,
-    });
-    const routeLayer = new ol.layer.Vector({
-        source: routeSource,
-    });
-    map.addLayer(routeLayer); // Add route layer to the map
+    // Add the user location layer to the map
+    map.addLayer(userLocationLayer);
 
-    // Flag to track if zoom has been applied
-    let zoomApplied = false;
+    // Function to update the user's location on the map
+    function updateUserLocation(position) {
+        const { latitude, longitude } = position.coords;
 
-    // Function to update the live location
-    let liveLocationCoord = null;
-    function updateLiveLocation(position) {
-        liveLocationCoord = [
-            position.coords.longitude,
-            position.coords.latitude,
-        ];
-        const feature = new ol.Feature({
-            geometry: new ol.geom.Point(ol.proj.fromLonLat(liveLocationCoord)),
+        // Convert the latitude and longitude to map coordinates
+        const userCoordinates = ol.proj.fromLonLat([longitude, latitude]);
+
+        // Clear any existing features
+        userLocationSource.clear();
+
+        // Add a new feature for the user's current location
+        const userLocationFeature = new ol.Feature({
+            geometry: new ol.geom.Point(userCoordinates),
         });
+        userLocationSource.addFeature(userLocationFeature);
 
-        feature.setStyle(
-            new ol.style.Style({
-                image: new ol.style.Circle({
-                    radius: 10, // Adjust size as needed
-                    fill: new ol.style.Fill({
-                        color: "red", // Red color for live location
-                    }),
-                    stroke: new ol.style.Stroke({
-                        color: "#000", // Optional: stroke color
-                        width: 2,
-                    }),
-                }),
-            })
-        );
-
-        liveLocationSource.clear();
-        liveLocationSource.addFeature(feature);
-
-        // Zoom only once when live location is first updated
-        if (!zoomApplied) {
-            map.getView().setCenter(ol.proj.fromLonLat(liveLocationCoord));
-            map.getView().setZoom(18); // Adjust zoom level as needed
-            zoomApplied = true;
-        }
+        // Optionally, center the map on the user's location
+        map.getView().setCenter(userCoordinates);
+        map.getView().setZoom(15); // Adjust zoom level as needed
     }
 
-    // Use the Geolocation API to get the user's current location
+    // Function to handle errors while fetching location
+    function handleLocationError(error) {
+        console.error("Error fetching location:", error.message);
+    }
+
+    // Use the Geolocation API to watch the user's position
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
-            updateLiveLocation,
-            (error) => {
-                console.error("Error getting location:", error);
-            },
+            updateUserLocation,
+            handleLocationError,
             {
                 enableHighAccuracy: true,
-                maximumAge: 10000,
-                timeout: 5000,
+                maximumAge: 0,
             }
         );
     } else {
-        console.error("Geolocation is not supported by this browser.");
+        console.error("Geolocation API not supported by this browser.");
     }
-
-    // Function to calculate the distance between two coordinates
-    function calculateDistance(coord1, coord2) {
-        // Convert coordinates to the same projection
-        const point1 = ol.proj.fromLonLat(coord1);
-        const point2 = ol.proj.fromLonLat(coord2);
-        return ol.sphere.getDistance(point1, point2); // Distance in meters
-    }
-    $("#gisForm").submit(function (e) {
-        e.preventDefault();
-        console.log(points);
-        const gisid = $("#pgisid").val(); // Ensure no extra spaces
-        const point = points.find((point) => Number(point.gisid) == gisid);
-        console.log(point);
-        console.log(gisid);
-        if (liveLocationCoord === null) {
-            alert(
-                "Live location is not available. Please enable location services."
-            );
-            return;
-        }
-
-        if (point) {
-            // Parse the coordinates from the point data
-            const coords = JSON.parse(point.coordinates);
-            const pointCoord = ol.proj.toLonLat(coords);
-
-            const pointCoords = ol.proj.fromLonLat(pointCoord); // Convert to map projection
-
-            // Set map view to the point's coordinates
-            map.getView().setCenter(pointCoords);
-            // map.getView().setZoom(20); // Adjust zoom level as needed
-
-            // Calculate distance from the live location to the point
-            const distance = calculateDistance(liveLocationCoord, pointCoord);
-            alert(
-                `Distance to the point with GIS ID ${gisid}: ${distance} meters`
-            );
-
-            // Create a LineString feature connecting the live location to the point
-            const routeFeature = new ol.Feature({
-                geometry: new ol.geom.LineString([
-                    ol.proj.fromLonLat(liveLocationCoord),
-                    pointCoords,
-                ]),
-            });
-
-            routeFeature.setStyle(
-                new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                        color: "blue", // Line color
-                        width: 3, // Line width
-                    }),
-                })
-            );
-
-            // Clear the previous route and add the new one
-            routeSource.clear();
-            routeSource.addFeature(routeFeature);
-        } else {
-            alert("GIS ID not found.");
-        }
-    });
-
-    // Handle cancel button click
-    $("#cancelRoute").click(function () {
-        // Clear the route layer
-        routeSource.clear();
-        // Optionally reset any other state or UI elements if needed
-        console.log("Route cleared");
-    });
 
     // Function to create point style
     function createPointStyle(feature) {
