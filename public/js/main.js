@@ -393,6 +393,63 @@ $(document).ready(function () {
             zoom: 20, // Adjust zoom level as needed
         }),
     });
+    // Create a new vector source for the user's location
+    var userLocationSource = new ol.source.Vector();
+
+    // Create a vector layer for the user's location
+    var userLocationLayer = new ol.layer.Vector({
+        source: userLocationSource,
+        style: new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 8,
+                fill: new ol.style.Fill({ color: "green" }),
+                stroke: new ol.style.Stroke({ color: "white", width: 2 }),
+            }),
+        }),
+    });
+
+    // Add the user location layer to the map
+    map.addLayer(userLocationLayer);
+
+    // Function to update the user's location on the map
+    function updateUserLocation(position) {
+        const { latitude, longitude } = position.coords;
+
+        // Convert the latitude and longitude to map coordinates
+        const userCoordinates = ol.proj.fromLonLat([longitude, latitude]);
+
+        // Clear any existing features
+        userLocationSource.clear();
+
+        // Add a new feature for the user's current location
+        const userLocationFeature = new ol.Feature({
+            geometry: new ol.geom.Point(userCoordinates),
+        });
+        userLocationSource.addFeature(userLocationFeature);
+
+        // Optionally, center the map on the user's location
+        map.getView().setCenter(userCoordinates);
+        map.getView().setZoom(15); // Adjust zoom level as needed
+    }
+
+    // Function to handle errors while fetching location
+    function handleLocationError(error) {
+        console.error("Error fetching location:", error.message);
+    }
+
+    // Use the Geolocation API to watch the user's position
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+            updateUserLocation,
+            handleLocationError,
+            {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+            }
+        );
+    } else {
+        console.error("Geolocation API not supported by this browser.");
+    }
 
     // Function to create point style
     function createPointStyle(feature) {
