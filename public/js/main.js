@@ -708,7 +708,7 @@ $(document).ready(function () {
                                     "/" +
                                     data.ward +
                                     "/images/" +
-                                    imagel;
+                                    image;
 
                                 // Set the image path
                                 $("#building_img").attr("src", imagePath);

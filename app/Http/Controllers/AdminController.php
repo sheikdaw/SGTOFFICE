@@ -255,7 +255,7 @@ class AdminController extends Controller
 
         try {
             Excel::import($import, $file);
-            return response()->json(['message' => 'Import successful'], 200);
+            // return response()->json(['message' => 'Import successful'], 200);
         } catch (\Exception $e) {
             Log::error('Import Error: ' . $e->getMessage());
             return response()->json(['message' => 'Import failed'], 500);
