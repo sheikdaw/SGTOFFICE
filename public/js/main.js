@@ -461,6 +461,11 @@ $(document).ready(function () {
             }),
         });
     }
+    function refreshStyles() {
+        vectorSource.getFeatures().forEach((feature) => {
+            feature.setStyle(determineStyle(feature)); // Reapply the style for each feature
+        });
+    }
 
     // Function to determine the style for features
     function determineStyle(feature) {
@@ -541,6 +546,7 @@ $(document).ready(function () {
         addFeatures(points, "Point");
         addFeatures(lines, "MultiLineString");
         addFeatures(polygons, "Polygon");
+        refreshStyles();
     }
 
     // Form submission handlers
