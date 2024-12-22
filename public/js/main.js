@@ -444,6 +444,8 @@ $(document).ready(function () {
     // Function to create point style
     function createPointStyle(feature) {
         var gisid = feature.get("gisid");
+        console.log("pointDatas is not an array:", pointDatas);
+
         var pointData = pointDatas.find((data) => data.point_gisid == gisid);
 
         return new ol.style.Style({
@@ -658,7 +660,6 @@ $(document).ready(function () {
                 showFlashMessage(response.message, "success");
                 $(".added").remove();
                 pointDatas = response.pointDatas;
-                console.log("pointDatas is not an array:", pointDatas);
 
                 $("#surveycount").text(response.pointCount);
                 // / polygons = response.polygon;
