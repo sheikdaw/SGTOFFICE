@@ -233,7 +233,6 @@ class SurveyorController extends Controller
         if ($request->type === "OLD") {
             $rules['assessment'] = 'required';
         }
-
         $validator = Validator::make($request->all(), $rules);
 
 
@@ -245,7 +244,16 @@ class SurveyorController extends Controller
             if (!$misDataExists) {
                 return response()->json(['msg' => 'Assessment not found in MIS table.'], 422);
             }
+            $pData = DB::table($data->pointdata)
+                ->where('assessment', $request->assessment)
+                ->first();
+            if ($pData) {
+                return response()->json([
+                    'msg' => "Assessment already entered. Contact {$pData->worker_name}"
+                ], 422);
+            }
         }
+
 
         $validatedData = $validator->validated();
 
