@@ -370,7 +370,7 @@ $(document).ready(function () {
         parseFloat(extentData.right),
         parseFloat(extentData.top),
     ];
-    pointDatas = pointDatas;
+    var pointDatas = pointDatas;
 
     // Calculate the center of the extent
     var extentCenter = ol.extent.getCenter(extent);
