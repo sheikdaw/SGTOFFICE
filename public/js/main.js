@@ -830,6 +830,7 @@ $(document).ready(function () {
                         document.getElementById("featureline").innerHTML =
                             content;
                         // var gisId = properties["gisid"];
+                        console.log(properties);
                         $("#linegisid").val(properties["gisid"]);
                         $("#lineModal").modal("show");
                     }
