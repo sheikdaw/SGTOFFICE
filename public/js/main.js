@@ -1056,35 +1056,37 @@ $(document).ready(function () {
                 });
             });
         } else if (value === "Line") {
-            removeDrawInteractions();
+            removeDrawInteractions(); // Remove existing interactions
 
-            // Add a new draw interaction for polygons
+            // Add a new draw interaction for LineString
             const draw = new ol.interaction.Draw({
                 source: new ol.source.Vector(),
-                type: "LineString",
+                type: "LineString", // Define the geometry type as LineString
             });
-            map.addInteraction(draw);
+            map.addInteraction(draw); // Add the interaction to the map
 
             draw.on("drawend", function (event) {
+                // Get the coordinates of the drawn line
                 const coordinates = event.feature
                     .getGeometry()
                     .getCoordinates();
                 console.log(coordinates);
 
+                // Send the line coordinates to the server using AJAX
                 $.ajax({
-                    url: routes.addLineFeature,
+                    url: routes.addLineFeature, // Ensure this route is defined in your backend
                     type: "POST",
                     headers: {
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
                             "content"
-                        ),
+                        ), // CSRF token for security
                     },
                     data: {
-                        type: value,
-                        coordinates: coordinates,
+                        type: value, // Type of feature (LineString)
+                        coordinates: coordinates, // The drawn line coordinates
                     },
                     success: function (response) {
-                        // Handle success response
+                        // Handle success response from the server
                         points = response.points;
                         polygons = response.polygons;
                         lines = response.lines;
@@ -1093,27 +1095,24 @@ $(document).ready(function () {
                             response.lines,
                             response.polygons
                         );
-                        showFlashMessage(response.message, "success");
-                        removeDrawInteractions();
-                        $("#addedFeature").val("none");
+                        showFlashMessage(response.message, "success"); // Display success message
+                        removeDrawInteractions(); // Remove the drawing interaction after success
+                        $("#addedFeature").val("none"); // Reset the feature type field
                     },
                     error: function (xhr) {
-                        // Handle error response
+                        // Handle error response from the server
                         if (xhr.status === 401) {
-                            // Show the error message from the response
                             const errorMessage =
                                 xhr.responseJSON?.error ||
-                                "An unknown error occurred.";
-                            showFlashMessage(errorMessage, "error");
-                            removeDrawInteractions();
+                                "Unauthorized access.";
+                            showFlashMessage(errorMessage, "error"); // Display error message
                         } else {
-                            // Handle other types of errors (if needed)
                             showFlashMessage(
                                 "An error occurred. Please try again later.",
                                 "error"
-                            );
-                            removeDrawInteractions();
+                            ); // General error message
                         }
+                        removeDrawInteractions(); // Remove the drawing interaction in case of error
                     },
                 });
             });
