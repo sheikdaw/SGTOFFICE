@@ -443,38 +443,6 @@ $(document).ready(function () {
 
     // Function to create point style
     // Function to create point style
-    function createPointStyle(feature) {
-        var gisid = feature.get("gisid");
-        // Ensure `pointDatas` refers to the updated global data
-        var pointData = pointDatas.find((data) => data.point_gisid == gisid);
-        console.log("Feature GISID:", gisid);
-        console.log("Matched Point Data:", pointData);
-        return new ol.style.Style({
-            image: new ol.style.Circle({
-                radius: 7,
-                fill: new ol.style.Fill({
-                    color: pointData ? "red" : "blue", // Color based on data presence
-                }),
-                stroke: new ol.style.Stroke({
-                    color: "#ffffff",
-                    width: 1,
-                }),
-            }),
-            text: new ol.style.Text({
-                text: gisid || "",
-                scale: 1.2,
-                offsetY: -15,
-                fill: new ol.style.Fill({
-                    color: "#000000",
-                }),
-                stroke: new ol.style.Stroke({
-                    color: "#ffffff",
-                    width: 3,
-                }),
-            }),
-        });
-    }
-
     // Vector source for storing the features (points, lines, polygons)
     var vectorSource = new ol.source.Vector();
 
@@ -483,8 +451,8 @@ $(document).ready(function () {
         source: vectorSource,
         style: function (feature) {
             var type = feature.get("type");
-            console.log("Feature type:", type);
             var gisid = feature.get("gisid");
+
             if (type === "Polygon") {
                 var polygonData = polygonDatas.find(
                     (data) => data.gisid == gisid
@@ -501,7 +469,35 @@ $(document).ready(function () {
                     }),
                 });
             } else if (type === "Point") {
-                return createPointStyle(feature);
+                var pointData = pointDatas.find(
+                    (data) => data.point_gisid == gisid
+                );
+                console.log("Feature GISID:", gisid);
+                console.log("Matched Point Data:", pointData);
+                return new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 7,
+                        fill: new ol.style.Fill({
+                            color: pointData ? "red" : "blue", // Color based on data presence
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: "#ffffff",
+                            width: 1,
+                        }),
+                    }),
+                    text: new ol.style.Text({
+                        text: gisid || "",
+                        scale: 1.2,
+                        offsetY: -15,
+                        fill: new ol.style.Fill({
+                            color: "#000000",
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: "#ffffff",
+                            width: 3,
+                        }),
+                    }),
+                });
             } else if (type === "LineString" || type === "MultiLineString") {
                 return new ol.style.Style({
                     stroke: new ol.style.Stroke({
