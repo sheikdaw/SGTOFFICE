@@ -816,17 +816,7 @@ $(document).ready(function () {
                         );
                     }
 
-                    var content = "";
-                    for (var key in properties) {
-                        if (key !== "geometry") {
-                            content +=
-                                "<li><strong>" +
-                                key +
-                                ":</strong> " +
-                                properties[key] +
-                                "</li>";
-                        }
-                    }
+                    var content = properties["road_name"];
                     document.getElementById("featureline").innerHTML = content;
                     $("#lineModal").modal("show");
                 }
