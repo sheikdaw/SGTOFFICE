@@ -359,7 +359,7 @@ class SurveyorController extends Controller
         $lineData = [
             'gisid' => $newGisId,
             'coordinates' => json_encode($request->coordinates), // Store coordinates as JSON
-            'type' => 'LineString', // Correct type for line
+            'type' => 'MultiLineString', // Correct type for line
             'created_at' => now(),
             'updated_at' => now(),
         ];
