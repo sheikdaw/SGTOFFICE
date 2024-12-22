@@ -995,16 +995,24 @@ $(document).ready(function () {
             });
         }
 
-        // Hide all forms initially
-        $("#mergeForm, #delForm").addClass("d-none");
+        function handleAjaxError(xhr) {
+            if (xhr.status === 401) {
+                const errorMessage =
+                    xhr.responseJSON?.error || "An unknown error occurred.";
+                showFlashMessage(errorMessage, "error");
+            } else {
+                showFlashMessage(
+                    "An error occurred. Please try again later.",
+                    "error"
+                );
+            }
+        }
 
-        if (value === "Polygon") {
+        function addFeature(type, drawType, route) {
             removeDrawInteractions();
-
-            // Add a new draw interaction for polygons
             const draw = new ol.interaction.Draw({
                 source: new ol.source.Vector(),
-                type: "Polygon",
+                type: drawType,
             });
             map.addInteraction(draw);
 
@@ -1012,82 +1020,21 @@ $(document).ready(function () {
                 const coordinates = event.feature
                     .getGeometry()
                     .getCoordinates();
-                console.log(coordinates);
+                debugLog("Feature coordinates: ", coordinates);
 
                 $.ajax({
-                    url: routes.addPolygonFeature,
+                    url: route,
                     type: "POST",
                     headers: {
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
                             "content"
                         ),
                     },
-                    data: {
-                        type: value,
-                        coordinates: coordinates,
-                    },
+                    data: { type: type, coordinates: coordinates },
                     success: function (response) {
-                        // Handle success response
                         points = response.points;
                         polygons = response.polygons;
-                        refreshLayer(response.points, lines, response.polygons);
-                        showFlashMessage(response.message, "success");
-                        removeDrawInteractions();
-                        $("#addedFeature").val("none");
-                    },
-                    error: function (xhr) {
-                        // Handle error response
-                        if (xhr.status === 401) {
-                            // Show the error message from the response
-                            const errorMessage =
-                                xhr.responseJSON?.error ||
-                                "An unknown error occurred.";
-                            showFlashMessage(errorMessage, "error");
-                            removeDrawInteractions();
-                        } else {
-                            // Handle other types of errors (if needed)
-                            showFlashMessage(
-                                "An error occurred. Please try again later.",
-                                "error"
-                            );
-                            removeDrawInteractions();
-                        }
-                    },
-                });
-            });
-        } else if (value === "Line") {
-            removeDrawInteractions();
-
-            // Add a new draw interaction for polygons
-            const draw = new ol.interaction.Draw({
-                source: new ol.source.Vector(),
-                type: "LineString",
-            });
-            map.addInteraction(draw);
-
-            draw.on("drawend", function (event) {
-                const coordinates = event.feature
-                    .getGeometry()
-                    .getCoordinates();
-                console.log(coordinates);
-
-                $.ajax({
-                    url: routes.addLineFeature,
-                    type: "POST",
-                    headers: {
-                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                            "content"
-                        ),
-                    },
-                    data: {
-                        type: value,
-                        coordinates: coordinates,
-                    },
-                    success: function (response) {
-                        // Handle success response
-                        points = response.points;
-                        polygons = response.polygons;
-                        lines = response.lines;
+                        lines = response.lines || lines;
                         refreshLayer(
                             response.points,
                             response.lines,
@@ -1098,35 +1045,38 @@ $(document).ready(function () {
                         $("#addedFeature").val("none");
                     },
                     error: function (xhr) {
-                        // Handle error response
-                        if (xhr.status === 401) {
-                            // Show the error message from the response
-                            const errorMessage =
-                                xhr.responseJSON?.error ||
-                                "An unknown error occurred.";
-                            showFlashMessage(errorMessage, "error");
-                            removeDrawInteractions();
-                        } else {
-                            // Handle other types of errors (if needed)
-                            showFlashMessage(
-                                "An error occurred. Please try again later.",
-                                "error"
-                            );
-                            removeDrawInteractions();
-                        }
+                        handleAjaxError(xhr);
+                        removeDrawInteractions();
+                    },
+                    complete: function () {
+                        $("#addedFeature").prop("disabled", false);
                     },
                 });
             });
+        }
+
+        // Disable dropdown during request
+        $("#addedFeature").prop("disabled", true);
+
+        // Hide all forms initially
+        $(".feature-form").addClass("d-none");
+
+        if (value === "Polygon") {
+            addFeature("Polygon", "Polygon", routes.addPolygonFeature);
+        } else if (value === "Line") {
+            addFeature("Line", "LineString", routes.addLineFeature);
         } else if (value === "Merge") {
-            // Remove any draw interactions
             removeDrawInteractions();
             $("#mergeForm").removeClass("d-none");
         } else if (value === "Delete") {
+            removeDrawInteractions();
             $("#delForm").removeClass("d-none");
         } else {
             removeDrawInteractions();
+            $("#addedFeature").prop("disabled", false);
         }
     });
+
     $("#mergeForm").submit(function (e) {
         e.preventDefault();
         // Get values from form inputs

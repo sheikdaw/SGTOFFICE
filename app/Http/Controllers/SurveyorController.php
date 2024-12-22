@@ -343,23 +343,31 @@ class SurveyorController extends Controller
         if (!$surveyor) {
             return response()->json(['error' => 'Surveyor not authenticated.'], 401);
         }
+
         // Fetch the data record
         $data = Data::find($surveyor->data_id);
         if (!$data) {
             return response()->json(['error' => 'Data not found.'], 404);
         }
+
+        // Retrieve existing lines
         $Lines = DB::table($data->line)->get();
         $maxGisId = $Lines->max('gisid');
         $newGisId = $maxGisId ? $maxGisId + 1 : 1;
+
+        // Prepare line data
         $lineData = [
             'gisid' => $newGisId,
             'coordinates' => json_encode($request->coordinates), // Store coordinates as JSON
-            'type' => 'Polygon',
+            'type' => 'LineString', // Correct type for line
             'created_at' => now(),
             'updated_at' => now(),
         ];
+
+        // Insert the line into the database
         DB::table($data->line)->insert($lineData);
 
+        // Retrieve updated data for points, lines, and polygons
         $polygons = DB::table($data->polygon)->get();
         $points = DB::table($data->point)->get();
         $lines = DB::table($data->line)->get();
@@ -368,10 +376,10 @@ class SurveyorController extends Controller
             'message' => 'Feature added successfully.',
             'points' => $points,
             'lines' => $lines,
-
-            'polygons' => $polygons
+            'polygons' => $polygons,
         ], 200);
     }
+
     private function calculateDataMidpoint($coordinates)
     {
         $totalPoints = count($coordinates[0]);
