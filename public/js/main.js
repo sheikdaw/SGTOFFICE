@@ -1059,9 +1059,9 @@ $(document).ready(function () {
             removeDrawInteractions(); // Remove existing interactions
 
             // Add a new draw interaction for LineString
-            const draw = new ol.interaction.Draw({
+            var draw = new ol.interaction.Draw({
                 source: new ol.source.Vector(),
-                type: "LineString", // Define the geometry type as LineString
+                type: "LineString",
             });
             map.addInteraction(draw); // Add the interaction to the map
 
