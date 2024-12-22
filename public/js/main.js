@@ -871,10 +871,12 @@ $(document).ready(function () {
             success: function (response) {
                 if (response.success) {
                     showFlashMessage(response.message, "success");
+                    // polygonDatas = response.polygonDatas;
+                    // polygons = response.polygon;
+                    // points = response.point;
+                    // refreshLayer(response.point, lines, response.polygon);
                     polygonDatas = response.polygonDatas;
-                    polygons = response.polygon;
-                    points = response.point;
-                    refreshLayer(response.point, lines, response.polygon);
+                    refreshLayer(points, lines, response.polygon);
                 }
                 // Re-enable the submit button after success
                 $("#buildingsubmitBtn").prop("disabled", false);
@@ -925,12 +927,9 @@ $(document).ready(function () {
             success: function (response) {
                 showFlashMessage(response.message, "success");
                 $(".added").remove();
-                pointDatas = response.pointDatas;
-
                 $("#surveycount").text(response.pointCount);
-                points = response.points;
-
-                refreshLayer(response.points, lines, polygons); // Refresh layer
+                pointDatas = response.pointDatas;
+                refreshLayer(response.points, lines, polygons);
                 $("#pointSubmit").prop("disabled", false);
             },
             error: function (xhr, status, error) {
