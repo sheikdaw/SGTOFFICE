@@ -272,6 +272,7 @@ class SurveyorController extends Controller
             'worker_name' => $surveyor->name,
             'eb' => $validatedData['eb'],
             'old_assessment' => $validatedData['old_assessment'],
+            'assessment' => $validatedData['assessment'] ?? $request->type,
             'floor' => $validatedData['floor'],
             'bill_usage' => $validatedData['bill_usage'],
             'phone_number' => $validatedData['phone_number'],
@@ -280,7 +281,7 @@ class SurveyorController extends Controller
             'old_door_no' => $validatedData['old_door_no'],
             'new_door_no' => $validatedData['new_door_no'],
             'water_tax' => $validatedData['water_tax'],
-            'remarks' => $validatedData['remarks'],
+            'remarks' => $validatedData['remarks'] . ' ' . $request->type,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
