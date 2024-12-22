@@ -444,251 +444,165 @@ $(document).ready(function () {
     // Function to create point style
     function createPointStyle(feature) {
         var gisid = feature.get("gisid");
-        console.log("pointDatas is not an array:", pointDatas);
-
         var pointData = pointDatas.find((data) => data.point_gisid == gisid);
 
         return new ol.style.Style({
             image: new ol.style.Circle({
                 radius: 7,
-                fill: new ol.style.Fill({
-                    color: pointData ? "red" : "blue", // Updates based on presence in pointDatas
-                }),
-                stroke: new ol.style.Stroke({
-                    color: "#ffffff",
-                    width: 1,
-                }),
+                fill: new ol.style.Fill({ color: pointData ? "red" : "blue" }),
+                stroke: new ol.style.Stroke({ color: "#ffffff", width: 1 }),
             }),
             text: new ol.style.Text({
                 text: gisid || "",
                 scale: 1.2,
                 offsetY: -15,
-                fill: new ol.style.Fill({
-                    color: "#000000",
-                }),
-                stroke: new ol.style.Stroke({
-                    color: "#ffffff",
-                    width: 3,
-                }),
+                fill: new ol.style.Fill({ color: "#000000" }),
+                stroke: new ol.style.Stroke({ color: "#ffffff", width: 3 }),
             }),
         });
     }
 
-    // Vector source for storing the features (points, lines, polygons)
-    var vectorSource = new ol.source.Vector();
+    // Function to determine the style for features
+    function determineStyle(feature) {
+        var type = feature.get("type");
+        var gisid = feature.get("gisid");
 
-    // Vector layer to render the features on the map
+        if (type === "Polygon") {
+            var polygonData = polygonDatas.find((data) => data.gisid == gisid);
+            return new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: polygonData ? "red" : "blue",
+                    width: 4,
+                }),
+                fill: new ol.style.Fill({
+                    color: polygonData
+                        ? "rgba(255, 0, 0, 0.3)"
+                        : "rgba(0, 0, 255, 0.3)",
+                }),
+            });
+        } else if (type === "Point") {
+            return createPointStyle(feature);
+        } else if (type === "LineString" || type === "MultiLineString") {
+            return new ol.style.Style({
+                stroke: new ol.style.Stroke({ color: "yellow", width: 5 }),
+            });
+        }
+    }
+
+    // Vector source and layer setup
+    var vectorSource = new ol.source.Vector();
     var vectorLayer = new ol.layer.Vector({
         source: vectorSource,
-        style: function (feature) {
-            var type = feature.get("type");
-            console.log("Feature type:", type);
-            var gisid = feature.get("gisid");
-            if (type === "Polygon") {
-                var polygonData = polygonDatas.find(
-                    (data) => data.gisid == gisid
-                );
-                return new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                        color: polygonData ? "red" : "blue",
-                        width: 4,
-                    }),
-                    fill: new ol.style.Fill({
-                        color: polygonData
-                            ? "rgba(255, 0, 0, 0.3)"
-                            : "rgba(0, 0, 255, 0.3)", // Light red or light blue fill with 30% opacity
-                    }),
-                });
-            } else if (type === "Point") {
-                return createPointStyle(feature);
-            } else if (type === "LineString" || type === "MultiLineString") {
-                return new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                        color: "yellow",
-                        width: 5,
-                    }),
-                });
-            }
-        },
+        style: determineStyle,
     });
-
-    // Add the vector layer to the map
     map.addLayer(vectorLayer);
 
-    // Function to add features (points, lines, polygons) to the vector layer
+    // Function to add features
     function addFeatures(features, type) {
-        features.forEach(function (feature) {
-            // Parse coordinates if they are in string format
+        features.forEach((feature) => {
             var coords = Array.isArray(feature.coordinates)
                 ? feature.coordinates
                 : JSON.parse(feature.coordinates || "[]");
 
             if (type === "Polygon") {
-                coords.forEach(function (ring) {
-                    var coordsForFeature = ring.map((coord) => [
-                        coord[0],
-                        coord[1],
-                    ]);
-                    var olFeature = new ol.Feature({
-                        geometry: new ol.geom.Polygon([coordsForFeature]),
-                        type: "Polygon",
-                        gisid: feature.gisid,
-                        area: feature.area,
-                    });
-                    vectorSource.addFeature(olFeature);
-                });
+                coords.forEach((ring) =>
+                    vectorSource.addFeature(
+                        new ol.Feature({
+                            geometry: new ol.geom.Polygon([ring]),
+                            type,
+                            gisid: feature.gisid,
+                            area: feature.area,
+                        })
+                    )
+                );
             } else if (type === "Point") {
-                var coordsForFeature = Array.isArray(feature.coordinates)
-                    ? feature.coordinates
-                    : JSON.parse(feature.coordinates || "[]");
-                var olFeature = new ol.Feature({
-                    geometry: new ol.geom.Point(coordsForFeature),
-                    type: "Point",
-                    gisid: feature.gisid,
-                });
-                vectorSource.addFeature(olFeature);
+                vectorSource.addFeature(
+                    new ol.Feature({
+                        geometry: new ol.geom.Point(coords),
+                        type,
+                        gisid: feature.gisid,
+                    })
+                );
             } else if (type === "LineString" || type === "MultiLineString") {
-                var olFeature;
-                if (type === "LineString") {
-                    var coordsForFeature = coords.map((coord) => [
-                        coord[0],
-                        coord[1],
-                    ]);
-                    olFeature = new ol.Feature({
-                        geometry: new ol.geom.LineString(coordsForFeature),
-                        type: type,
-                        gisid: feature.gisid,
-                    });
-                } else if (type === "MultiLineString") {
-                    var geometries = coords.map(
-                        (lineCoords) => new ol.geom.LineString(lineCoords)
-                    );
-                    olFeature = new ol.Feature({
-                        geometry: new ol.geom.MultiLineString(geometries),
-                        type: type,
-                        gisid: feature.gisid,
-                    });
-                }
-                vectorSource.addFeature(olFeature);
+                var geometry =
+                    type === "LineString"
+                        ? new ol.geom.LineString(coords)
+                        : new ol.geom.MultiLineString(coords);
+                vectorSource.addFeature(
+                    new ol.Feature({ geometry, type, gisid: feature.gisid })
+                );
             }
         });
     }
 
-    // Function to refresh the vector layer with updated points, lines, and polygons
+    // Refresh layer with updated features
     function refreshLayer(points, lines, polygons) {
-        console.log(lines);
-        console.log(points);
-        vectorSource.clear(); // Clear existing features before adding new ones
+        vectorSource.clear();
         addFeatures(points, "Point");
-        addFeatures(lines, "MultiLineString"); // Ensure type matches your data
+        addFeatures(lines, "MultiLineString");
         addFeatures(polygons, "Polygon");
     }
 
-    // Refresh the layer with the data providedp
-    refreshLayer(points, lines, polygons);
-    $("#buildingForm").submit(function (e) {
-        e.preventDefault();
-        $(".error-message").text("");
-        $("input").removeClass("is-invalid");
-        $("select").removeClass("is-invalid");
+    // Form submission handlers
+    function handleFormSubmit(formId, url, callback) {
+        $(formId).submit(function (e) {
+            e.preventDefault();
+            $(".error-message").text("");
+            $("input, select").removeClass("is-invalid");
+            var formData = new FormData(this);
+            $(`${formId} button[type=submit]`).prop("disabled", true);
 
-        // Disable submit button to prevent multiple submissions
-        $("#buildingsubmitBtn").prop("disabled", true);
-
-        var formData = new FormData(this);
-        $.ajax({
-            type: "POST",
-            url: routes.surveyorPolygonDatasUpload,
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                if (response.success) {
-                    showFlashMessage(response.message, "success");
-                    polygonDatas = response.polygonDatas;
-                    polygons = response.polygon;
-                    points = response.point;
-                    refreshLayer(response.point, lines, response.polygon);
-                }
-                // Re-enable the submit button after success
-                $("#buildingsubmitBtn").prop("disabled", false);
-            },
-            error: function (xhr, status, error) {
-                console.log(error);
-                let errorMsg =
-                    "An error occurred while processing your request. Please try again.";
-
-                if (xhr.responseJSON && xhr.responseJSON.msg) {
-                    errorMsg = xhr.responseJSON.msg;
-                }
-
-                showFlashMessage(errorMsg, "error");
-
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    $.each(xhr.responseJSON.errors, function (key, value) {
-                        $("#" + key).addClass("is-invalid");
-                        $("#" + key + "_error").text(value[0]);
-                    });
-                }
-
-                // Re-enable the submit button in case of an error
-                $("#buildingsubmitBtn").prop("disabled", false);
-            },
-            complete: function () {
-                // Always re-enable the submit button after request completes
-                $("#buildingsubmitBtn").prop("disabled", false);
-            },
+            $.ajax({
+                type: "POST",
+                url,
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: callback,
+                error: function (xhr) {
+                    let errorMsg =
+                        xhr.responseJSON?.msg || "An error occurred.";
+                    showFlashMessage(errorMsg, "error");
+                    if (xhr.responseJSON?.errors) {
+                        $.each(xhr.responseJSON.errors, (key, value) => {
+                            $(`#${key}`).addClass("is-invalid");
+                            $(`#${key}_error`).text(value[0]);
+                        });
+                    }
+                },
+                complete: function () {
+                    $(`${formId} button[type=submit]`).prop("disabled", false);
+                },
+            });
         });
-    });
+    }
 
-    // point form submit
-    $("#pointForm").submit(function (e) {
-        e.preventDefault();
-        $(".error-message").text("");
-        $("input").removeClass("is-invalid");
-
-        var pointDatas = $(this).serialize();
-        $("#pointSubmit").prop("disabled", true);
-        $.ajax({
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            },
-            type: "POST",
-            url: routes.surveyorPointDataUpload,
-            data: pointDatas,
-            success: function (response) {
+    // Form-specific logic
+    handleFormSubmit(
+        "#buildingForm",
+        routes.surveyorPolygonDatasUpload,
+        (response) => {
+            if (response.success) {
                 showFlashMessage(response.message, "success");
-                $(".added").remove();
-                pointDatas = response.pointDatas;
+                polygonDatas = response.polygonDatas;
+                polygons = response.polygon;
+                points = response.point;
+                refreshLayer(response.point, lines, response.polygon);
+            }
+        }
+    );
 
-                $("#surveycount").text(response.pointCount);
-                // / polygons = response.polygon;
-                points = response.points;
+    handleFormSubmit(
+        "#pointForm",
+        routes.surveyorPointDataUpload,
+        (response) => {
+            showFlashMessage(response.message, "success");
+            pointDatas = response.pointDatas;
+            points = response.points;
+            refreshLayer(response.points, lines, polygons);
+        }
+    );
 
-                refreshLayer(response.points, lines, polygons);
-                $("#pointSubmit").prop("disabled", false);
-            },
-            error: function (xhr, status, error) {
-                console.log(xhr);
-                let errorMsg =
-                    "An error occurred while processing your request. Please try again.";
-                if (xhr.responseJSON && xhr.responseJSON.msg) {
-                    errorMsg = xhr.responseJSON.msg;
-                }
-                showFlashMessage(errorMsg, "error");
-                $("#pointSubmit").prop("disabled", false);
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    $.each(xhr.responseJSON.errors, function (key, value) {
-                        $("#" + key).addClass("is-invalid");
-                        $("#" + key + "_error").text(value[0]);
-                    });
-                }
-            },
-            complete: function () {
-                $("#pointSubmit").prop("disabled", false);
-            },
-        });
-    });
     // Optional: Console log to see the points data
     $(document).ready(function () {
         map.on("click", function (evt) {
