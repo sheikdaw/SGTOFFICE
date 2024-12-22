@@ -579,12 +579,12 @@ $(document).ready(function () {
                 console.error("Feature is undefined!");
                 return null;
             }
+
             var type = feature.get("type");
-            console.log("Processing Feature Type:", type);
+            var gisid = feature.get("gisid");
+            console.log(`Processing Feature Type: ${type}, GISID: ${gisid}`);
 
             if (type === "Polygon") {
-                var gisid = feature.get("gisid");
-                console.log("Polygon GISID:", gisid);
                 var polygonData = polygonDatas.find(
                     (data) => data.gisid == gisid
                 );
@@ -595,10 +595,7 @@ $(document).ready(function () {
                     }),
                 });
             } else if (type === "Point") {
-                var gisid = feature.get("gisid");
-                console.log("Polygon GISID:", gisid);
                 var pointData = pointDatas.find((data) => data.gisid == gisid);
-                console.log("Processing Point Feature");
                 return new ol.style.Style({
                     image: new ol.style.Circle({
                         radius: 7,
@@ -624,7 +621,6 @@ $(document).ready(function () {
                     }),
                 });
             } else if (type === "LineString" || type === "MultiLineString") {
-                console.log("Processing Line Feature");
                 return createLineStyle(feature);
             } else {
                 console.warn("Unexpected feature type:", type);
@@ -645,270 +641,258 @@ $(document).ready(function () {
     refreshLayer(points, lines, polygons);
 
     // Optional: Console log to see the points data
-    $(document).ready(function () {
-        map.on("click", function (evt) {
-            if ($("#addedFeature").val() == "none") {
-                $(".error-message").text("");
-                $("input").removeClass("is-invalid");
-                $("select").removeClass("is-invalid");
-                const feature = map.forEachFeatureAtPixel(
-                    evt.pixel,
-                    function (feature) {
-                        return feature;
-                    }
-                );
-                if (feature) {
-                    var properties = feature.getProperties();
 
-                    var geometryType = feature.getGeometry().getType();
+    map.on("click", function (evt) {
+        if ($("#addedFeature").val() == "none") {
+            $(".error-message").text("");
+            $("input").removeClass("is-invalid");
+            $("select").removeClass("is-invalid");
+            const feature = map.forEachFeatureAtPixel(
+                evt.pixel,
+                function (feature) {
+                    return feature;
+                }
+            );
+            if (feature) {
+                var properties = feature.getProperties();
 
-                    if (geometryType == "Point") {
-                        //if point
-                        function resetFields(fieldIds) {
-                            fieldIds.forEach(function (id) {
-                                $("#" + id).val("");
-                            });
-                        }
+                var geometryType = feature.getGeometry().getType();
 
-                        // List of field IDs to reset
-                        var fieldsToReset = [
-                            "pointgis",
-                            "assessment",
-                            "old_assessment",
-                            "owner_name",
-                            "present_owner_name",
-                            "floor",
-                            "old_door_no",
-                            "eb",
-                            "new_door_no",
-                            "bill_usage",
-                            "water_tax",
-
-                            "phone",
-                            "remarks",
-                        ];
-                        // Reset the fields
-                        resetFields(fieldsToReset);
-                        var content = "";
-                        for (var key in properties) {
-                            // alert( key + ':</strong> ' + properties[key]);
-                            if (key !== "geometry") {
-                                content +=
-                                    "<li><strong>" +
-                                    key +
-                                    ":</strong> " +
-                                    properties[key] +
-                                    "</li>";
-                            }
-                        }
-
-                        var gisid = properties["gisid"];
-                        $("#pointgis").val(gisid);
-                        var polygonbData = polygonDatas.find(
-                            (data) => data.gisid === gisid
-                        );
-                        console.log(polygonbData);
-                        var polygonnumofbill = polygonbData
-                            ? polygonbData.number_bill
-                            : null;
-                        var matchingPointsCount = pointDatas.filter(
-                            (data) => data.point_gisid === gisid
-                        ).length;
-                        if (polygonnumofbill > matchingPointsCount) {
-                            $("#pointModal").modal("show");
-                        } else {
-                            showFlashMessage(
-                                "Already this building have " +
-                                    matchingPointsCount +
-                                    " bills",
-                                "error"
-                            );
-                        }
-                    } else if (geometryType == "Polygon") {
-                        // if polygen
-                        var content = "";
-                        for (var key in properties) {
-                            if (key !== "geometry") {
-                                content +=
-                                    "<li><strong>" +
-                                    key +
-                                    ":</strong> " +
-                                    properties[key] +
-                                    "</li>";
-                            }
-                        }
-                        // document.getElementById("featurePropertiesList").innerHTML =                     content;
-
-                        var gisId = properties["gisid"]; // Get the GIS ID from the clicked feature
-
-                        let valueFound = false;
-                        polygonDatas.forEach(function (item) {
-                            if (item.gisid == gisId) {
-                                console.log(
-                                    "===================================="
-                                );
-
-                                console.log(
-                                    "===================================="
-                                );
-                                document.getElementById("number_bill").value =
-                                    item.number_bill || "";
-                                document.getElementById("number_shop").value =
-                                    item.number_shop || "";
-                                document.getElementById("number_floor").value =
-                                    item.number_floor || "";
-
-                                document.getElementById("building_name").value =
-                                    item.building_name || "";
-                                document.getElementById(
-                                    "building_usage"
-                                ).value = item.building_usage || "";
-                                document.getElementById(
-                                    "construction_type"
-                                ).value = item.construction_type || "";
-                                document.getElementById("road_name").value =
-                                    item.road_name || "";
-                                document.getElementById("ugd").value =
-                                    item.ugd || "";
-                                document.getElementById(
-                                    "rainwater_harvesting"
-                                ).value = item.rainwater_harvesting || "";
-                                document.getElementById("parking").value =
-                                    item.parking || "";
-                                document.getElementById("ramp").value =
-                                    item.ramp || "";
-                                document.getElementById("hoarding").value =
-                                    item.hoarding || "";
-                                document.getElementById("building_type").value =
-                                    item.building_type || "";
-                                document.getElementById("basement").value =
-                                    item.basement || "";
-                                document.getElementById("liftroom").value =
-                                    item.liftroom || "";
-                                document.getElementById("overhead_tank").value =
-                                    item.overhead_tank || "";
-                                document.getElementById("headroom").value =
-                                    item.headroom || "";
-                                document.getElementById("cell_tower").value =
-                                    item.cell_tower || "";
-                                document.getElementById("percentage").value =
-                                    item.percentage || "";
-                                document.getElementById("new_address").value =
-                                    item.new_address || "";
-                                document.getElementById("cctv").value =
-                                    item.solar_panel || "";
-
-                                document.getElementById(
-                                    "water_connection"
-                                ).value = item.water_connection || "";
-                                document.getElementById("phone").value =
-                                    item.phone || "";
-                                document.getElementById("remarks").value =
-                                    item.remarks || "";
-
-                                var imagel = gisId + ".png";
-                                var basePath =
-                                    "{{ asset('public/corporation/coimbatore') }}";
-
-                                // Construct the full image path
-                                var imagePath =
-                                    basePath +
-                                    "/" +
-                                    data.zone +
-                                    "/" +
-                                    data.ward +
-                                    "/images/" +
-                                    image;
-
-                                // Set the image path
-                                $("#building_img").attr("src", imagePath);
-
-                                console.log(imagePath);
-                                valueFound = true;
-
-                                // Break out of the loop since we found the value
-                                return false;
-                            }
+                if (geometryType == "Point") {
+                    //if point
+                    function resetFields(fieldIds) {
+                        fieldIds.forEach(function (id) {
+                            $("#" + id).val("");
                         });
+                    }
 
-                        if (!valueFound) {
-                            console.log(data);
-                            console.log("====================================");
-                            console.log("no");
-                            console.log("====================================");
-                            // If the GIS ID is not present in polygonDatas, reset all input fields to empty
-                            document.getElementById("number_bill").value = "";
-                            document.getElementById("number_shop").value = "";
-                            document.getElementById("number_floor").value = "";
+                    // List of field IDs to reset
+                    var fieldsToReset = [
+                        "pointgis",
+                        "assessment",
+                        "old_assessment",
+                        "owner_name",
+                        "present_owner_name",
+                        "floor",
+                        "old_door_no",
+                        "eb",
+                        "new_door_no",
+                        "bill_usage",
+                        "water_tax",
 
-                            document.getElementById("building_name").value = "";
+                        "phone",
+                        "remarks",
+                    ];
+                    // Reset the fields
+                    resetFields(fieldsToReset);
+                    var content = "";
+                    for (var key in properties) {
+                        // alert( key + ':</strong> ' + properties[key]);
+                        if (key !== "geometry") {
+                            content +=
+                                "<li><strong>" +
+                                key +
+                                ":</strong> " +
+                                properties[key] +
+                                "</li>";
+                        }
+                    }
+
+                    var gisid = properties["gisid"];
+                    $("#pointgis").val(gisid);
+                    var polygonbData = polygonDatas.find(
+                        (data) => data.gisid === gisid
+                    );
+                    console.log(polygonbData);
+                    var polygonnumofbill = polygonbData
+                        ? polygonbData.number_bill
+                        : null;
+                    var matchingPointsCount = pointDatas.filter(
+                        (data) => data.point_gisid === gisid
+                    ).length;
+                    if (polygonnumofbill > matchingPointsCount) {
+                        $("#pointModal").modal("show");
+                    } else {
+                        showFlashMessage(
+                            "Already this building have " +
+                                matchingPointsCount +
+                                " bills",
+                            "error"
+                        );
+                    }
+                } else if (geometryType == "Polygon") {
+                    // if polygen
+                    var content = "";
+                    for (var key in properties) {
+                        if (key !== "geometry") {
+                            content +=
+                                "<li><strong>" +
+                                key +
+                                ":</strong> " +
+                                properties[key] +
+                                "</li>";
+                        }
+                    }
+                    // document.getElementById("featurePropertiesList").innerHTML =                     content;
+
+                    var gisId = properties["gisid"]; // Get the GIS ID from the clicked feature
+
+                    let valueFound = false;
+                    polygonDatas.forEach(function (item) {
+                        if (item.gisid == gisId) {
+                            console.log("====================================");
+
+                            console.log("====================================");
+                            document.getElementById("number_bill").value =
+                                item.number_bill || "";
+                            document.getElementById("number_shop").value =
+                                item.number_shop || "";
+                            document.getElementById("number_floor").value =
+                                item.number_floor || "";
+
+                            document.getElementById("building_name").value =
+                                item.building_name || "";
                             document.getElementById("building_usage").value =
-                                "";
+                                item.building_usage || "";
                             document.getElementById("construction_type").value =
-                                "";
-                            // document.getElementById('road_name').value = "";
-                            document.getElementById("ugd").value = "";
+                                item.construction_type || "";
+                            document.getElementById("road_name").value =
+                                item.road_name || "";
+                            document.getElementById("ugd").value =
+                                item.ugd || "";
                             document.getElementById(
                                 "rainwater_harvesting"
-                            ).value = "";
-                            document.getElementById("parking").value = "";
-                            document.getElementById("ramp").value = "";
-                            document.getElementById("hoarding").value = "";
-                            document.getElementById("liftroom").value = "";
-                            document.getElementById("overhead_tank").value = "";
-                            document.getElementById("headroom").value = "";
-                            document.getElementById("cell_tower").value = "";
-                            document.getElementById("percentage").value = "";
-                            document.getElementById("cctv").value = "";
-                            document.getElementById("new_address").value = "";
-                            document.getElementById("solar_panel").value = "";
+                            ).value = item.rainwater_harvesting || "";
+                            document.getElementById("parking").value =
+                                item.parking || "";
+                            document.getElementById("ramp").value =
+                                item.ramp || "";
+                            document.getElementById("hoarding").value =
+                                item.hoarding || "";
+                            document.getElementById("building_type").value =
+                                item.building_type || "";
+                            document.getElementById("basement").value =
+                                item.basement || "";
+                            document.getElementById("liftroom").value =
+                                item.liftroom || "";
+                            document.getElementById("overhead_tank").value =
+                                item.overhead_tank || "";
+                            document.getElementById("headroom").value =
+                                item.headroom || "";
+                            document.getElementById("cell_tower").value =
+                                item.cell_tower || "";
+                            document.getElementById("percentage").value =
+                                item.percentage || "";
+                            document.getElementById("new_address").value =
+                                item.new_address || "";
+                            document.getElementById("cctv").value =
+                                item.solar_panel || "";
+
                             document.getElementById("water_connection").value =
-                                "";
-                            document.getElementById("phone").value = "";
-                            document.getElementById("image").value = "";
-                            document.getElementById("remarks").value = "";
-                            $("#building_img").attr("src", "");
-                        }
+                                item.water_connection || "";
+                            document.getElementById("phone").value =
+                                item.phone || "";
+                            document.getElementById("remarks").value =
+                                item.remarks || "";
 
-                        // Set the GIS ID value in the form
-                        document.getElementById("gisIdInput").value = gisId;
-                        $("#buildingModal").modal("show");
-                    } else if (
-                        geometryType == "LineString" ||
-                        geometryType == "MultiLineString"
-                    ) {
-                        var gisid = properties["gisid"];
-                        $("#pointgis").val(gisid);
-                        console.log("Line feature properties:", properties);
+                            var imagel = gisId + ".png";
+                            var basePath =
+                                "{{ asset('public/corporation/coimbatore') }}";
 
-                        if (gisid) {
-                            console.log("Retrieved GIS ID:", gisid);
-                            $("#linegisid").val(gisid);
-                        } else {
-                            console.error(
-                                "GIS ID not found for the selected line."
-                            );
-                        }
+                            // Construct the full image path
+                            var imagePath =
+                                basePath +
+                                "/" +
+                                data.zone +
+                                "/" +
+                                data.ward +
+                                "/images/" +
+                                image;
 
-                        var content = "";
-                        for (var key in properties) {
-                            if (key !== "geometry") {
-                                content +=
-                                    "<li><strong>" +
-                                    key +
-                                    ":</strong> " +
-                                    properties[key] +
-                                    "</li>";
-                            }
+                            // Set the image path
+                            $("#building_img").attr("src", imagePath);
+
+                            console.log(imagePath);
+                            valueFound = true;
+
+                            // Break out of the loop since we found the value
+                            return false;
                         }
-                        document.getElementById("featureline").innerHTML =
-                            content;
-                        $("#lineModal").modal("show");
+                    });
+
+                    if (!valueFound) {
+                        console.log(data);
+                        console.log("====================================");
+                        console.log("no");
+                        console.log("====================================");
+                        // If the GIS ID is not present in polygonDatas, reset all input fields to empty
+                        document.getElementById("number_bill").value = "";
+                        document.getElementById("number_shop").value = "";
+                        document.getElementById("number_floor").value = "";
+
+                        document.getElementById("building_name").value = "";
+                        document.getElementById("building_usage").value = "";
+                        document.getElementById("construction_type").value = "";
+                        // document.getElementById('road_name').value = "";
+                        document.getElementById("ugd").value = "";
+                        document.getElementById("rainwater_harvesting").value =
+                            "";
+                        document.getElementById("parking").value = "";
+                        document.getElementById("ramp").value = "";
+                        document.getElementById("hoarding").value = "";
+                        document.getElementById("liftroom").value = "";
+                        document.getElementById("overhead_tank").value = "";
+                        document.getElementById("headroom").value = "";
+                        document.getElementById("cell_tower").value = "";
+                        document.getElementById("percentage").value = "";
+                        document.getElementById("cctv").value = "";
+                        document.getElementById("new_address").value = "";
+                        document.getElementById("solar_panel").value = "";
+                        document.getElementById("water_connection").value = "";
+                        document.getElementById("phone").value = "";
+                        document.getElementById("image").value = "";
+                        document.getElementById("remarks").value = "";
+                        $("#building_img").attr("src", "");
                     }
+
+                    // Set the GIS ID value in the form
+                    document.getElementById("gisIdInput").value = gisId;
+                    $("#buildingModal").modal("show");
+                } else if (
+                    geometryType == "LineString" ||
+                    geometryType == "MultiLineString"
+                ) {
+                    var gisid = properties["gisid"];
+                    $("#pointgis").val(gisid);
+                    console.log("Line feature properties:", properties);
+
+                    if (gisid) {
+                        console.log("Retrieved GIS ID:", gisid);
+                        $("#linegisid").val(gisid);
+                    } else {
+                        console.error(
+                            "GIS ID not found for the selected line."
+                        );
+                    }
+
+                    var content = "";
+                    for (var key in properties) {
+                        if (key !== "geometry") {
+                            content +=
+                                "<li><strong>" +
+                                key +
+                                ":</strong> " +
+                                properties[key] +
+                                "</li>";
+                        }
+                    }
+                    document.getElementById("featureline").innerHTML = content;
+                    $("#lineModal").modal("show");
                 }
             }
-        });
+        }
     });
+
     $("#buildingForm").submit(function (e) {
         e.preventDefault();
         $(".error-message").text("");
