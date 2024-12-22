@@ -814,12 +814,10 @@ $(document).ready(function () {
                         geometryType == "LineString" ||
                         geometryType == "MultiLineString"
                     ) {
+                        var gisid = properties["gisid"];
+                        $("#pointgis").val(gisid);
                         console.log("Line feature properties:", properties);
 
-                        var gisid =
-                            properties["gisid"] ||
-                            properties["GISID"] ||
-                            properties["GisId"];
                         if (gisid) {
                             console.log("Retrieved GIS ID:", gisid);
                             $("#linegisid").val(gisid);
