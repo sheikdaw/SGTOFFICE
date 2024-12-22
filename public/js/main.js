@@ -679,6 +679,18 @@ $(document).ready(function () {
                         // document.getElementById("featurePropertiesList").innerHTML =                     content;
 
                         var gisId = properties["gisid"]; // Get the GIS ID from the clicked feature
+                        var gisid = properties["gisid"];
+                        $("#pointgis").val(gisid);
+                        console.log("Line feature properties:", properties);
+
+                        if (gisid) {
+                            console.log("Retrieved GIS ID:", gisid);
+                            $("#linegisid").val(gisid);
+                        } else {
+                            console.error(
+                                "GIS ID not found for the selected line."
+                            );
+                        }
                         let valueFound = false;
                         polygonDatas.forEach(function (item) {
                             if (item.gisid == gisId) {
