@@ -284,7 +284,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                aria-label="Close">Close</button>
 
 
                             <button type="submit" id="buildingsubmitBtn" class="btn btn-primary">Save</button>
@@ -396,7 +397,8 @@
                         <div id="append"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        aria-label="Close">Close</button>
 
                     <button type="submit" id="pointSubmit" class="btn btn-primary">Submit</button>
 
@@ -431,7 +433,8 @@
                         <button type="submit" id="pointSubmit" class="btn btn-primary">Submit</button>
 
                     </form>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" data-bs-dismiss="modal"
+                        aria-label="Close">Close</button>
 
                 </div>
             </div>
