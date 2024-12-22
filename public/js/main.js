@@ -442,8 +442,10 @@ $(document).ready(function () {
     }
 
     // Function to create point style
+    // Function to create point style
     function createPointStyle(feature) {
         var gisid = feature.get("gisid");
+        // Ensure `pointDatas` refers to the updated global data
         var pointData = pointDatas.find((data) => data.point_gisid == gisid);
 
         return new ol.style.Style({
@@ -580,6 +582,9 @@ $(document).ready(function () {
         addFeatures(points, "Point");
         addFeatures(lines, "MultiLineString"); // Ensure type matches your data
         addFeatures(polygons, "Polygon");
+        vectorLayer.setStyle(function (feature) {
+            return vectorLayer.getStyle()(feature);
+        });
     }
 
     // Refresh the layer with the data providedp
@@ -923,12 +928,13 @@ $(document).ready(function () {
             success: function (response) {
                 showFlashMessage(response.message, "success");
                 $(".added").remove();
+                // Update the global pointDatas variable
                 pointDatas = response.pointDatas;
+
                 $("#surveycount").text(response.pointCount);
-                // / polygons = response.polygon;
                 points = response.points;
 
-                refreshLayer(response.points, lines, polygons);
+                refreshLayer(response.points, lines, polygons); // Refresh layer
                 $("#pointSubmit").prop("disabled", false);
             },
             error: function (xhr, status, error) {
