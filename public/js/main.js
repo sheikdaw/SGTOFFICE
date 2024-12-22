@@ -803,6 +803,7 @@ $(document).ready(function () {
                     geometryType == "LineString" ||
                     geometryType == "MultiLineString"
                 ) {
+                    console.log(properties);
                     var gisid = properties["gisid"];
                     $("#pointgis").val(gisid);
                     console.log("Line feature properties:", properties);
