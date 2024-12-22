@@ -572,7 +572,7 @@ $(document).ready(function () {
 
     // Function to refresh the vector layer with updated points, lines, and polygons
     function refreshLayer(points, lines, polygons) {
-        console.log(points);
+        console.log(lines);
         vectorSource.clear(); // Clear existing features before adding new ones
         addFeatures(points, "Point");
         addFeatures(lines, "MultiLineString"); // Ensure type matches your data
@@ -829,7 +829,6 @@ $(document).ready(function () {
                         }
                         document.getElementById("featureline").innerHTML =
                             content;
-                        // var gisId = properties["gisid"];
                         console.log(properties);
                         $("#linegisid").val(properties["gisid"]);
                         $("#lineModal").modal("show");
