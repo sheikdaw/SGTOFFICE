@@ -446,15 +446,27 @@ $(document).ready(function () {
 
     // Function to style points
     function createPointStyle(feature) {
-        alert("hi");
-        var gisid = feature.get("gisid");
-        var pointData = pointDatas.find((data) => data.point_gisid == gisid);
+        if (!feature) {
+            console.error("Feature is undefined in createPointStyle!");
+            return null;
+        }
 
+        console.log("createPointStyle called for feature:", feature);
+
+        // Retrieve GIS ID from the feature
+        var gisid = feature.get("gisid");
+        console.log("GISID of feature:", gisid);
+
+        // Find point data using the GIS ID
+        var pointData = pointDatas.find((data) => data.point_gisid == gisid);
+        console.log("Point data found:", pointData);
+
+        // Return the style based on pointData
         return new ol.style.Style({
             image: new ol.style.Circle({
                 radius: 7,
                 fill: new ol.style.Fill({
-                    color: pointData ? "red" : "blue",
+                    color: pointData ? "red" : "blue", // Red if data exists, blue otherwise
                 }),
                 stroke: new ol.style.Stroke({
                     color: "#ffffff",
