@@ -474,6 +474,8 @@
             surveyorPolygonDatasUpload: "{{ route('surveyor.polygondata-upload') }}",
             surveyorDelete: "{{ route('admin.surveyorDelete', ['id' => 'mm']) }}", // Use a placeholder
             addPolygonFeature: "{{ route('surveyor.addPolygonFeature') }}",
+            addLineFeature: "{{ route('surveyor.addLineFeature') }}",
+
             mergePolygon: "{{ route('surveyor.mergePolygon') }}",
             deletePolygon: "{{ route('surveyor.deletePolygon') }}",
             updateRoadName: "{{ route('surveyor.updateRoadName') }}",
