@@ -573,6 +573,7 @@ $(document).ready(function () {
     // Function to refresh the vector layer with updated points, lines, and polygons
     function refreshLayer(points, lines, polygons) {
         console.log(lines);
+        console.log(points);
         vectorSource.clear(); // Clear existing features before adding new ones
         addFeatures(points, "Point");
         addFeatures(lines, "MultiLineString"); // Ensure type matches your data
