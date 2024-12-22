@@ -1199,9 +1199,11 @@ $(document).ready(function () {
                 $("#lineSubmit").prop("disabled", true).text("Submitting...");
             },
             success: function (response) {
-                // Handle success response
-                alert("Form submitted successfully");
-                $("#lineForm")[0].reset(); // Reset form
+                showFlashMessage(response.message, "success");
+                lines = response.lines;
+                refreshLayer(points, response.lines, polygons);
+
+                $("#lineForm")[0].reset();
             },
             error: function (xhr, status, error) {
                 // Handle error response

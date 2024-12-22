@@ -455,7 +455,7 @@ class SurveyorController extends Controller
 
         if ($update) {
             $line = DB::table($data->line)->get();
-            return response()->json(['message' => 'Data submitted successfully!', 'line' => $line]);
+            return response()->json(['message' => 'Data submitted successfully!', 'lines' => $line]);
         } else {
             return response()->json(['error' => 'Update failed.'], 500);
         }
