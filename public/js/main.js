@@ -829,7 +829,8 @@ $(document).ready(function () {
                         }
                         document.getElementById("featureline").innerHTML =
                             content;
-                        $("#linegisid").val(properties[gisid]);
+                        // var gisId = properties["gisid"];
+                        $("#linegisid").val(properties["gisid"]);
                         $("#lineModal").modal("show");
                     }
                 }
