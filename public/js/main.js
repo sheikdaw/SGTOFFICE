@@ -562,9 +562,16 @@ $(document).ready(function () {
     var vectorLayer = new ol.layer.Vector({
         source: vectorSource,
         style: function (feature) {
+            if (!feature) {
+                console.error("Feature is undefined!");
+                return null;
+            }
             var type = feature.get("type");
+            console.log("Processing Feature Type:", type);
+
             if (type === "Polygon") {
                 var gisid = feature.get("gisid");
+                console.log("Polygon GISID:", gisid);
                 var polygonData = polygonDatas.find(
                     (data) => data.gisid == gisid
                 );
@@ -575,9 +582,19 @@ $(document).ready(function () {
                     }),
                 });
             } else if (type === "Point") {
+                console.log("Processing Point Feature");
                 return createPointStyle(feature);
             } else if (type === "LineString" || type === "MultiLineString") {
+                console.log("Processing Line Feature");
                 return createLineStyle(feature);
+            } else {
+                console.warn("Unexpected feature type:", type);
+                return new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: "gray",
+                        width: 2,
+                    }),
+                });
             }
         },
     });
