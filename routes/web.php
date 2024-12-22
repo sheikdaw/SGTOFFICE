@@ -58,6 +58,8 @@ Route::middleware('surveyor')->group(function () {
     Route::post('pointdata-upload', [SurveyorController::class, 'uploadPointData'])->name('surveyor.pointdata-upload');
     Route::post('polygondata-upload', [SurveyorController::class, 'uploadPolygonData'])->name('surveyor.polygondata-upload');
     Route::post('addPolygonFeature', [SurveyorController::class, 'addPolygonFeature'])->name('surveyor.addPolygonFeature');
+    Route::post('addLineFeature', [SurveyorController::class, 'addLineFeature'])->name('surveyor.addLineFeature');
+
     Route::post('mergepolygon', [SurveyorController::class, 'mergePolygon'])->name('surveyor.mergePolygon');
     Route::post('deletePolygon', [SurveyorController::class, 'deletePolygon'])->name('surveyor.deletePolygon');
     Route::post('updateRoadName', [SurveyorController::class, 'updateRoadName'])->name('surveyor.updateRoadName');

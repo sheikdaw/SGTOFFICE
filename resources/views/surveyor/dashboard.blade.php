@@ -8,6 +8,7 @@
         <option value="Polygon">Polygon</option>
         <option value="Merge">Merge</option>
         <option value="Delete">delete</option>
+        <option value="Line">Line</option>
     </select>
     <form id="mergeForm" class="d-none">
         <input type="text" name="firstmerge" id="firstmerge" required>

@@ -1055,6 +1055,68 @@ $(document).ready(function () {
                     },
                 });
             });
+        } else if (value === "Line") {
+            removeDrawInteractions();
+
+            // Add a new draw interaction for polygons
+            const draw = new ol.interaction.Draw({
+                source: new ol.source.Vector(),
+                type: "LineString",
+            });
+            map.addInteraction(draw);
+
+            draw.on("drawend", function (event) {
+                const coordinates = event.feature
+                    .getGeometry()
+                    .getCoordinates();
+                console.log(coordinates);
+
+                $.ajax({
+                    url: routes.addLineFeature,
+                    type: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                            "content"
+                        ),
+                    },
+                    data: {
+                        type: value,
+                        coordinates: coordinates,
+                    },
+                    success: function (response) {
+                        // Handle success response
+                        points = response.points;
+                        polygons = response.polygons;
+                        lines = response.lines;
+                        refreshLayer(
+                            response.points,
+                            response.lines,
+                            response.polygons
+                        );
+                        showFlashMessage(response.message, "success");
+                        removeDrawInteractions();
+                        $("#addedFeature").val("none");
+                    },
+                    error: function (xhr) {
+                        // Handle error response
+                        if (xhr.status === 401) {
+                            // Show the error message from the response
+                            const errorMessage =
+                                xhr.responseJSON?.error ||
+                                "An unknown error occurred.";
+                            showFlashMessage(errorMessage, "error");
+                            removeDrawInteractions();
+                        } else {
+                            // Handle other types of errors (if needed)
+                            showFlashMessage(
+                                "An error occurred. Please try again later.",
+                                "error"
+                            );
+                            removeDrawInteractions();
+                        }
+                    },
+                });
+            });
         } else if (value === "Merge") {
             // Remove any draw interactions
             removeDrawInteractions();
