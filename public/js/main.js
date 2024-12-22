@@ -441,81 +441,66 @@ $(document).ready(function () {
         console.error("Geolocation API not supported by this browser.");
     }
 
-    // Function to create point style
-    // Function to create point style
-    // Vector source for storing the features (points, lines, polygons)
+    // OpenLayers vector source
     var vectorSource = new ol.source.Vector();
 
-    // Vector layer to render the features on the map
-    var vectorLayer = new ol.layer.Vector({
-        source: vectorSource,
-        style: function (feature) {
-            var type = feature.get("type");
-            var gisid = feature.get("gisid");
+    // Function to style points
+    function createPointStyle(feature) {
+        var gisid = feature.get("gisid");
+        var pointData = pointDatas.find((data) => data.point_gisid == gisid);
 
-            if (type === "Polygon") {
-                var polygonData = polygonDatas.find(
-                    (data) => data.gisid == gisid
-                );
-                return new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                        color: polygonData ? "red" : "blue",
-                        width: 4,
-                    }),
-                    fill: new ol.style.Fill({
-                        color: polygonData
-                            ? "rgba(255, 0, 0, 0.3)"
-                            : "rgba(0, 0, 255, 0.3)", // Light red or light blue fill with 30% opacity
-                    }),
-                });
-            } else if (type === "Point") {
-                var pointData = pointDatas.find(
-                    (data) => data.point_gisid == gisid
-                );
-                console.log("Feature GISID:", gisid);
-                console.log("Matched Point Data:", pointData);
-                return new ol.style.Style({
-                    image: new ol.style.Circle({
-                        radius: 7,
-                        fill: new ol.style.Fill({
-                            color: pointData ? "red" : "blue", // Color based on data presence
-                        }),
-                        stroke: new ol.style.Stroke({
-                            color: "#ffffff",
-                            width: 1,
-                        }),
-                    }),
-                    text: new ol.style.Text({
-                        text: gisid || "",
-                        scale: 1.2,
-                        offsetY: -15,
-                        fill: new ol.style.Fill({
-                            color: "#000000",
-                        }),
-                        stroke: new ol.style.Stroke({
-                            color: "#ffffff",
-                            width: 3,
-                        }),
-                    }),
-                });
-            } else if (type === "LineString" || type === "MultiLineString") {
-                return new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                        color: "yellow",
-                        width: 5,
-                    }),
-                });
-            }
-        },
-    });
+        return new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({
+                    color: pointData ? "red" : "blue",
+                }),
+                stroke: new ol.style.Stroke({
+                    color: "#ffffff",
+                    width: 1,
+                }),
+            }),
+            text: new ol.style.Text({
+                text: gisid || "",
+                scale: 1.2,
+                offsetY: -15,
+                fill: new ol.style.Fill({
+                    color: "#000000",
+                }),
+                stroke: new ol.style.Stroke({
+                    color: "#ffffff",
+                    width: 3,
+                }),
+            }),
+        });
+    }
 
-    // Add the vector layer to the map
-    map.addLayer(vectorLayer);
+    // Function to style lines
+    function createLineStyle(feature) {
+        var road_name = feature.get("road_name"); // Use road_name for labeling
+        return new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: "yellow",
+                width: 5,
+            }),
+            text: new ol.style.Text({
+                text: road_name || "", // Use road_name or leave blank if not available
+                scale: 1.2,
+                offsetY: -15,
+                fill: new ol.style.Fill({
+                    color: "#000000",
+                }),
+                stroke: new ol.style.Stroke({
+                    color: "#ffffff",
+                    width: 3,
+                }),
+            }),
+        });
+    }
 
-    // Function to add features (points, lines, polygons) to the vector layer
+    // Function to add features to the vector source
     function addFeatures(features, type) {
         features.forEach(function (feature) {
-            // Parse coordinates if they are in string format
             var coords = Array.isArray(feature.coordinates)
                 ? feature.coordinates
                 : JSON.parse(feature.coordinates || "[]");
@@ -535,56 +520,71 @@ $(document).ready(function () {
                     vectorSource.addFeature(olFeature);
                 });
             } else if (type === "Point") {
-                var coordsForFeature = Array.isArray(feature.coordinates)
-                    ? feature.coordinates
-                    : JSON.parse(feature.coordinates || "[]");
                 var olFeature = new ol.Feature({
-                    geometry: new ol.geom.Point(coordsForFeature),
+                    geometry: new ol.geom.Point(coords),
                     type: "Point",
                     gisid: feature.gisid,
                 });
                 vectorSource.addFeature(olFeature);
             } else if (type === "LineString" || type === "MultiLineString") {
-                var olFeature;
-                if (type === "LineString") {
-                    var coordsForFeature = coords.map((coord) => [
-                        coord[0],
-                        coord[1],
-                    ]);
-                    olFeature = new ol.Feature({
-                        geometry: new ol.geom.LineString(coordsForFeature),
-                        type: type,
-                        gisid: feature.gisid,
-                    });
-                } else if (type === "MultiLineString") {
-                    var geometries = coords.map(
-                        (lineCoords) => new ol.geom.LineString(lineCoords)
-                    );
-                    olFeature = new ol.Feature({
-                        geometry: new ol.geom.MultiLineString(geometries),
-                        type: type,
-                        gisid: feature.gisid,
-                    });
-                }
+                var geometry =
+                    type === "LineString"
+                        ? new ol.geom.LineString(
+                              coords.map((coord) => [coord[0], coord[1]])
+                          )
+                        : new ol.geom.MultiLineString(
+                              coords.map((line) =>
+                                  line.map((coord) => [coord[0], coord[1]])
+                              )
+                          );
+
+                var olFeature = new ol.Feature({
+                    geometry: geometry,
+                    type: type,
+                    road_name: feature.road_name, // Pass road_name for styling
+                });
+
                 vectorSource.addFeature(olFeature);
             }
         });
     }
 
-    // Function to refresh the vector layer with updated points, lines, and polygons
+    // Function to refresh the vector layer
     function refreshLayer(points, lines, polygons) {
-        console.log(lines);
-        console.log(points);
-        vectorSource.clear(); // Clear existing features before adding new ones
+        vectorSource.clear(); // Clear existing features
         addFeatures(points, "Point");
-        addFeatures(lines, "MultiLineString"); // Ensure type matches your data
+        addFeatures(lines, "MultiLineString"); // Handle lines as MultiLineString
         addFeatures(polygons, "Polygon");
-        vectorLayer.setStyle(function (feature) {
-            return vectorLayer.getStyle()(feature);
-        });
     }
 
-    // Refresh the layer with the data providedp
+    // OpenLayers vector layer
+    var vectorLayer = new ol.layer.Vector({
+        source: vectorSource,
+        style: function (feature) {
+            var type = feature.get("type");
+            if (type === "Polygon") {
+                var gisid = feature.get("gisid");
+                var polygonData = polygonDatas.find(
+                    (data) => data.gisid == gisid
+                );
+                return new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: polygonData ? "red" : "blue",
+                        width: 4,
+                    }),
+                });
+            } else if (type === "Point") {
+                return createPointStyle(feature);
+            } else if (type === "LineString" || type === "MultiLineString") {
+                return createLineStyle(feature);
+            }
+        },
+    });
+
+    // Add the vector layer to the map
+    map.addLayer(vectorLayer);
+
+    // Refresh the layer with data
     refreshLayer(points, lines, polygons);
 
     // Optional: Console log to see the points data
