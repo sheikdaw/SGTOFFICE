@@ -814,10 +814,23 @@ $(document).ready(function () {
                         geometryType == "LineString" ||
                         geometryType == "MultiLineString"
                     ) {
-                        // if line
+                        console.log("Line feature properties:", properties);
+
+                        var gisid =
+                            properties["gisid"] ||
+                            properties["GISID"] ||
+                            properties["GisId"];
+                        if (gisid) {
+                            console.log("Retrieved GIS ID:", gisid);
+                            $("#linegisid").val(gisid);
+                        } else {
+                            console.error(
+                                "GIS ID not found for the selected line."
+                            );
+                        }
+
                         var content = "";
                         for (var key in properties) {
-                            // alert( key + ':</strong> ' + properties[key]);
                             if (key !== "geometry") {
                                 content +=
                                     "<li><strong>" +
@@ -829,8 +842,6 @@ $(document).ready(function () {
                         }
                         document.getElementById("featureline").innerHTML =
                             content;
-                        console.log(properties);
-                        $("#linegisid").val(properties["gisid"]);
                         $("#lineModal").modal("show");
                     }
                 }
