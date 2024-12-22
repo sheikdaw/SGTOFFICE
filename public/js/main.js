@@ -370,6 +370,7 @@ $(document).ready(function () {
         parseFloat(extentData.right),
         parseFloat(extentData.top),
     ];
+    pointDatas = pointDatas;
 
     // Calculate the center of the extent
     var extentCenter = ol.extent.getCenter(extent);
@@ -594,8 +595,34 @@ $(document).ready(function () {
                     }),
                 });
             } else if (type === "Point") {
+                var gisid = feature.get("gisid");
+                console.log("Polygon GISID:", gisid);
+                var pointData = pointDatas.find((data) => data.gisid == gisid);
                 console.log("Processing Point Feature");
-                return createPointStyle(feature);
+                return new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 7,
+                        fill: new ol.style.Fill({
+                            color: pointData ? "red" : "blue", // Red if data exists, blue otherwise
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: "#ffffff",
+                            width: 1,
+                        }),
+                    }),
+                    text: new ol.style.Text({
+                        text: gisid || "",
+                        scale: 1.2,
+                        offsetY: -15,
+                        fill: new ol.style.Fill({
+                            color: "#000000",
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: "#ffffff",
+                            width: 3,
+                        }),
+                    }),
+                });
             } else if (type === "LineString" || type === "MultiLineString") {
                 console.log("Processing Line Feature");
                 return createLineStyle(feature);
