@@ -315,6 +315,7 @@
                             <select name="type" id="type" class="form-control">
                                 <option value="OLD">OLD</option>
                                 <option value="NEW">NEW</option>
+                                <option value="OTHER">OTHER WARD</option>
                             </select>
                         </div>
                         <div id="suveyedbtn"></div>
@@ -424,7 +425,7 @@
                         @csrf
                         <div class="modal-body">
                         </div>
-                        <input type="hidden" name="linegisid" id="linegisid" class="form-control">
+                        <input type="text" name="linegisid" id="linegisid" class="form-control">
                         <input type="text" name="roadname" id="roadname" class="form-control">
                         <button type="submit" id="pointSubmit" class="btn btn-primary">Submit</button>
 
