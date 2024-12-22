@@ -925,6 +925,9 @@ $(document).ready(function () {
                 $(".added").remove();
                 pointDatas = response.pointDatas;
                 $("#surveycount").text(response.pointCount);
+                // / polygons = response.polygon;
+                points = response.points;
+
                 refreshLayer(response.points, lines, polygons);
                 $("#pointSubmit").prop("disabled", false);
             },
