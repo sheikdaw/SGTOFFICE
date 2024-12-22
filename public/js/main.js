@@ -446,6 +446,7 @@ $(document).ready(function () {
 
     // Function to style points
     function createPointStyle(feature) {
+        alert("hi");
         var gisid = feature.get("gisid");
         var pointData = pointDatas.find((data) => data.point_gisid == gisid);
 
