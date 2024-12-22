@@ -270,7 +270,7 @@ class SurveyorController extends Controller
         DB::table($data->pointdata)->insert([
             'point_gisid' => $validatedData['point_gisid'],
             'worker_name' => $surveyor->name,
-            'eb' => $validatedData['eb'],
+            // 'eb' => $validatedData['eb'],
             'old_assessment' => $validatedData['old_assessment'],
             'assessment' => $validatedData['assessment'] ?? $request->type,
             'floor' => $validatedData['floor'],
@@ -280,7 +280,7 @@ class SurveyorController extends Controller
             'present_owner_name' => $validatedData['present_owner_name'],
             'old_door_no' => $validatedData['old_door_no'],
             'new_door_no' => $validatedData['new_door_no'],
-            'water_tax' => $validatedData['water_tax'],
+            // 'water_tax' => $validatedData['water_tax'],
             'remarks' => $validatedData['remarks'] . ' ' . $request->type,
             'created_at' => now(),
             'updated_at' => now(),
