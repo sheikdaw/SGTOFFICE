@@ -217,7 +217,7 @@ class SurveyorController extends Controller
 
         $rules = [
             'point_gisid' => 'required',
-            'eb' => 'required',
+            'eb' => 'nullable',
             'old_assessment' => 'required',
             'floor' => 'required',
             'bill_usage' => 'required',
