@@ -658,6 +658,7 @@ $(document).ready(function () {
                 showFlashMessage(response.message, "success");
                 $(".added").remove();
                 pointDatas = response.pointDatas;
+                console.log(pointDatas);
 
                 $("#surveycount").text(response.pointCount);
                 // / polygons = response.polygon;
