@@ -564,6 +564,7 @@ $(document).ready(function () {
                         geometry: new ol.geom.MultiLineString(geometries),
                         type: type,
                         gisid: feature.gisid,
+                        road_name: feature.road_name,
                     });
                 }
                 vectorSource.addFeature(olFeature);
