@@ -39,12 +39,12 @@ $(document).ready(function () {
             },
             error: function (xhr) {
                 showFlashMessage("Error storing data", "error");
-                // // let errors = xhr.responseJSON.errors;
-                // $.each(errors, function (key, value) {
-                //     $("#" + key + "_error")
-                //         .text(value[0])
-                //         .show();
-                // });
+                let errors = xhr.responseJSON.errors;
+                $.each(errors, function (key, value) {
+                    $("#" + key + "_error")
+                        .text(value[0])
+                        .show();
+                });
             },
         });
     });

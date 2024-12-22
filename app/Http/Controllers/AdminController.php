@@ -123,17 +123,17 @@ class AdminController extends Controller
         }
 
         // Handle MIS Import
-        if ($request->hasFile('mis')) {
-            $file = $request->file('mis');
-            $import = new MisImport($tablePrefix . 'mis');
+        // if ($request->hasFile('mis')) {
+        //     $file = $request->file('mis');
+        //     $import = new MisImport($tablePrefix . 'mis');
 
-            try {
-                Excel::import($import, $file);
-            } catch (\Exception $e) {
-                Log::error('Import Error: ' . $e->getMessage());
-                return response()->json(['message' => 'Import failed'], 500);
-            }
-        }
+        //     try {
+        //         Excel::import($import, $file);
+        //     } catch (\Exception $e) {
+        //         Log::error('Import Error: ' . $e->getMessage());
+        //         return response()->json(['message' => 'Import failed'], 500);
+        //     }
+        // }
 
         // Process GeoJSON files (point, line, polygon)
         $geojsonFiles = ['point', 'line', 'polygon'];
