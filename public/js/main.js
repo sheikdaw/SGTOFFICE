@@ -599,7 +599,6 @@ $(document).ready(function () {
                     }),
                 });
             } else if (type === "Point") {
-                var pointData = pointDatas.find((data) => data.gisid == gisid);
                 return createPointStyle(feature);
             } else if (type === "LineString" || type === "MultiLineString") {
                 return createLineStyle(feature);
