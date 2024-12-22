@@ -447,7 +447,8 @@ $(document).ready(function () {
         var gisid = feature.get("gisid");
         // Ensure `pointDatas` refers to the updated global data
         var pointData = pointDatas.find((data) => data.point_gisid == gisid);
-
+        console.log("Feature GISID:", gisid);
+        console.log("Matched Point Data:", pointData);
         return new ol.style.Style({
             image: new ol.style.Circle({
                 radius: 7,
@@ -928,7 +929,6 @@ $(document).ready(function () {
             success: function (response) {
                 showFlashMessage(response.message, "success");
                 $(".added").remove();
-                // Update the global pointDatas variable
                 pointDatas = response.pointDatas;
 
                 $("#surveycount").text(response.pointCount);
