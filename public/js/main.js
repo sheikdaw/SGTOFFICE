@@ -450,7 +450,7 @@ $(document).ready(function () {
             image: new ol.style.Circle({
                 radius: 7,
                 fill: new ol.style.Fill({
-                    color: pointData ? "red" : "blue", // Color based on data presence
+                    color: pointData ? "red" : "blue", // Updates based on presence in pointDatas
                 }),
                 stroke: new ol.style.Stroke({
                     color: "#ffffff",
@@ -584,7 +584,109 @@ $(document).ready(function () {
 
     // Refresh the layer with the data providedp
     refreshLayer(points, lines, polygons);
+    $("#buildingForm").submit(function (e) {
+        e.preventDefault();
+        $(".error-message").text("");
+        $("input").removeClass("is-invalid");
+        $("select").removeClass("is-invalid");
 
+        // Disable submit button to prevent multiple submissions
+        $("#buildingsubmitBtn").prop("disabled", true);
+
+        var formData = new FormData(this);
+        $.ajax({
+            type: "POST",
+            url: routes.surveyorPolygonDatasUpload,
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.success) {
+                    showFlashMessage(response.message, "success");
+                    polygonDatas = response.polygonDatas;
+                    polygons = response.polygon;
+                    points = response.point;
+                    refreshLayer(response.point, lines, response.polygon);
+                }
+                // Re-enable the submit button after success
+                $("#buildingsubmitBtn").prop("disabled", false);
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+                let errorMsg =
+                    "An error occurred while processing your request. Please try again.";
+
+                if (xhr.responseJSON && xhr.responseJSON.msg) {
+                    errorMsg = xhr.responseJSON.msg;
+                }
+
+                showFlashMessage(errorMsg, "error");
+
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    $.each(xhr.responseJSON.errors, function (key, value) {
+                        $("#" + key).addClass("is-invalid");
+                        $("#" + key + "_error").text(value[0]);
+                    });
+                }
+
+                // Re-enable the submit button in case of an error
+                $("#buildingsubmitBtn").prop("disabled", false);
+            },
+            complete: function () {
+                // Always re-enable the submit button after request completes
+                $("#buildingsubmitBtn").prop("disabled", false);
+            },
+        });
+    });
+
+    // point form submit
+    $("#pointForm").submit(function (e) {
+        e.preventDefault();
+        $(".error-message").text("");
+        $("input").removeClass("is-invalid");
+
+        var pointDatas = $(this).serialize();
+        $("#pointSubmit").prop("disabled", true);
+        $.ajax({
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+            type: "POST",
+            url: routes.surveyorPointDataUpload,
+            data: pointDatas,
+            success: function (response) {
+                showFlashMessage(response.message, "success");
+                $(".added").remove();
+                pointDatas = response.pointDatas;
+
+                $("#surveycount").text(response.pointCount);
+                // / polygons = response.polygon;
+                points = response.points;
+
+                refreshLayer(response.points, lines, polygons);
+                $("#pointSubmit").prop("disabled", false);
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr);
+                let errorMsg =
+                    "An error occurred while processing your request. Please try again.";
+                if (xhr.responseJSON && xhr.responseJSON.msg) {
+                    errorMsg = xhr.responseJSON.msg;
+                }
+                showFlashMessage(errorMsg, "error");
+                $("#pointSubmit").prop("disabled", false);
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    $.each(xhr.responseJSON.errors, function (key, value) {
+                        $("#" + key).addClass("is-invalid");
+                        $("#" + key + "_error").text(value[0]);
+                    });
+                }
+            },
+            complete: function () {
+                $("#pointSubmit").prop("disabled", false);
+            },
+        });
+    });
     // Optional: Console log to see the points data
     $(document).ready(function () {
         map.on("click", function (evt) {
@@ -848,108 +950,6 @@ $(document).ready(function () {
                     }
                 }
             }
-        });
-    });
-    $("#buildingForm").submit(function (e) {
-        e.preventDefault();
-        $(".error-message").text("");
-        $("input").removeClass("is-invalid");
-        $("select").removeClass("is-invalid");
-
-        // Disable submit button to prevent multiple submissions
-        $("#buildingsubmitBtn").prop("disabled", true);
-
-        var formData = new FormData(this);
-        $.ajax({
-            type: "POST",
-            url: routes.surveyorPolygonDatasUpload,
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                if (response.success) {
-                    showFlashMessage(response.message, "success");
-                    polygonDatas = response.polygonDatas;
-                    polygons = response.polygon;
-                    points = response.point;
-                    refreshLayer(response.point, lines, response.polygon);
-                }
-                // Re-enable the submit button after success
-                $("#buildingsubmitBtn").prop("disabled", false);
-            },
-            error: function (xhr, status, error) {
-                console.log(error);
-                let errorMsg =
-                    "An error occurred while processing your request. Please try again.";
-
-                if (xhr.responseJSON && xhr.responseJSON.msg) {
-                    errorMsg = xhr.responseJSON.msg;
-                }
-
-                showFlashMessage(errorMsg, "error");
-
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    $.each(xhr.responseJSON.errors, function (key, value) {
-                        $("#" + key).addClass("is-invalid");
-                        $("#" + key + "_error").text(value[0]);
-                    });
-                }
-
-                // Re-enable the submit button in case of an error
-                $("#buildingsubmitBtn").prop("disabled", false);
-            },
-            complete: function () {
-                // Always re-enable the submit button after request completes
-                $("#buildingsubmitBtn").prop("disabled", false);
-            },
-        });
-    });
-
-    // point form submit
-    $("#pointForm").submit(function (e) {
-        e.preventDefault();
-        $(".error-message").text("");
-        $("input").removeClass("is-invalid");
-
-        var pointDatas = $(this).serialize();
-        $("#pointSubmit").prop("disabled", true);
-        $.ajax({
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            },
-            type: "POST",
-            url: routes.surveyorPointDataUpload,
-            data: pointDatas,
-            success: function (response) {
-                showFlashMessage(response.message, "success");
-                $(".added").remove();
-                pointDatas = response.pointDatas;
-                $("#surveycount").text(response.pointCount);
-                // / polygons = response.polygon;
-                points = response.points;
-
-                refreshLayer(response.points, lines, polygons);
-                $("#pointSubmit").prop("disabled", false);
-            },
-            error: function (xhr, status, error) {
-                console.log(xhr);
-                let errorMsg =
-                    "An error occurred while processing your request. Please try again.";
-                if (xhr.responseJSON && xhr.responseJSON.msg) {
-                    errorMsg = xhr.responseJSON.msg;
-                }
-                showFlashMessage(errorMsg, "error");
-                $("#pointSubmit").prop("disabled", false);
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    $.each(xhr.responseJSON.errors, function (key, value) {
-                        $("#" + key).addClass("is-invalid");
-                        $("#" + key + "_error").text(value[0]);
-                    });
-                }
-            },
-            complete: function () {
-                $("#pointSubmit").prop("disabled", false);
-            },
         });
     });
 
