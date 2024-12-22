@@ -565,6 +565,10 @@ $(document).ready(function () {
 
     // Function to refresh the vector layer
     function refreshLayer(points, lines, polygons) {
+        console.log("data is secure", pointDatas);
+
+        console.log("data is secure", polygonDatas);
+
         vectorSource.clear(); // Clear existing features
         addFeatures(points, "Point");
         addFeatures(lines, "MultiLineString"); // Handle lines as MultiLineString
