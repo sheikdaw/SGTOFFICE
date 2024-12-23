@@ -866,18 +866,32 @@ class AdminController extends Controller
     }
     private function createZipArchive($source, $destination)
     {
-        $zip = new \ZipArchive();
-
-        if ($zip->open($destination, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
-            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source));
-            foreach ($files as $file) {
-                if (!$file->isDir()) {
-                    $filePath = $file->getRealPath();
-                    $relativePath = substr($filePath, strlen($source) + 1);
-                    $zip->addFile($filePath, $relativePath);
-                }
-            }
-            $zip->close();
+        // Check if source directory exists
+        if (!file_exists($source)) {
+            throw new \Exception("Source directory does not exist: {$source}");
         }
+
+        // Open the ZIP file
+        $zip = new \ZipArchive();
+        if ($zip->open($destination, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            throw new \Exception("Cannot open ZIP file for writing: {$destination}");
+        }
+
+        // Iterate through files and add to ZIP
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source));
+        foreach ($files as $file) {
+            if (!$file->isDir()) {
+                $filePath = $file->getRealPath();
+                $relativePath = substr($filePath, strlen($source) + 1);
+                $zip->addFile($filePath, $relativePath);
+            }
+        }
+
+        // Close the ZIP archive
+        if (!$zip->close()) {
+            throw new \Exception("Failed to close ZIP file: {$destination}");
+        }
+
+        return true;
     }
 }
