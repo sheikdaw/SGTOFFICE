@@ -393,51 +393,66 @@ $(document).ready(function () {
             zoom: 20, // Initial zoom level
         }),
     });
-    var userLocationSource = new ol.source.Vector();
-    var userLocationLayer = new ol.layer.Vector({
-        source: userLocationSource,
-        style: new ol.style.Style({
-            image: new ol.style.Circle({
-                radius: 8,
-                fill: new ol.style.Fill({ color: "yellow" }), // Green fill for the circle
-                stroke: new ol.style.Stroke({ color: "white", width: 2 }), // White border
+    const liveLocationStyle = new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 5, // Marker size
+            fill: new ol.style.Fill({
+                color: "yellow", // Marker color (red with transparency)
+            }),
+            stroke: new ol.style.Stroke({
+                color: "yellow", // Optional stroke color (black)
+                width: 2, // Stroke width
             }),
         }),
     });
-    map.addLayer(userLocationLayer);
-    function updateUserLocation(position) {
-        const { latitude, longitude } = position.coords;
 
-        const userCoordinates = ol.proj.fromLonLat([longitude, latitude]);
+    // Create a vector source and layer for the live location
+    const liveLocationSource = new ol.source.Vector({
+        wrapX: false,
+    });
+    const liveLocationLayer = new ol.layer.Vector({
+        source: liveLocationSource,
+        style: liveLocationStyle, // Apply the custom style
+    });
+    map.addLayer(liveLocationLayer); // Add live location layer to the map
 
-        userLocationSource.clear();
+    // Function to update the live location
+    let isFirstUpdate = true; // Flag to track the first update
 
-        const userLocationFeature = new ol.Feature({
-            geometry: new ol.geom.Point(userCoordinates),
+    function updateLiveLocation(position) {
+        const coord = [position.coords.longitude, position.coords.latitude];
+        const feature = new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.fromLonLat(coord)),
         });
-        userLocationSource.addFeature(userLocationFeature);
 
-        map.getView().setCenter(userCoordinates);
-        map.getView().setZoom(15); // Adjust zoom level as needed
+        liveLocationSource.clear();
+        liveLocationSource.addFeature(feature);
+
+        if (isFirstUpdate) {
+            map.getView().setCenter(ol.proj.fromLonLat(coord));
+            map.getView().setZoom(22); // Adjust zoom level as needed
+            isFirstUpdate = false; // Set the flag to false after the first update
+        } else {
+            // Optional: Update the map view without changing zoom/center if not the first update
+            // map.getView().setCenter(ol.proj.fromLonLat(coord));
+        }
     }
 
-    // Function to handle errors while fetching location
-    function handleLocationError(error) {
-        console.error("Error fetching location:", error.message);
-    }
-
-    // Use the Geolocation API to watch the user's position
+    // Use the Geolocation API to get the user's current location
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
-            updateUserLocation,
-            handleLocationError,
+            updateLiveLocation,
+            (error) => {
+                console.error("Error getting location", error);
+            },
             {
-                enableHighAccuracy: true, // Enable high-accuracy GPS
-                maximumAge: 0, // No cached position
+                enableHighAccuracy: true,
+                maximumAge: 10000,
+                timeout: 5000,
             }
         );
     } else {
-        console.error("Geolocation API not supported by this browser.");
+        console.error("Geolocation is not supported by this browser.");
     }
 
     // Function to create point style
@@ -490,11 +505,11 @@ $(document).ready(function () {
                         color: polygonData ? "red" : "blue",
                         width: 4,
                     }),
-                    fill: new ol.style.Fill({
-                        color: polygonData
-                            ? "rgba(255, 0, 0, 0.3)"
-                            : "rgba(0, 0, 255, 0.3)", // Light red or light blue fill with 30% opacity
-                    }),
+                    // fill: new ol.style.Fill({
+                    //     color: polygonData
+                    //         ? "rgba(255, 0, 0, 0.3)"
+                    //         : "rgba(0, 0, 255, 0.3)", // Light red or light blue fill with 30% opacity
+                    // }),
                 });
             } else if (type === "Point") {
                 return createPointStyle(feature);

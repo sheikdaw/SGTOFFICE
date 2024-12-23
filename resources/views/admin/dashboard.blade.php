@@ -53,6 +53,9 @@
                                     Lines</a>
                                 <a href="#" class="btn btn-danger btn-sm surveyor-count"
                                     data-id="{{ $data['id'] }}">Surveyor Count</a>
+                                <a href="{{ route('admin.downloadsteetwise', ['id' => $data['id']]) }}"
+                                    class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">Street
+                                    Wise</a>
 
                             </div>
                         </div>

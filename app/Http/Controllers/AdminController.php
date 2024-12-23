@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Exports\AreaVariationExport;
+use App\Exports\MultiStreetExport;
+use App\Exports\StreetExport;
 use App\Exports\UsageAreaVariationExport;
 use App\Exports\UsageVariationExport;
 use App\Exports\UsageVariationsExport;
@@ -817,5 +819,20 @@ class AdminController extends Controller
             )
             ->orderBy('mis.road_name')
             ->get();
+    }
+    //Usage variation
+    public function downloadsteetwise($id)
+    {
+        $data = Data::findOrFail($id);
+
+        // Group data by road name
+        $mis = DB::table($data->mis)
+            ->select('road_name', 'old_door_no', 'new_door_no')
+            ->orderBy('old_door_no')
+            ->get()
+            ->groupBy('road_name');
+
+        // Export as an Excel file with separate sheets for each road name
+        return Excel::download(new MultiStreetExport($mis), 'streetwise_roads.xlsx');
     }
 }

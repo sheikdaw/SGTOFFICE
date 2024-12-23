@@ -47,6 +47,7 @@ Route::middleware('admin')->group(function () {
     Route::get('/download-polygons/{id}', [AdminController::class, 'polygonDownload'])->name('admin.downloadPolygons');
     Route::get('/download-points/{id}', [AdminController::class, 'pointDownload'])->name('admin.downloadPoints');
     Route::get('/download-lines/{id}', [AdminController::class, 'roadDownload'])->name('admin.downloadLines');
+    Route::get('/download-Street/{id}', [AdminController::class, 'downloadSteetWise'])->name('admin.downloadsteetwise');
 
     Route::get('surveyor/count/{id}', [AdminController::class, 'surveyorCount'])->name('surveyor.count');
 });
