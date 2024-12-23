@@ -850,7 +850,7 @@ class AdminController extends Controller
         foreach ($mis as $roadName => $data) {
             $sanitizedName = preg_replace('/[^A-Za-z0-9 _-]/', '', $roadName);
             $filename = $sanitizedName . '.xlsx';
-            Excel::store(new StreetExport($roadName, $data), "app/public/streetwise_exports/{$filename}");
+            Excel::store(new StreetExport($roadName, $data), "{$folderPath}/{$filename}");
         }
 
         // Return a download link for all files as a ZIP archive
