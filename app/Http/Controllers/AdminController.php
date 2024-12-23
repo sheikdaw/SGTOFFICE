@@ -827,7 +827,7 @@ class AdminController extends Controller
 
         // Group data by road name
         $mis = DB::table($data->mis)
-            ->select('road_name', 'old_door_no', 'new_door_no', 'assessment', 'old_assessment', 'owner_name', 'mobile_no', 'usage')
+            ->select('road_name', 'old_door_no', 'new_door_no', 'assessment', 'old_assessment', 'owner_name', 'phone', 'building_usage')
             ->orderBy('old_door_no')
             ->get()
             ->groupBy('road_name');
