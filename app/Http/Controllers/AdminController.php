@@ -825,14 +825,13 @@ class AdminController extends Controller
     {
         $data = Data::findOrFail($id);
 
-        // Group data by road name
+        // Ensure all necessary columns are selected
         $mis = DB::table($data->mis)
-            ->select('road_name', 'old_door_no', 'new_door_no')
+            ->select('assessment', 'old_assessment', 'owner_name', 'phone', 'usage', 'old_door_no', 'new_door_no', 'road_name')
             ->orderBy('old_door_no')
             ->get()
             ->groupBy('road_name');
 
-        // Export as an Excel file with separate sheets for each road name
         return Excel::download(new MultiStreetExport($mis), 'streetwise_roads.xlsx');
     }
 }
