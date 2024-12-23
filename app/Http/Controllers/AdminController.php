@@ -831,64 +831,45 @@ class AdminController extends Controller
             ->orderBy('old_door_no')
             ->get()
             ->groupBy('road_name');
-
         // Define the folder path
         $folderPath = storage_path('app/public/streetwise_exports');
-        Log::info("Folder path: {$folderPath}");
 
         // Delete the folder if it exists
         if (File::exists($folderPath)) {
             File::deleteDirectory($folderPath);
-            Log::info("Existing directory deleted: {$folderPath}");
         }
 
         // Recreate the folder
         File::makeDirectory($folderPath, 0755, true);
-        Log::info("Directory created: {$folderPath}");
 
-        // Check if folder was created successfully
         if (!file_exists($folderPath)) {
-            throw new \Exception("Failed to create folder: {$folderPath}");
+            mkdir($folderPath, 0755, true);
         }
 
         // Loop through each road name and create a file
         foreach ($mis as $roadName => $data) {
             $sanitizedName = preg_replace('/[^A-Za-z0-9 _-]/', '', $roadName);
             $filename = $sanitizedName . '.xlsx';
-            try {
-                Excel::store(new StreetExport($roadName, $data), "{$folderPath}/{$filename}");
-                Log::info("File created for road: {$roadName}, Filename: {$filename}");
-            } catch (\Exception $e) {
-                Log::error("Error creating file for road: {$roadName}. Error: " . $e->getMessage());
-            }
+            Excel::store(new StreetExport($roadName, $data), "app/public/streetwise_exports/{$filename}");
         }
 
         // Return a download link for all files as a ZIP archive
         $zipFile = storage_path('app/public/streetwise_exports.zip');
-        Log::info("Preparing to create ZIP file: {$zipFile}");
-
-        try {
-            if (!$this->createZipArchive($folderPath, $zipFile)) {
-                throw new \Exception("Failed to create ZIP file: {$zipFile}");
-            }
-            Log::info("ZIP file created successfully: {$zipFile}");
-        } catch (\Exception $e) {
-            Log::error("Error creating ZIP file: " . $e->getMessage());
-            throw $e; // Re-throw exception to handle it in the controller
+        if (!$this->createZipArchive($folderPath, $zipFile)) {
+            throw new \Exception("Failed to create ZIP file: {$zipFile}");
         }
 
-        // Return the ZIP file for download
+        // Log success and download the ZIP file
+        Log::info("ZIP file created successfully: {$zipFile}");
+
         return response()->download($zipFile)->deleteFileAfterSend(true);
     }
-
     private function createZipArchive($source, $destination)
     {
         // Check if source directory exists
         if (!file_exists($source)) {
             throw new \Exception("Source directory does not exist: {$source}");
         }
-
-        Log::info("Starting ZIP file creation");
 
         // Open the ZIP file
         $zip = new \ZipArchive();
@@ -903,7 +884,6 @@ class AdminController extends Controller
                 $filePath = $file->getRealPath();
                 $relativePath = substr($filePath, strlen($source) + 1);
                 $zip->addFile($filePath, $relativePath);
-                Log::info("Adding file to ZIP: {$relativePath}");
             }
         }
 
@@ -912,7 +892,6 @@ class AdminController extends Controller
             throw new \Exception("Failed to close ZIP file: {$destination}");
         }
 
-        Log::info("ZIP file creation completed successfully");
         return true;
     }
 }
