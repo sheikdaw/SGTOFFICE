@@ -827,7 +827,7 @@ class AdminController extends Controller
 
         // Ensure all necessary columns are selected
         $mis = DB::table($data->mis)
-            ->select('assessment', 'old_assessment', 'owner_name', 'phone', 'usage', 'old_door_no', 'new_door_no', 'road_name')
+            ->select('assessment', 'old_assessment', 'owner_name', 'phone', 'building_usage', 'old_door_no', 'new_door_no', 'road_name')
             ->orderBy('old_door_no')
             ->get()
             ->groupBy('road_name');
