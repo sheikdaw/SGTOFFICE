@@ -457,12 +457,18 @@ class SurveyorController extends Controller
         }
 
         $pointdata = DB::table($data->pointdata)->where('point_gisid', $request->gisid)->first();
-        if ($pointdata) {
+        $pointdataworker = DB::table($data->pointdata)
+            ->where('point_gisid', $request->gisid)
+            ->where('worker_name', '!=', $surveyor->name)
+            ->first();
+
+        if ($pointdata && $pointdataworker) {
             return response()->json([
                 'error' => 'Data found. Please contact the team.',
                 'name' => $pointdata->worker_name ?? 'N/A' // Ensures safe access if worker_name is missing
             ], 403); // Use 403 for forbidden action
         }
+
 
         // Perform deletion
         DB::table($data->point)->where('gisid', $request->gisid)->delete();
