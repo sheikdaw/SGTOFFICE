@@ -855,7 +855,12 @@ class AdminController extends Controller
 
         // Return a download link for all files as a ZIP archive
         $zipFile = storage_path('app/public/streetwise_exports.zip');
-        $this->createZipArchive($folderPath, $zipFile);
+        if (!$this->createZipArchive($folderPath, $zipFile)) {
+            throw new \Exception("Failed to create ZIP file: {$zipFile}");
+        }
+
+        // Log success and download the ZIP file
+        Log::info("ZIP file created successfully: {$zipFile}");
 
         return response()->download($zipFile)->deleteFileAfterSend(true);
     }
