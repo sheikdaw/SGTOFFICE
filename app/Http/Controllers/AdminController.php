@@ -825,13 +825,46 @@ class AdminController extends Controller
     {
         $data = Data::findOrFail($id);
 
-        // Ensure all necessary columns are selected
+        // Group data by road name
         $mis = DB::table($data->mis)
-            ->select('assessment', 'old_assessment', 'owner_name', 'phone', 'building_usage', 'old_door_no', 'new_door_no', 'road_name')
+            ->select('road_name', 'old_door_no', 'new_door_no', 'assessment', 'old_assessment', 'owner_name', 'mobile_no', 'usage')
             ->orderBy('old_door_no')
             ->get()
             ->groupBy('road_name');
 
-        return Excel::download(new MultiStreetExport($mis), 'streetwise_roads.xlsx');
+        // Create a folder to store the files
+        $folderPath = storage_path('app/public/streetwise_exports');
+        if (!file_exists($folderPath)) {
+            mkdir($folderPath, 0755, true);
+        }
+
+        // Loop through each road name and create a file
+        foreach ($mis as $roadName => $data) {
+            $sanitizedName = preg_replace('/[^A-Za-z0-9 _-]/', '', $roadName);
+            $filename = $sanitizedName . '.xlsx';
+            Excel::store(new StreetExport($roadName, $data), "public/streetwise_exports/{$filename}");
+        }
+
+        // Return a download link for all files as a ZIP archive
+        $zipFile = storage_path('app/public/streetwise_exports.zip');
+        $this->createZipArchive($folderPath, $zipFile);
+
+        return response()->download($zipFile)->deleteFileAfterSend(true);
+    }
+    private function createZipArchive($source, $destination)
+    {
+        $zip = new \ZipArchive();
+
+        if ($zip->open($destination, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
+            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source));
+            foreach ($files as $file) {
+                if (!$file->isDir()) {
+                    $filePath = $file->getRealPath();
+                    $relativePath = substr($filePath, strlen($source) + 1);
+                    $zip->addFile($filePath, $relativePath);
+                }
+            }
+            $zip->close();
+        }
     }
 }
