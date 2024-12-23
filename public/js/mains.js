@@ -490,11 +490,11 @@ $(document).ready(function () {
                         color: polygonData ? "red" : "blue",
                         width: 4,
                     }),
-                    fill: new ol.style.Fill({
-                        color: polygonData
-                            ? "rgba(255, 0, 0, 0.3)"
-                            : "rgba(0, 0, 255, 0.3)", // Light red or light blue fill with 30% opacity
-                    }),
+                    // fill: new ol.style.Fill({
+                    //     color: polygonData
+                    //         ? "rgba(255, 0, 0, 0.3)"
+                    //         : "rgba(0, 0, 255, 0.3)", // Light red or light blue fill with 30% opacity
+                    // }),
                 });
             } else if (type === "Point") {
                 return createPointStyle(feature);
