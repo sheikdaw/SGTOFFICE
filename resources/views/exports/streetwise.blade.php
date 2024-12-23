@@ -18,7 +18,7 @@
                 <td>{{ $row->old_assessment }}</td>
                 <td>{{ $row->owner_name }}</td>
                 <td>{{ $row->phone }}</td>
-                <td>{{ $row->usage }}</td>
+                <td>{{ $row->building_usage }}</td>
                 <td>{{ $row->old_door_no }}</td>
                 <td>{{ $row->new_door_no }}</td>
                 <td>{{ $row->road_name }}</td>
