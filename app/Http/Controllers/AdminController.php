@@ -831,9 +831,17 @@ class AdminController extends Controller
             ->orderBy('old_door_no')
             ->get()
             ->groupBy('road_name');
-
-        // Create a folder to store the files
+        // Define the folder path
         $folderPath = storage_path('app/public/streetwise_exports');
+
+        // Delete the folder if it exists
+        if (File::exists($folderPath)) {
+            File::deleteDirectory($folderPath);
+        }
+
+        // Recreate the folder
+        File::makeDirectory($folderPath, 0755, true);
+
         if (!file_exists($folderPath)) {
             mkdir($folderPath, 0755, true);
         }
