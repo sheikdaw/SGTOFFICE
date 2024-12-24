@@ -470,7 +470,7 @@ class AdminController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:surveyors,email,' . $request->id,
+            'email' => 'required|email',
             'mobile' => 'required|regex:/^[0-9]{10}$/',
             'password' => 'nullable|string|min:8',
             'data_id' => 'required',
