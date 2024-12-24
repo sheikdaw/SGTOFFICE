@@ -393,51 +393,66 @@ $(document).ready(function () {
             zoom: 20, // Initial zoom level
         }),
     });
-    var userLocationSource = new ol.source.Vector();
-    var userLocationLayer = new ol.layer.Vector({
-        source: userLocationSource,
-        style: new ol.style.Style({
-            image: new ol.style.Circle({
-                radius: 8,
-                fill: new ol.style.Fill({ color: "yellow" }), // Green fill for the circle
-                stroke: new ol.style.Stroke({ color: "white", width: 2 }), // White border
+    const liveLocationStyle = new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 5, // Marker size
+            fill: new ol.style.Fill({
+                color: "yellow", // Marker color (red with transparency)
+            }),
+            stroke: new ol.style.Stroke({
+                color: "yellow", // Optional stroke color (black)
+                width: 2, // Stroke width
             }),
         }),
     });
-    map.addLayer(userLocationLayer);
-    function updateUserLocation(position) {
-        const { latitude, longitude } = position.coords;
 
-        const userCoordinates = ol.proj.fromLonLat([longitude, latitude]);
+    // Create a vector source and layer for the live location
+    const liveLocationSource = new ol.source.Vector({
+        wrapX: false,
+    });
+    const liveLocationLayer = new ol.layer.Vector({
+        source: liveLocationSource,
+        style: liveLocationStyle, // Apply the custom style
+    });
+    map.addLayer(liveLocationLayer); // Add live location layer to the map
 
-        userLocationSource.clear();
+    // Function to update the live location
+    let isFirstUpdate = true; // Flag to track the first update
 
-        const userLocationFeature = new ol.Feature({
-            geometry: new ol.geom.Point(userCoordinates),
+    function updateLiveLocation(position) {
+        const coord = [position.coords.longitude, position.coords.latitude];
+        const feature = new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.fromLonLat(coord)),
         });
-        userLocationSource.addFeature(userLocationFeature);
 
-        map.getView().setCenter(userCoordinates);
-        map.getView().setZoom(15); // Adjust zoom level as needed
+        liveLocationSource.clear();
+        liveLocationSource.addFeature(feature);
+
+        if (isFirstUpdate) {
+            map.getView().setCenter(ol.proj.fromLonLat(coord));
+            map.getView().setZoom(22); // Adjust zoom level as needed
+            isFirstUpdate = false; // Set the flag to false after the first update
+        } else {
+            // Optional: Update the map view without changing zoom/center if not the first update
+            // map.getView().setCenter(ol.proj.fromLonLat(coord));
+        }
     }
 
-    // Function to handle errors while fetching location
-    function handleLocationError(error) {
-        console.error("Error fetching location:", error.message);
-    }
-
-    // Use the Geolocation API to watch the user's position
+    // Use the Geolocation API to get the user's current location
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
-            updateUserLocation,
-            handleLocationError,
+            updateLiveLocation,
+            (error) => {
+                console.error("Error getting location", error);
+            },
             {
-                enableHighAccuracy: true, // Enable high-accuracy GPS
-                maximumAge: 0, // No cached position
+                enableHighAccuracy: true,
+                maximumAge: 10000,
+                timeout: 5000,
             }
         );
     } else {
-        console.error("Geolocation API not supported by this browser.");
+        console.error("Geolocation is not supported by this browser.");
     }
 
     // Function to create point style
@@ -564,6 +579,7 @@ $(document).ready(function () {
                         geometry: new ol.geom.MultiLineString(geometries),
                         type: type,
                         gisid: feature.gisid,
+                        road_name: feature.road_name,
                     });
                 }
                 vectorSource.addFeature(olFeature);
@@ -574,7 +590,7 @@ $(document).ready(function () {
     // Function to refresh the vector layer with updated points, lines, and polygons
     function refreshLayer(points, lines, polygons) {
         console.log("suprise", pointDatas);
-        console.log(points);
+        console.log(lines);
         vectorSource.clear(); // Clear existing features before adding new ones
         addFeatures(points, "Point");
         addFeatures(lines, "MultiLineString"); // Ensure type matches your data
@@ -736,20 +752,17 @@ $(document).ready(function () {
                             document.getElementById("remarks").value =
                                 item.remarks || "";
 
-                            var imagel = gisId + ".png";
-                            var basePath =
-                                "{{ asset('public/corporation/coimbatore') }}";
+                            var image = gisId + ".png";
 
-                            // Construct the full image path
-                            var imagePath =
-                                basePath +
+                            var assetBasePath =
+                                "public/corporation/coimbatore" +
                                 "/" +
                                 data.zone +
                                 "/" +
                                 data.ward +
-                                "/images/" +
-                                image;
+                                "/images/";
 
+                            var imagePath = assetBasePath + gisId + ".png";
                             // Set the image path
                             $("#building_img").attr("src", imagePath);
 
@@ -803,6 +816,7 @@ $(document).ready(function () {
                     geometryType == "LineString" ||
                     geometryType == "MultiLineString"
                 ) {
+                    console.log(properties);
                     var gisid = properties["gisid"];
                     $("#pointgis").val(gisid);
                     console.log("Line feature properties:", properties);
@@ -816,17 +830,7 @@ $(document).ready(function () {
                         );
                     }
 
-                    var content = "";
-                    for (var key in properties) {
-                        if (key !== "geometry") {
-                            content +=
-                                "<li><strong>" +
-                                key +
-                                ":</strong> " +
-                                properties[key] +
-                                "</li>";
-                        }
-                    }
+                    var content = properties["road_name"];
                     document.getElementById("featureline").innerHTML = content;
                     $("#lineModal").modal("show");
                 }

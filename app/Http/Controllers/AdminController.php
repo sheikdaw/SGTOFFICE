@@ -97,15 +97,15 @@ class AdminController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-
         $corporationID = $request->corporation;
+
+
         $cbe = CBE::findOrFail($corporationID);
         $corporation = $cbe->name;
         $zone = $request->zone;
         $ward = $request->ward;
         $tablePrefix = "{$corporation}_{$zone}_{$ward}_";
 
-        // Define tables and their schemas
         $tables = [
             'polygons' => function (Blueprint $table) {
                 $table->id();
@@ -114,88 +114,238 @@ class AdminController extends Controller
                 $table->json('coordinates');
                 $table->timestamps();
             },
-            // Repeat for other tables...
+            'points' => function (Blueprint $table) {
+                $table->id();
+                $table->string('gisid');
+                $table->string('type');
+                $table->json('coordinates');
+                $table->timestamps();
+            },
+            'lines' => function (Blueprint $table) {
+                $table->id();
+                $table->string('gisid');
+                $table->string('type');
+                $table->json('coordinates');
+                $table->timestamps();
+            },
+            'mis' => function (Blueprint $table) {
+                $table->id();
+                $table->string('assessment')->nullable();
+                $table->string('old_assessment')->nullable();
+                $table->string('number_floor')->nullable();
+                $table->string('new_address')->nullable();
+                $table->string('building_usage')->nullable();
+                $table->string('construction_type')->nullable();
+                $table->string('road_name')->nullable();
+                $table->string('phone')->nullable();
+                $table->string('building_type')->nullable();
+                $table->string('ward')->nullable();
+                $table->string('owner_name')->nullable();
+                $table->string('old_door_no')->nullable();
+                $table->string('new_door_no')->nullable();
+                $table->string('plot_area')->nullable();
+                $table->string('watertax')->nullable();
+                $table->string('halfyeartax')->nullable();
+                $table->string('balance')->nullable();
+                $table->timestamps();
+            },
+            'pointdata' => function (Blueprint $table) {
+                $table->id();
+                $table->string('data_id')->nullable();
+                $table->string('point_gisid')->nullable();
+                $table->string('worker_name')->nullable();
+                $table->string('assessment')->nullable();
+                $table->string('old_assessment')->nullable();
+                $table->string('owner_name')->nullable();
+                $table->string('present_owner_name')->nullable();
+                $table->string('eb')->nullable();
+                $table->string('floor')->nullable();
+                $table->string('bill_usage')->nullable();
+                $table->string('aadhar_no')->nullable();
+                $table->string('ration_no')->nullable();
+                $table->string('phone_number')->nullable();
+                $table->string('shop_floor')->nullable();
+                $table->string('shop_name')->nullable();
+                $table->string('shop_owner_name')->nullable();
+                $table->string('old_door_no')->nullable();
+                $table->string('new_door_no')->nullable();
+                $table->string('shop_category')->nullable();
+                $table->string('shop_mobile')->nullable();
+                $table->string('license')->nullable();
+                $table->string('professional_tax')->nullable();
+                $table->string('gst')->nullable();
+                $table->string('number_of_employee')->nullable();
+                $table->string('trade_income')->nullable();
+                $table->string('establishment_remarks')->nullable();
+                $table->string('remarks')->nullable();
+                $table->string('plot_area')->nullable();
+                $table->string('water_tax')->nullable();
+                $table->string('halfyeartax')->nullable();
+                $table->string('balance')->nullable();
+                $table->string('building_data_id')->nullable();
+                $table->string('qc_area')->nullable();
+                $table->string('qc_usage')->nullable();
+                $table->string('qc_name')->nullable();
+                $table->string('qc_remarks')->nullable();
+                $table->string('otsarea')->nullable();
+                $table->timestamps();
+            },
+            'buildingdata' => function (Blueprint $table) {
+                $table->id();
+                $table->string('data_id')->nullable();
+                $table->string('gisid')->nullable();
+                $table->string('number_bill')->nullable();
+                $table->string('number_shop')->nullable();
+                $table->string('number_floor')->nullable();
+                $table->string('new_address')->nullable();
+                $table->string('liftroom')->nullable();
+                $table->string('headroom')->nullable();
+                $table->string('overhead_tank')->nullable();
+                $table->string('percentage')->nullable();
+                $table->string('building_name')->nullable();
+                $table->string('building_usage')->nullable();
+                $table->string('construction_type')->nullable();
+                $table->string('road_name')->nullable();
+                $table->string('ugd')->nullable();
+                $table->string('rainwater_harvesting')->nullable();
+                $table->string('parking')->nullable();
+                $table->string('ramp')->nullable();
+                $table->string('hoarding')->nullable();
+                $table->string('cctv')->nullable();
+                $table->string('cell_tower')->nullable();
+                $table->string('solar_panel')->nullable();
+                $table->string('basement')->nullable();
+                $table->string('water_connection')->nullable();
+                $table->string('phone')->nullable();
+                $table->string('building_type')->nullable();
+                $table->string('image')->nullable();
+                $table->string('sqfeet')->nullable();
+                $table->string('merge')->nullable();
+                $table->string('split')->nullable();
+                $table->string('worker_name')->nullable();
+                $table->string('remarks')->nullable();
+                $table->string('corporationremarks')->nullable();
+                $table->timestamps();
+            },
+            'qc' => function (Blueprint $table) {
+                $table->id();
+                $table->string('gisid')->nullable();
+                $table->string('floor')->nullable();
+                $table->string('length')->nullable();
+                $table->string('breth')->nullable();
+                $table->string('qcarea')->nullable();
+                $table->string('qcusage')->nullable();
+                $table->string('otsarea')->nullable();
+                $table->string('qcremarks')->nullable();
+                $table->string('qcname')->nullable();
+                $table->timestamps();
+            }
         ];
 
-        // Create tables dynamically if they don't exist
         foreach ($tables as $name => $schema) {
             if (!Schema::hasTable($tablePrefix . $name)) {
                 Schema::create($tablePrefix . $name, $schema);
             }
         }
 
-        // Handle MIS Import
-        // if ($request->hasFile('mis')) {
-        //     $file = $request->file('mis');
-        //     $import = new MisImport($tablePrefix . 'mis');
+        // Handle Import
+        $file = $request->file('mis');
+        if (!$file) {
+            return response()->json(['message' => 'No file uploaded'], 400);
+        }
+        $import = new MisImport($tablePrefix . 'mis');
 
-        //     try {
-        //         Excel::import($import, $file);
-        //     } catch (\Exception $e) {
-        //         Log::error('Import Error: ' . $e->getMessage());
-        //         return response()->json(['message' => 'Import failed'], 500);
-        //     }
-        // }
+        try {
+            Excel::import($import, $file);
+            // return response()->json(['message' => 'Import successful'], 200);
+        } catch (\Exception $e) {
+            Log::error('Import Error: ' . $e->getMessage());
+            return response()->json(['message' => 'Import failed'], 500);
+        }
 
-        // Process GeoJSON files (point, line, polygon)
-        $geojsonFiles = ['point', 'line', 'polygon'];
-        foreach ($geojsonFiles as $geoFile) {
-            if ($request->hasFile($geoFile)) {
-                $file = $request->file($geoFile);
-                $data = json_decode(file_get_contents($file->getRealPath()), true);
+        // Handle Point File Upload
+        if ($request->hasFile('point')) {
+            $pointFile = $request->file('point');
+            $pointData = json_decode(file_get_contents($pointFile->getRealPath()), true);
 
-                foreach ($data['features'] as $key => $feature) {
-                    DB::table($tablePrefix . "{$geoFile}s")->insert([
-                        'gisid' => $feature['properties']['GIS_ID'] ?? $key,
-                        'type' => $feature['geometry']['type'] ?? null,
-                        'coordinates' => json_encode($feature['geometry']['coordinates']),
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
+            foreach ($pointData['features'] as $feature) {
+                DB::table($tablePrefix . 'points')->insert([
+                    'gisid' => $feature['properties']['GIS_ID'] ?? null,
+                    'type' => $feature['geometry']['type'] ?? null,
+                    'coordinates' => json_encode($feature['geometry']['coordinates']),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
         }
 
-        // Save uploaded image
+        // Handle Line File Upload
+        if ($request->hasFile('line')) {
+            $lineFile = $request->file('line');
+            $lineData = json_decode(file_get_contents($lineFile->getRealPath()), true);
+            $count = 0;
+            foreach ($lineData['features'] as $feature) {
+                DB::table($tablePrefix . 'lines')->insert([
+                    'gisid' => $count++,
+                    'type' => $feature['geometry']['type'] ?? null,
+                    'coordinates' => json_encode($feature['geometry']['coordinates']),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+        if ($request->hasFile('polygon')) {
+            $lineFile = $request->file('polygon');
+            $lineData = json_decode(file_get_contents($lineFile->getRealPath()), true);
+            $count = 0;
+
+            foreach ($lineData['features'] as $feature) {
+                DB::table($tablePrefix . 'polygons')->insert([
+                    'gisid' => $count++,
+                    'type' => $feature['geometry']['type'] ?? null,
+                    'coordinates' => json_encode($feature['geometry']['coordinates'][0]),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imageFile = $request->file('image');
             $imageName = 'image' . '.' . $imageFile->getClientOriginalExtension();
-            $corporationPath = public_path("corporations/{$corporation}/{$zone}/{$ward}");
+            $corporationPath = public_path('corporations/' . $corporation . '/' . $zone . '/' . $ward);
 
+            // Create the directory if it doesn't exist
             if (!File::exists($corporationPath)) {
                 File::makeDirectory($corporationPath, 0755, true);
             }
 
+            // Move the image file
             $imageFile->move($corporationPath, $imageName);
-            $imagePath = "corporations/{$corporation}/{$zone}/{$ward}/{$imageName}";
+            $imagePath = 'corporations/' . $corporation . '/' . $zone . '/' . $ward . '/' . $imageName;
         }
 
-        // Save data to the database
+        // Save Data
         $data = new Data();
-        $data->fill([
-            'corporation_id' => $cbe->id,
-            'corporation_name' => $corporation,
-            'ward' => $ward,
-            'zone' => $zone,
-            'image' => $imagePath,
-            'polygon' => $tablePrefix . 'polygons',
-            'line' => $tablePrefix . 'lines',
-            'point' => $tablePrefix . 'points',
-            'mis' => $tablePrefix . 'mis',
-            'qc' => $tablePrefix . 'qc',
-            'pointdata' => $tablePrefix . 'pointdata',
-            'polygondata' => $tablePrefix . 'buildingdata',
-            'extend_left' => $request->extend_left,
-            'extend_right' => $request->extend_right,
-            'extend_top' => $request->extend_top,
-            'extend_bottom' => $request->extend_bottom,
-        ]);
+        $data->corporation_id = $cbe->id;
+        $data->corporation_name =   $corporation;
+        $data->ward = $request->input('ward');
+        $data->zone = $request->input('zone');
+        $data->image = $imagePath; // Save the path to the uploaded image
+        $data->polygon = $tablePrefix . 'polygons'; // Save the table name for polygons
+        $data->line = $tablePrefix . 'lines'; // Save the table name for lines
+        $data->point = $tablePrefix . 'points'; // Save the table name for points
+        $data->mis = $tablePrefix . 'mis';
+        $data->qc = $tablePrefix . 'qc';
+        $data->pointdata = $tablePrefix . 'pointdata';
+        $data->polygondata = $tablePrefix . 'buildingdata';
+        $data->extend_left = $request->input('extend_left');
+        $data->extend_right = $request->input('extend_right');
+        $data->extend_top = $request->input('extend_top');
+        $data->extend_bottom = $request->input('extend_bottom');
         $data->save();
-
         return response()->json(['message' => 'Success', 'data' => 'Data added successfully']);
     }
-
 
     // cbe start
     public function cbe()
