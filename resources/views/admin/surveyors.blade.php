@@ -15,31 +15,31 @@
                     </div>
                 </div>
             @else
-               <div class="row show-surveyors">
-                @foreach ($surveyors as $surveyor)
-                <div class="col-md-4">
-                    <div class="card mb-4 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $surveyor->name }}</h5>
-                            <p class="card-text">
-                                <strong>Email:</strong> {{ $surveyor->email }} <br>
-                                <strong>Mobile:</strong> {{ $surveyor->mobile }} <br>
-                                <strong>Data ID:</strong> {{ $surveyor->data_id }} <br>
-                                <strong>Password:</strong> {{ $surveyor->password }} <br>
-                                <strong>Password Reset Token:</strong> {{ $surveyor->password_reset_token }}
-                            </p>
-                            <button class="btn btn-primary editSurveyor" data-id="{{ $surveyor->id }}"
-                                data-name="{{ $surveyor->name }}" data-email="{{ $surveyor->email }}"
-                                data-mobile="{{ $surveyor->mobile }}" data-password="{{ $surveyor->password }}"
-                                data-data_id="{{ $surveyor->data_id }}">Update</button>
-                                <button class="btn btn-danger delete-surveyor" data-id="{{ $surveyor->id }}"
-                                 >Delete</button>
+                <div class="row show-surveyors">
+                    @foreach ($surveyors as $surveyor)
+                        <div class="col-md-4">
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ $surveyor->name }}</h5>
+                                    <p class="card-text">
+                                        <strong>Email:</strong> {{ $surveyor->email }} <br>
+                                        <strong>Mobile:</strong> {{ $surveyor->mobile }} <br>
+                                        <strong>Data ID:</strong> {{ $surveyor->data_id }} <br>
+                                        <strong>Password:</strong> {{ $surveyor->password }} <br>
+                                        <strong>Password Reset Token:</strong> {{ $surveyor->password_reset_token }}
+                                    </p>
+                                    <button class="btn btn-primary editSurveyor" data-sid="{{ $surveyor->id }}"
+                                        data-name="{{ $surveyor->name }}" data-email="{{ $surveyor->email }}"
+                                        data-mobile="{{ $surveyor->mobile }}" data-password="{{ $surveyor->password }}"
+                                        data-data_id="{{ $surveyor->data_id }}">Update</button>
+                                    <button class="btn btn-danger delete-surveyor"
+                                        data-id="{{ $surveyor->id }}">Delete</button>
 
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    @endforeach
                 </div>
-            @endforeach
-               </div>
             @endif
         </div>
     </div>
@@ -73,7 +73,7 @@
                         <div class="mb-3">
                             <label for="data_id" class="form-label">Data ID</label>
                             <select class="form-control" id="data_id" name="data_id" required>
-                                <option value=""  selected>Select a Data ID</option> <!-- Default option -->
+                                <option value="" selected>Select a Data ID</option> <!-- Default option -->
                                 @foreach ($datas as $data)
                                     <option value="{{ $data->id }}">ward {{ $data->ward }}</option>
                                     <!-- Adjust based on your data model -->
@@ -98,7 +98,8 @@
     </div>
 
     {{-- Model for update surveyors --}}
-    <div class="modal fade" id="updateSurveyorModal" tabindex="-1" aria-labelledby="updateSurveyorModalLabel" aria-hidden="true">
+    <div class="modal fade" id="updateSurveyorModal" tabindex="-1" aria-labelledby="updateSurveyorModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="updateSurveyorForm" novalidate>
@@ -109,7 +110,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="update_id" name="id" >
+                            <input type="text" class="form-control" id="update_id" name="id">
                             <label for="name" class="form-label">Name</label>
                             <input type="text" class="form-control" id="update_name" name="name" required>
                             <div class="invalid-feedback">Please enter a name.</div>
@@ -127,7 +128,7 @@
                         <div class="mb-3">
                             <label for="data_id" class="form-label">Data ID</label>
                             <select class="form-control" id="update_data_id" name="data_id" required>
-                                <option value=""  selected>Select a Data ID</option> <!-- Default option -->
+                                <option value="" selected>Select a Data ID</option> <!-- Default option -->
                                 @foreach ($datas as $data)
                                     <option value="{{ $data->id }}">ward {{ $data->ward }}</option>
                                     <!-- Adjust based on your data model -->
@@ -153,13 +154,12 @@
 
 
     <script>
-
-    const routes = {
-        SurveyorStore: "{{ route('admin.store-Surveyor') }}",
-        surveyorUpdate: "{{ route('admin.surveyorUpdate') }}",
-        surveyorDelete: "{{ route('admin.surveyorDelete', ['id' => 'mm']) }}", // Use a placeholder
-    };
-</script>
+        const routes = {
+            SurveyorStore: "{{ route('admin.store-Surveyor') }}",
+            surveyorUpdate: "{{ route('admin.surveyorUpdate') }}",
+            surveyorDelete: "{{ route('admin.surveyorDelete', ['id' => 'mm']) }}", // Use a placeholder
+        };
+    </script>
 
 
 @endsection

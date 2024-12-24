@@ -273,7 +273,7 @@ $(document).ready(function () {
     // Edit Surveyor
     $(document).on("click", ".editSurveyor", function () {
         const data_id = $(this).data("data_id");
-        const id = $(this).data("id");
+        const id = $(this).data("sid");
         const name = $(this).data("name");
         const email = $(this).data("email");
         const mobile = $(this).data("mobile");
