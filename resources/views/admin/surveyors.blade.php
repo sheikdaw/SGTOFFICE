@@ -30,8 +30,8 @@
                                         <strong>Password Reset Token:</strong> {{ $surveyor->password_reset_token }}
                                     </p>
                                     <button class="btn btn-primary editSurveyor" data-name="{{ $surveyor->name }}"
-                                        data-email="{{ $surveyor->email }}" data-mobile="{{ $surveyor->mobile }}"
-                                        data-password="{{ $surveyor->password }}"
+                                        data-i="{{ $surveyor->id }}" data-email="{{ $surveyor->email }}"
+                                        data-mobile="{{ $surveyor->mobile }}" data-password="{{ $surveyor->password }}"
                                         data-data_id="{{ $surveyor->data_id }}">Update</button>
                                     <button class="btn btn-danger delete-surveyor"
                                         data-id="{{ $surveyor->id }}">Delete</button>
