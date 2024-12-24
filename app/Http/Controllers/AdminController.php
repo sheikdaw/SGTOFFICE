@@ -468,12 +468,12 @@ class AdminController extends Controller
     public function surveyorUpdate(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email',
-            'mobile' => 'required',
-            'password' => 'nullable',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:surveyors,email,' . $request->id,
+            'mobile' => 'required|regex:/^[0-9]{10}$/',
+            'password' => 'nullable|string|min:8',
             'data_id' => 'required',
-            'id' => 'required',
+            'id' => 'required|exists:surveyors,id',
         ]);
 
         if ($validator->fails()) {
@@ -488,19 +488,22 @@ class AdminController extends Controller
             $surveyor->email = $request->email;
             $surveyor->mobile = $request->mobile;
             $surveyor->data_id = $request->data_id;
-            if ($request->password) {
+
+            if ($request->filled('password')) {
                 $surveyor->password = Hash::make($request->password);
             }
+
             $surveyor->save();
 
             // Fetch all surveyors to return
-            $surveyors = Surveyor::all();
+            $surveyors = Surveyor::orderBy('id', 'desc')->get();
 
             return response()->json(['data' => 'Surveyor updated successfully!', 'surveyors' => $surveyors], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred. Please try again.'], 500);
         }
     }
+
     public function surveyorDestroy($id)
     {
         try {
