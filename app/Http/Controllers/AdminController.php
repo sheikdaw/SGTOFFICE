@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use ZipArchive;
 use App\Mail\TestEmail;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 
 class AdminController extends Controller
@@ -465,7 +466,7 @@ class AdminController extends Controller
         // Return a success response
         return response()->json(['message' => 'Surveyor added successfully!', 'surveyors' => $surveyors], 201);
     }
-    public function surveyorUpdate(Request $request)
+    public function surveyorUpdate(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
@@ -495,14 +496,12 @@ class AdminController extends Controller
 
             $surveyor->save();
 
-            // Fetch all surveyors to return
-            $surveyors = Surveyor::orderBy('id', 'desc')->get();
-
-            return response()->json(['data' => 'Surveyor updated successfully!', 'surveyors' => $surveyors], 200);
+            return response()->json(['message' => 'Surveyor updated successfully!', 'surveyor' => $surveyor], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred. Please try again.'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
 
     public function surveyorDestroy($id)
     {
