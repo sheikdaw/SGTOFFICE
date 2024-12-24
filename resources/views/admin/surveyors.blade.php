@@ -21,6 +21,7 @@
                             <div class="card mb-4 shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $surveyor->name }}</h5>
+                                    <h5> {{ $surveyor->id }}</h5>
                                     <p class="card-text">
                                         <strong>Email:</strong> {{ $surveyor->email }} <br>
                                         <strong>Mobile:</strong> {{ $surveyor->mobile }} <br>
@@ -28,9 +29,9 @@
                                         <strong>Password:</strong> {{ $surveyor->password }} <br>
                                         <strong>Password Reset Token:</strong> {{ $surveyor->password_reset_token }}
                                     </p>
-                                    <button class="btn btn-primary editSurveyor" data-sid="{{ $surveyor->id }}"
-                                        data-name="{{ $surveyor->name }}" data-email="{{ $surveyor->email }}"
-                                        data-mobile="{{ $surveyor->mobile }}" data-password="{{ $surveyor->password }}"
+                                    <button class="btn btn-primary editSurveyor" data-name="{{ $surveyor->name }}"
+                                        data-email="{{ $surveyor->email }}" data-mobile="{{ $surveyor->mobile }}"
+                                        data-password="{{ $surveyor->password }}"
                                         data-data_id="{{ $surveyor->data_id }}">Update</button>
                                     <button class="btn btn-danger delete-surveyor"
                                         data-id="{{ $surveyor->id }}">Delete</button>
