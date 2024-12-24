@@ -788,6 +788,7 @@ $(document).ready(function () {
                         document.getElementById("building_usage").value = "";
                         document.getElementById("construction_type").value = "";
                         // document.getElementById('road_name').value = "";
+                        $("#road_name").val(localStorage.getItem("road"));
                         document.getElementById("ugd").value = "";
                         document.getElementById("rainwater_harvesting").value =
                             "";
@@ -843,6 +844,8 @@ $(document).ready(function () {
         $(".error-message").text("");
         $("input").removeClass("is-invalid");
         $("select").removeClass("is-invalid");
+        let road = $("#road_name").val();
+        localStorage.setItem("road", road);
 
         // Disable submit button to prevent multiple submissions
         $("#buildingsubmitBtn").prop("disabled", true);
