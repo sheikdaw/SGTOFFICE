@@ -686,7 +686,7 @@ class AdminController extends Controller
         // Fetch the data by joining tables
         $filters = $this->areaVariations($data);
 
-        return Excel::download(new AreaVariationExport($filters->toArray(), ''), 'Area_variation.xlsx');
+        return Excel::download(new AreaVariationExport($filters, ''), 'Area_variation.xlsx');
     }
 
 
