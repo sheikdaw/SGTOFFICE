@@ -609,6 +609,7 @@ class AdminController extends Controller
                 'poly.coordinates',
                 'polyd.basement',
                 'polyd.road_name',
+                'polyd.building_type',
                 'pd.assessment',
                 'pd.old_assessment',
                 'mis.building_usage as misusage',
