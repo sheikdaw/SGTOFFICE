@@ -358,9 +358,6 @@ $(document).ready(function () {
         $(this).find(".invalid-feedback").hide(); // Hide error messages
     });
 
-    //surveyors dashboard
-    // Ensure extent is parsed correctly as a JavaScript array of floats
-    // Parse the extent data into an array
     var extent = [
         parseFloat(extentData.left),
         parseFloat(extentData.bottom),
