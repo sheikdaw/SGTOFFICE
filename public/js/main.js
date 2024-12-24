@@ -286,7 +286,7 @@ $(document).ready(function () {
         // $("#updateSurveyorModal #update_password").val(password);
         $("#updateSurveyorModal #update_mobile").val(mobile);
         $("#updateSurveyorModal #update_data_id").val(data_id);
-        $("#updateSurveyorModal #update_id").val(data_id);
+        $("#updateSurveyorModal #update_id").val(id);
         $("#updateSurveyorModal").modal("show");
     });
     $("#updateSurveyorForm").submit(function (e) {

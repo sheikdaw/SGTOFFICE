@@ -27,8 +27,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use ZipArchive;
 use App\Mail\TestEmail;
-use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Mail;
 
 class AdminController extends Controller
@@ -441,16 +439,41 @@ class AdminController extends Controller
         // Pass the surveyors data to the view
         return view('admin.surveyors', compact('surveyors', 'datas'));
     }
-    public function surveyorUpdate(Request $request)
+    public function storeSurveyor(Request $request)
     {
-        // Validate the incoming request
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'email' => 'required|email|unique:surveyors,email',
             'mobile' => 'required|string|max:20',
-            'password' => 'nullable|string|min:8',
-            'data_id' => 'required|integer',
-            'id' => 'required|integer',
+            'data_id' => 'required|string|max:50',
+            'password' => 'required|string|min:6', // Adjust as needed
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+        $surveyor = new Surveyor();
+        $surveyor->name = $request->input('name');
+        $surveyor->email = $request->input('email');
+        $surveyor->mobile = $request->input('mobile');
+        $surveyor->data_id = $request->input('data_id');
+        $surveyor->password = Hash::make($request->password);    // Hash the password
+        $surveyor->password_reset_token = null; // Adjust if you need this field
+
+        // Save the surveyor to the database
+        $surveyor->save();
+        $surveyors = Surveyor::all();
+        // Return a success response
+        return response()->json(['message' => 'Surveyor added successfully!', 'surveyors' => $surveyors], 201);
+    }
+    public function surveyorUpdate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|email',
+            'mobile' => 'required',
+            'password' => 'nullable',
+            'data_id' => 'required',
+            'id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -458,37 +481,26 @@ class AdminController extends Controller
         }
 
         try {
-            // Find the surveyor by ID or fail
             $surveyor = Surveyor::findOrFail($request->id);
 
-            // Update surveyor fields
+            // Update the surveyor data
             $surveyor->name = $request->name;
             $surveyor->email = $request->email;
             $surveyor->mobile = $request->mobile;
             $surveyor->data_id = $request->data_id;
-
-            // Update password if provided
-            if (!empty($request->password)) {
+            if ($request->password) {
                 $surveyor->password = Hash::make($request->password);
             }
-
-            // Save the updated surveyor
             $surveyor->save();
 
-            // Fetch updated list of all surveyors
+            // Fetch all surveyors to return
             $surveyors = Surveyor::all();
 
-            return response()->json([
-                'message' => 'Surveyor updated successfully!',
-                'surveyors' => $surveyors
-            ], 200);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Surveyor not found.'], 404);
-        } catch (Exception $e) {
-            return response()->json(['error' => 'An unexpected error occurred. Please try again later.'], 500);
+            return response()->json(['data' => 'Surveyor updated successfully!', 'surveyors' => $surveyors], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred. Please try again.'], 500);
         }
     }
-
     public function surveyorDestroy($id)
     {
         try {
