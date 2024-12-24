@@ -273,12 +273,12 @@ $(document).ready(function () {
     // Edit Surveyor
     $(document).on("click", ".editSurveyor", function () {
         const data_id = $(this).data("data_id");
-        const id = $(this).data("i");
+        const i = $(this).data("i");
         const name = $(this).data("name");
         const email = $(this).data("email");
         const mobile = $(this).data("mobile");
         // const password = $(this).data('password');
-
+        alert(i);
         // Populate modal fields
         // $("#updateCorporationModal #id").val(id);
         $("#updateSurveyorModal #update_name").val(name);
@@ -286,7 +286,7 @@ $(document).ready(function () {
         // $("#updateSurveyorModal #update_password").val(password);
         $("#updateSurveyorModal #update_mobile").val(mobile);
         $("#updateSurveyorModal #update_data_id").val(data_id);
-        $("#updateSurveyorModal #update_id").val(id);
+        $("#updateSurveyorModal #update_id").val(i);
         $("#updateSurveyorModal").modal("show");
     });
     $("#updateSurveyorForm").submit(function (e) {
