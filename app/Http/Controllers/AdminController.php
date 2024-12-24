@@ -257,7 +257,6 @@ class AdminController extends Controller
 
         try {
             Excel::import($import, $file);
-            // return response()->json(['message' => 'Import successful'], 200);
         } catch (\Exception $e) {
             Log::error('Import Error: ' . $e->getMessage());
             return response()->json(['message' => 'Import failed'], 500);
@@ -655,10 +654,23 @@ class AdminController extends Controller
                 $allData->ward = $data->ward;
             }
         }
+        $matchingPoints = $allDatas;
+
+        foreach ($matchingPoints as $allData) {
+
+            if ($allData['areavariation'] > 150) {
+                if ($allData['areavariation'] > 250) {
+                    if (!in_array($allData['building_type'], ['Flat', 'apartment', 'Flat-Multistoried'])) {
+                        $areavariation[] = $allData;
+                    }
+                } else if ($allData['building_usage'] === 'commercial') {
+                    $areavariation[] = $allData;
+                }
+            }
+        }
 
 
-
-        return $allDatas;
+        return $areavariation;
     }
 
     // Area variation
@@ -675,20 +687,7 @@ class AdminController extends Controller
 
         return Excel::download(new AreaVariationExport($filters->toArray(), ''), 'Area_variation.xlsx');
     }
-    // $matchingPoints = $pointdata->where('point_gisid', $polygon->gisid);
-    // foreach ($matchingPoints as $point) {
-    //     $combinedData = array_merge((array)$polygon, (array)$point);
 
-    //     if ($combinedData['areavariation'] > 150) {
-    //         if ($combinedData['areavariation'] > 250) {
-    //             if (!in_array($combinedData['building_type'], ['Flat', 'apartment', 'Flat-Multistoried'])) {
-    //                 $areavariation[] = $combinedData;
-    //             }
-    //         } elseif ($combinedData['building_usage'] === 'commercial') {
-    //             $areavariation[] = $combinedData;
-    //         }
-    //     }
-    // }
 
     public function usageAndAreaVariation($id)
     {

@@ -276,6 +276,7 @@ class SurveyorController extends Controller
         }
 
         DB::table($data->pointdata)->insert([
+            'data_id' => $polygonData->id,
             'point_gisid' => $validatedData['point_gisid'],
             'worker_name' => $surveyor->name,
             // 'eb' => $validatedData['eb'],
