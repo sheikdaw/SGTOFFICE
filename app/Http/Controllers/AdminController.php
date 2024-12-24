@@ -658,12 +658,12 @@ class AdminController extends Controller
 
         foreach ($matchingPoints as $allData) {
 
-            if ($allData['areavariation'] > 150) {
-                if ($allData['areavariation'] > 250) {
-                    if (!in_array($allData['building_type'], ['Flat', 'apartment', 'Flat-Multistoried'])) {
+            if ($allData->areavariation > 150) {
+                if ($allData->areavariation > 250) {
+                    if (!in_array($allData->building_type, ['Flat', 'apartment', 'Flat-Multistoried'])) {
                         $areavariation[] = $allData;
                     }
-                } else if ($allData['building_usage'] === 'commercial') {
+                } else if ($allData->building_usage === 'commercial') {
                     $areavariation[] = $allData;
                 }
             }
