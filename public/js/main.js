@@ -749,7 +749,7 @@ $(document).ready(function () {
                             document.getElementById("remarks").value =
                                 item.remarks || "";
 
-                            var imagel = gisId + ".png";
+                            var image = gisId + ".png";
                             var basePath = "public/corporation/coimbatore";
 
                             // Construct the full image path
