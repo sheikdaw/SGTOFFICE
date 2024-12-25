@@ -750,8 +750,7 @@ $(document).ready(function () {
                                 item.remarks || "";
 
                             var imagel = gisId + ".png";
-                            var basePath =
-                                "{{ asset('public/corporation/coimbatore') }}";
+                            var basePath = "public/corporation/coimbatore";
 
                             // Construct the full image path
                             var imagePath =
