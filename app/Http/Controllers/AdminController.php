@@ -250,18 +250,18 @@ class AdminController extends Controller
         }
 
         // Handle Import
-        $file = $request->file('mis');
-        if (!$file) {
-            return response()->json(['message' => 'No file uploaded'], 400);
-        }
-        $import = new MisImport($tablePrefix . 'mis');
+        // $file = $request->file('mis');
+        // if (!$file) {
+        //     return response()->json(['message' => 'No file uploaded'], 400);
+        // }
+        // $import = new MisImport($tablePrefix . 'mis');
 
-        try {
-            Excel::import($import, $file);
-        } catch (\Exception $e) {
-            Log::error('Import Error: ' . $e->getMessage());
-            return response()->json(['message' => 'Import failed'], 500);
-        }
+        // try {
+        //     Excel::import($import, $file);
+        // } catch (\Exception $e) {
+        //     Log::error('Import Error: ' . $e->getMessage());
+        //     return response()->json(['message' => 'Import failed'], 500);
+        // }
 
         // Handle Point File Upload
         if ($request->hasFile('point')) {

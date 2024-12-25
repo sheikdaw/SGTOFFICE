@@ -278,7 +278,7 @@ $(document).ready(function () {
         const email = $(this).data("email");
         const mobile = $(this).data("mobile");
         // const password = $(this).data('password');
-        alert(i);
+        // alert(i);
         // Populate modal fields
         // $("#updateCorporationModal #id").val(id);
         $("#updateSurveyorModal #update_name").val(name);
