@@ -763,7 +763,10 @@ $(document).ready(function () {
                                 image;
 
                             // Set the image path
-                            $("#building_img").attr("src", imagePath);
+                            $("#building_img").attr(
+                                "src",
+                                "{{ asset('') }}" + imagePath
+                            );
 
                             console.log(imagePath);
                             valueFound = true;
