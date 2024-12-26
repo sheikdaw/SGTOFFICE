@@ -749,7 +749,7 @@ $(document).ready(function () {
                             document.getElementById("remarks").value =
                                 item.remarks || "";
 
-                            var image = gisId + ".png";
+                            var image = gisId + ".jpg";
                             var basePath = "public/corporation/coimbatore";
 
                             // Construct the full image path
@@ -763,10 +763,7 @@ $(document).ready(function () {
                                 image;
 
                             // Set the image path
-                            $("#building_img").attr(
-                                "src",
-                                "{{ asset('') }}" + imagePath
-                            );
+                            $("#building_img").attr("src", imagePath);
 
                             console.log(imagePath);
                             valueFound = true;

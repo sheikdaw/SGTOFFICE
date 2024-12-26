@@ -770,6 +770,7 @@ class AdminController extends Controller
     }
 
 
+
     public function polygonDownload($id)
     {
         $data = Data::findOrFail($id);
@@ -785,11 +786,16 @@ class AdminController extends Controller
 
         // Convert polygons to GeoJSON features
         $features = $polygons->map(function ($polygon) {
-            $coordinates = json_decode($polygon->coordinates, true);
-
-            if (!$coordinates) {
-                return null; // Skip invalid polygons
-            }
+            // Decode coordinates and cast string values to floats
+            $coordinates = json_decode($polygon->coordinates);
+            $numericCoordinates = array_map(function ($polygonCoordinates) {
+                return array_map(function ($coordinatePair) {
+                    return [
+                        (float) $coordinatePair[0], // Cast to float
+                        (float) $coordinatePair[1], // Cast to float
+                    ];
+                }, $polygonCoordinates);
+            }, $coordinates);
 
             return [
                 'type' => 'Feature',
@@ -799,10 +805,10 @@ class AdminController extends Controller
                 ],
                 'geometry' => [
                     'type' => 'Polygon',
-                    'coordinates' => $coordinates,
+                    'coordinates' => $numericCoordinates, // Use the converted coordinates
                 ],
             ];
-        })->filter(); // Remove null entries
+        });
 
         // Prepare GeoJSON structure
         $geojson = [
@@ -811,19 +817,21 @@ class AdminController extends Controller
             'crs' => [
                 'type' => 'name',
                 'properties' => [
-                    'name' => 'urn:ogc:def:crs:EPSG::3857',
+                    'name' => 'urn:ogc:def:crs:EPSG::3857', // Ensure the correct CRS
                 ],
             ],
             'features' => $features,
         ];
 
+        // Set headers to indicate a file download
         $headers = [
             'Content-Type' => 'application/geo+json',
-            'Content-Disposition' => 'attachment; filename="' . $tablePrefix . 'polygons.geojson"',
+            'Content-Disposition' => 'attachment; filename="polygons.geojson"',
         ];
 
         return response()->json($geojson, 200, $headers);
     }
+
 
     public function pointDownload($id)
     {
