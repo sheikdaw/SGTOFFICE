@@ -523,7 +523,7 @@ class SurveyorController extends Controller
 
     public function findGisid(Request $request)
     {
-        $gisid = $request->gisid;
+        $gisid = $request->sgisid;
         $surveyor = auth()->guard('surveyor')->user();
 
         // Fetch related data using surveyor's data_id
