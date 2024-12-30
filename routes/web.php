@@ -64,6 +64,10 @@ Route::middleware('surveyor')->group(function () {
     Route::post('mergepolygon', [SurveyorController::class, 'mergePolygon'])->name('surveyor.mergePolygon');
     Route::post('deletePolygon', [SurveyorController::class, 'deletePolygon'])->name('surveyor.deletePolygon');
     Route::post('updateRoadName', [SurveyorController::class, 'updateRoadName'])->name('surveyor.updateRoadName');
+
+    Route::get('/surveyor/find-gisid', [SurveyorController::class, 'findGisid'])->name('surveyor.findGisid');
+
+    Route::post('/surveyor/update-assessment', [SurveyorController::class, 'updateAssessment'])->name('surveyor.updateAssessment');
 });
 
 // CBE dashboard route, protected by 'cbe' middleware group

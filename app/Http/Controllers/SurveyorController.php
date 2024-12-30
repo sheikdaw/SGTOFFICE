@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Data;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -518,5 +519,86 @@ class SurveyorController extends Controller
         } else {
             return response()->json(['error' => 'Update failed.'], 500);
         }
+    }
+
+    public function findGisid(Request $request)
+    {
+        $gisid = $request->gisid;
+        $surveyor = auth()->guard('surveyor')->user();
+
+        // Fetch related data using surveyor's data_id
+        $data = DB::table('data')
+            ->where('id', $surveyor->data_id)
+            ->first();
+
+        if (!$data) {
+            return redirect()->back()->with('error', 'No data found for the surveyor.');
+        }
+
+        // Fetch all point data by gisid
+        $pointData = DB::table($data->pointdata)
+            ->where('point_gisid', $gisid)
+            ->get(); // Fetch all records
+        if ($pointData->isEmpty()) {
+
+            $pointData = DB::table($data->pointdata)
+                ->where('assessment', $gisid)
+                ->get(); // Fetch all records
+            if ($pointData->isEmpty()) {
+                return view('surveyor.editgisid', [
+                    'pointData' => [],
+                    'surveyor' => $surveyor // Assuming $surveyor is defined somewhere in your method
+                ])->with('error', 'No data found for the provided GISID.');
+            }
+            return view('surveyor.editgisid', compact('pointData', 'surveyor'));
+        }
+
+
+        return view('surveyor.editgisid', compact('pointData', 'surveyor')); // Return the view with all matching records
+    }
+    public function updateAssessment(Request $request)
+    {
+        $id = $request->id;
+        $updatedData = $request->data;
+
+        // Fetch the correct table name based on your data structure
+        $surveyor = auth()->guard('surveyor')->user();
+        $data = DB::table('data')->where('id', $surveyor->data_id)->first();
+        $tableName = $data->pointdata;
+
+        // Define validation rules
+        $rules = [
+            'assessment' => 'required',
+            'old_assessment' => 'required',
+            'floor' => 'required',
+            'bill_usage' => 'required',
+            'aadhar_no' => 'nullable',
+            'ration_no' => 'nullable',
+            'phone_number' => 'required',
+            'owner_name' => 'required',
+            'present_owner_name' => 'required',
+            'point_gisid' => 'required',
+            'old_door_no' => 'required',
+            'new_door_no' => 'required',
+            'remarks' => 'nullable',
+        ];
+
+        // Validate the updated data
+        $validator = Validator::make($updatedData, $rules);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Set the updated_at field to the current timestamp
+        $updatedData['updated_at'] = Carbon::now();
+
+        // Ensure created_at is not set to null
+        unset($updatedData['created_at']);
+
+        // Update the data in the database
+        DB::table($tableName)->where('id', $id)->update($updatedData);
+
+        return response()->json(['message' => 'Data updated successfully'], 200);
     }
 }

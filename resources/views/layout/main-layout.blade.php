@@ -197,6 +197,11 @@
                     <p>Welcome, {{ Auth::guard('surveyor')->user()->name }}!</p>
                     <h3>Total Count : <span id="surveycount">{{ $pointCount }}<spam>
                                 <h3>
+                                    <form class="d-flex mt-3" action="{{ route('surveyor.findGisid') }}">
+                                        <input class="form-control me-2" type="text" id="sgisid" name="sgisid">
+                                        <button class="btn btn-outline-success" type="submit"><i
+                                                class="fas fa-search"></i> Search</button>
+                                    </form>
                                 @else
                                     <p>Welcome, User!</p>
                 @endif
@@ -211,10 +216,7 @@
                     </form>
                 </li>
             </ul>
-            <form class="d-flex mt-3" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i> Search</button>
-            </form>
+
         </div>
     </div>
 

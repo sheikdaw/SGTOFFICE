@@ -81,18 +81,18 @@ class AdminController extends Controller
     public function dataStore(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'image' => 'required|image|mimes:jpeg,png,jpg',
+            'image' => 'required|image|mimes:jpeg,png,jpg',
             'corporation' => 'required',
             'zone' => 'required',
             'ward' => 'required',
             'polygon' => 'required',
-            // 'point' => 'required',
-            // 'line' => 'required',
-            // 'mis' => 'required|file|mimes:xlsx,xls,csv',
-            // 'extend-right' => 'required',
-            // 'extend-left' => 'required',
-            // 'extend-top' => 'required',
-            // 'extend-bottom' => 'required'
+            'point' => 'required',
+            'line' => 'required',
+            'mis' => 'required|file|mimes:xlsx,xls,csv',
+            'extend-right' => 'required',
+            'extend-left' => 'required',
+            'extend-top' => 'required',
+            'extend-bottom' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -250,50 +250,50 @@ class AdminController extends Controller
         }
 
         // Handle Import
-        // $file = $request->file('mis');
-        // if (!$file) {
-        //     return response()->json(['message' => 'No file uploaded'], 400);
-        // }
-        // $import = new MisImport($tablePrefix . 'mis');
+        $file = $request->file('mis');
+        if (!$file) {
+            return response()->json(['message' => 'No file uploaded'], 400);
+        }
+        $import = new MisImport($tablePrefix . 'mis');
 
-        // try {
-        //     Excel::import($import, $file);
-        // } catch (\Exception $e) {
-        //     Log::error('Import Error: ' . $e->getMessage());
-        //     return response()->json(['message' => 'Import failed'], 500);
-        // }
+        try {
+            Excel::import($import, $file);
+        } catch (\Exception $e) {
+            Log::error('Import Error: ' . $e->getMessage());
+            return response()->json(['message' => 'Import failed'], 500);
+        }
 
         // Handle Point File Upload
-        // if ($request->hasFile('point')) {
-        //     $pointFile = $request->file('point');
-        //     $pointData = json_decode(file_get_contents($pointFile->getRealPath()), true);
+        if ($request->hasFile('point')) {
+            $pointFile = $request->file('point');
+            $pointData = json_decode(file_get_contents($pointFile->getRealPath()), true);
 
-        //     foreach ($pointData['features'] as $feature) {
-        //         DB::table($tablePrefix . 'points')->insert([
-        //             'gisid' => $feature['properties']['GIS_ID'] ?? null,
-        //             'type' => $feature['geometry']['type'] ?? null,
-        //             'coordinates' => json_encode($feature['geometry']['coordinates']),
-        //             'created_at' => now(),
-        //             'updated_at' => now(),
-        //         ]);
-        //     }
-        // }
+            foreach ($pointData['features'] as $feature) {
+                DB::table($tablePrefix . 'points')->insert([
+                    'gisid' => $feature['properties']['GIS_ID'] ?? null,
+                    'type' => $feature['geometry']['type'] ?? null,
+                    'coordinates' => json_encode($feature['geometry']['coordinates']),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
 
         // Handle Line File Upload
-        // if ($request->hasFile('line')) {
-        //     $lineFile = $request->file('line');
-        //     $lineData = json_decode(file_get_contents($lineFile->getRealPath()), true);
-        //     $count = 0;
-        //     foreach ($lineData['features'] as $feature) {
-        //         DB::table($tablePrefix . 'lines')->insert([
-        //             'gisid' => $count++,
-        //             'type' => $feature['geometry']['type'] ?? null,
-        //             'coordinates' => json_encode($feature['geometry']['coordinates']),
-        //             'created_at' => now(),
-        //             'updated_at' => now(),
-        //         ]);
-        //     }
-        // }
+        if ($request->hasFile('line')) {
+            $lineFile = $request->file('line');
+            $lineData = json_decode(file_get_contents($lineFile->getRealPath()), true);
+            $count = 0;
+            foreach ($lineData['features'] as $feature) {
+                DB::table($tablePrefix . 'lines')->insert([
+                    'gisid' => $count++,
+                    'type' => $feature['geometry']['type'] ?? null,
+                    'coordinates' => json_encode($feature['geometry']['coordinates']),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
         if ($request->hasFile('polygon')) {
             $lineFile = $request->file('polygon');
             $lineData = json_decode(file_get_contents($lineFile->getRealPath()), true);
@@ -309,7 +309,7 @@ class AdminController extends Controller
                 ]);
             }
         }
-        return response()->json(['message' => 'Success', 'data' => 'Data added successfully']);
+        // return response()->json(['message' => 'Success', 'data' => 'Data added successfully']);
 
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -341,10 +341,10 @@ class AdminController extends Controller
         $data->qc = $tablePrefix . 'qc';
         $data->pointdata = $tablePrefix . 'pointdata';
         $data->polygondata = $tablePrefix . 'buildingdata';
-        $data->extend_left = $request->input('extend_left');
-        $data->extend_right = $request->input('extend_right');
-        $data->extend_top = $request->input('extend_top');
-        $data->extend_bottom = $request->input('extend_bottom');
+        $data->extend_left = $request->extend_left;
+        $data->extend_right = $request->extend_right;
+        $data->extend_top = $request->extend_top;
+        $data->extend_bottom = $request->extend_bottom;
         $data->save();
         return response()->json(['message' => 'Success', 'data' => 'Data added successfully']);
     }
