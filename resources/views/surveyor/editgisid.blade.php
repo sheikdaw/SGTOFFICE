@@ -1,4 +1,5 @@
-@extends('main-layouts.dashboardLayout')
+@extends('layout.main-layout')
+
 
 @section('content')
     <div id="flash-message-container"></div>
@@ -56,7 +57,7 @@
                 });
             } else {
                 $("#tableBody").html(
-                "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
+                    "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
             }
 
             $(document).on("click", ".updateBtn", function() {
