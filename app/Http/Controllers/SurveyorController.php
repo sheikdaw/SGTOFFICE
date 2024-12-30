@@ -557,49 +557,49 @@ class SurveyorController extends Controller
 
         return view('surveyor.editgisid', compact('pointData', 'surveyor')); // Return the view with all matching records
     }
-    // public function updateAssessment(Request $request)
-    // {
-    //     $id = $request->id;
-    //     $updatedData = $request->data;
+    public function updateAssessment(Request $request)
+    {
+        $id = $request->id;
+        $updatedData = $request->data;
 
-    //     // Fetch the correct table name based on your data structure
-    //     $surveyor = auth()->guard('surveyor')->user();
-    //     $data = DB::table('data')->where('id', $surveyor->data_id)->first();
-    //     $tableName = $data->pointdata;
+        // Fetch the correct table name based on your data structure
+        $surveyor = auth()->guard('surveyor')->user();
+        $data = DB::table('data')->where('id', $surveyor->data_id)->first();
+        $tableName = $data->pointdata;
 
-    //     // Define validation rules
-    //     $rules = [
-    //         'assessment' => 'required',
-    //         'old_assessment' => 'required',
-    //         'floor' => 'required',
-    //         'bill_usage' => 'required',
-    //         'aadhar_no' => 'nullable',
-    //         'ration_no' => 'nullable',
-    //         'phone_number' => 'required',
-    //         'owner_name' => 'required',
-    //         'present_owner_name' => 'required',
-    //         'point_gisid' => 'required',
-    //         'old_door_no' => 'required',
-    //         'new_door_no' => 'required',
-    //         'remarks' => 'nullable',
-    //     ];
+        // Define validation rules
+        $rules = [
+            'assessment' => 'required',
+            'old_assessment' => 'required',
+            'floor' => 'required',
+            'bill_usage' => 'required',
+            'aadhar_no' => 'nullable',
+            'ration_no' => 'nullable',
+            'phone_number' => 'required',
+            'owner_name' => 'required',
+            'present_owner_name' => 'required',
+            'point_gisid' => 'required',
+            'old_door_no' => 'required',
+            'new_door_no' => 'required',
+            'remarks' => 'nullable',
+        ];
 
-    //     // Validate the updated data
-    //     $validator = Validator::make($updatedData, $rules);
+        // Validate the updated data
+        $validator = Validator::make($updatedData, $rules);
 
-    //     if ($validator->fails()) {
-    //         return response()->json(['errors' => $validator->errors()], 422);
-    //     }
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
-    //     // Set the updated_at field to the current timestamp
-    //     $updatedData['updated_at'] = Carbon::now();
+        // Set the updated_at field to the current timestamp
+        $updatedData['updated_at'] = Carbon::now();
 
-    //     // Ensure created_at is not set to null
-    //     unset($updatedData['created_at']);
+        // Ensure created_at is not set to null
+        unset($updatedData['created_at']);
 
-    //     // Update the data in the database
-    //     DB::table($tableName)->where('id', $id)->update($updatedData);
+        // Update the data in the database
+        DB::table($tableName)->where('id', $id)->update($updatedData);
 
-    //     return response()->json(['message' => 'Data updated successfully'], 200);
-    // }
+        return response()->json(['message' => 'Data updated successfully'], 200);
+    }
 }

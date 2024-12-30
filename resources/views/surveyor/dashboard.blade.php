@@ -1,8 +1,9 @@
 @extends('layout.main-layout')
 
 @section('content')
-    <!--<img src="{{ asset('public/' . $image) }}" width=100px;>-->
-    {{-- <h3>Total Count : <span id="surveycount">{{ $pointCount }}<spam> --}}
+    <div>
+        <h3>Total Count : <span id="surveycount">{{ $pointCount }}<spam>
+    </div>
     <label for="Polygon">Select added Feature:</label>
     <select id="addedFeature">
         <option value="none">Select an option</option>
