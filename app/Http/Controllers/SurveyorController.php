@@ -550,29 +550,12 @@ class SurveyorController extends Controller
                     'surveyor' => $surveyor // Assuming $surveyor is defined somewhere in your method
                 ])->with('error', 'No data found for the provided GISID.');
             }
-            $pointDatas = DB::table($data->pointdata)->get();
-            $username = $surveyor->name;
 
-            // Filter pointDatas where worker_name equals the authenticated username
-            $filteredPointDatas = $pointDatas->filter(function ($point) use ($username) {
-                return $point->worker_name === $username;
-            });
-
-            // Count the filtered pointDatas
-            $pointCount = $filteredPointDatas->count();
-            $username = $surveyor->name;
-            $filteredPointDatas = $pointDatas->filter(function ($point) use ($username) {
-                return $point->worker_name === $username;
-            });
-
-            // Count the filtered pointDatas
-            $pointCount = $filteredPointDatas->count();
-
-            return view('surveyor.editgisid', compact('pointData', 'surveyor', 'pointCount'));
+            return view('surveyor.editgisid', compact('pointData', 'surveyor'));
         }
 
 
-        return view('surveyor.editgisid', compact('pointData', 'surveyor', 'pointCount')); // Return the view with all matching records
+        return view('surveyor.editgisid', compact('pointData', 'surveyor')); // Return the view with all matching records
     }
     public function updateAssessment(Request $request)
     {
