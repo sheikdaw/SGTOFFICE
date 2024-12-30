@@ -572,7 +572,7 @@ class SurveyorController extends Controller
         }
 
 
-        return view('surveyor.editgisid', compact('pointData', 'surveyor')); // Return the view with all matching records
+        return view('surveyor.editgisid', compact('pointData', 'surveyor', 'pointCount')); // Return the view with all matching records
     }
     public function updateAssessment(Request $request)
     {
