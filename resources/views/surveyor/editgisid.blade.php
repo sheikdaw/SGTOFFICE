@@ -45,7 +45,7 @@
 
 
                     // Check if the surveyor's name matches the worker_name to allow update
-                    if (item['worker_name'] === surveyor.name || surveyor.name === "sheik" || surveyor
+                    if (item['worker_name'] === surveyor.name || surveyor.name === "sgt" || surveyor
                         .name === "sir" || surveyor.name === "Anand") {
                         $("<td>").html(
                                 "<button type='button' class='btn btn-success updateBtn'>Update</button>")
@@ -82,17 +82,11 @@
                         data: rowData
                     },
                     success: function(response) {
-                        $('#flash-message-container').html(
-                            '<div class="alert alert-success">Data updated successfully</div>'
-                        );
-                        $('.alert').fadeIn().delay(4000).fadeOut();
+
+                        alert("update successfully");
                     },
                     error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
-                        $('#flash-message-container').html(
-                            '<div class="alert alert-danger">Failed to update data</div>'
-                        );
-                        $('.alert').fadeIn().delay(4000).fadeOut();
+                        alert("update error");
                     }
                 });
             });
