@@ -1,8 +1,6 @@
 @extends('layout.main-layout')
 
 @section('content')
-    <h3>Total Count : <span id="surveycount">{{ $pointCount }}<spam>
-    </h3>
     <label for="Polygon">Select added Feature:</label>
     <select id="addedFeature">
         <option value="none">Select an option</option>
