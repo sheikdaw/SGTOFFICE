@@ -686,12 +686,9 @@ class AdminController extends Controller
     }
 
     // Area variation
-    public function areaVariation(Request $request)
+    public function areaVariation($id)
     {
-        $dataId = $request->input('id');
-        $roadName = $request->input('road_name');
-
-        $data = Data::findOrFail($dataId);
+        $data = Data::findOrFail($id);
 
         if (is_null($data->mis) || is_null($data->pointdata) || is_null($data->polygon)) {
             return response()->json(['error' => 'Invalid table names'], 400);
