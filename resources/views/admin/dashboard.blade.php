@@ -187,9 +187,7 @@
                 console.log('Data Sent:', data); // Log the data being sent
 
                 $.ajax({
-                    url: route(
-                        'admin.area.variation'
-                        ), // Laravel route helper will generate the correct URL
+                    url: {{ route('admin.area.variation') }}, // Laravel route helper will generate the correct URL
                     method: 'GET', // Or 'POST' if you're submitting sensitive data
                     data: data, // Send the data to the server
                     success: function(response) {
