@@ -431,7 +431,7 @@ $(document).ready(function () {
             isFirstUpdate = false; // Set the flag to false after the first update
         } else {
             // Optional: Update the map view without changing zoom/center if not the first update
-            map.getView().setCenter(ol.proj.fromLonLat(coord));
+            // map.getView().setCenter(ol.proj.fromLonLat(coord));
         }
     }
 
