@@ -602,10 +602,8 @@ class AdminController extends Controller
 
     private function areaVariations($data)
     {
-        // Fetch polygon data
         $polygons = DB::table($data->polygon)->select('gisid', 'coordinates')->get();
 
-        // Fetch joined data
         $allDatas = DB::table("{$data->pointdata} as pd")
             ->join("{$data->polygon} as poly", 'poly.gisid', '=', 'pd.point_gisid')
             ->join("{$data->polygondata} as polyd", 'polyd.gisid', '=', 'pd.point_gisid')
@@ -635,7 +633,6 @@ class AdminController extends Controller
             ->orderBy('mis.road_name')
             ->get();
 
-        // Process data
         foreach ($allDatas as $allData) {
             $coordinates = json_decode($allData->coordinates, true);
             $areaInSquareFeet = $this->calculatePolygonAreaInSquareFeet($coordinates) * 10.7639;
@@ -649,7 +646,10 @@ class AdminController extends Controller
 
                 // Calculate total plot area for the same GISID
                 $totalPlotArea = array_reduce($allDatas->toArray(), function ($carry, $item) use ($allData) {
-                    return $item->point_gisid === $allData->point_gisid ? $carry + $item->plot_area : $carry;
+                    if ($item->point_gisid === $allData->point_gisid) {
+                        $carry += $item->plot_area;
+                    }
+                    return $carry;
                 }, 0);
 
                 $allData->plotcount = $totalPlotArea;
@@ -659,40 +659,40 @@ class AdminController extends Controller
                 $allData->ward = $data->ward;
             }
         }
-
-        // Filter data
+        $matchingPoints = $allDatas;
         $areavariation = [];
-        foreach ($allDatas as $allData) {
+        foreach ($matchingPoints as $allData) {
+
             if ($allData->areavariation > 150) {
                 if ($allData->areavariation > 350) {
                     if (!in_array($allData->building_type, ['Flat', 'apartment', 'Flat-Multistoried'])) {
                         $areavariation[] = $allData;
                     }
-                } elseif ($allData->bill_usage === 'commercial') {
+                } else if ($allData->bill_usage === 'commercial') {
                     $areavariation[] = $allData;
                 }
             }
         }
 
+
         return $areavariation;
     }
 
+    // Area variation
     public function areaVariation($id)
     {
-        // Fetch data record
         $data = Data::findOrFail($id);
 
-        // Validate required fields
         if (is_null($data->mis) || is_null($data->pointdata) || is_null($data->polygon)) {
             return response()->json(['error' => 'Invalid table names'], 400);
         }
 
-        // Process area variations
+        // Fetch the data by joining tables
         $filters = $this->areaVariations($data);
 
-        // Export results to Excel
         return Excel::download(new AreaVariationExport($filters, ''), 'Area_variation.xlsx');
     }
+
 
     public function usageAndAreaVariation($id)
     {
