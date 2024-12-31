@@ -27,6 +27,13 @@
                                     {{ $data['pointdatacount'] - $data['connected'] }}
                                 </p>
                             </div>
+                            <select name="road_name" id="road_name">
+                                <option value="">Select a road</option>
+                                @foreach ($data['road_name'] as $road)
+                                    <option value="{{ $road }}">{{ $road }}</option>
+                                @endforeach
+                            </select>
+
                             <div class="card-footer bg-light d-flex flex-wrap gap-2">
                                 <a href="{{ route('admin.area.variation', ['id' => $data['id']]) }}"
                                     class="btn btn-primary btn-sm area-variation" data-id="{{ $data['id'] }}">

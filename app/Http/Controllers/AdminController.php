@@ -56,6 +56,10 @@ class AdminController extends Controller
         foreach ($details as $detail) {
             $misCount = DB::table($detail->mis)->count();
             $pointDataCount = DB::table($detail->pointdata)->count();
+            $road_names = DB::table($detail->mis)
+                ->distinct()
+                ->pluck('road_name'); // Ensure unique road names
+
 
             // Assuming 'assessment' is a column in the 'pointdata' table
             $connectedCount = DB::table($detail->pointdata)
@@ -71,6 +75,7 @@ class AdminController extends Controller
                 'miscount' => $misCount,
                 'pointdatacount' => $pointDataCount,
                 'connected' => $connectedCount,
+                'road_name' => $road_names
             ];
         }
 
