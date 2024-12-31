@@ -686,7 +686,7 @@ class AdminController extends Controller
     }
 
     // Area variation
-    public function areaVariation($id)
+    public function areaVariation($id, Request $request)
     {
         $data = Data::findOrFail($id);
 
