@@ -57,8 +57,9 @@
                                     class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">Street
                                     Wise</a>
                                 <a href="{{ route('admin.downloadMissingBill', ['id' => $data['id']]) }}"
-                                    class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">Missing
-                                    bill</a>
+                                    class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">
+                                    Missing bill
+                                </a>
 
                             </div>
                         </div>
