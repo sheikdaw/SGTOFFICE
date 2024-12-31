@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\AreaVariationExport;
+use App\Exports\missingBillExport;
 use App\Exports\MultiStreetExport;
 use App\Exports\StreetExport;
 use App\Exports\UsageAreaVariationExport;
@@ -29,6 +30,7 @@ use ZipArchive;
 use App\Mail\TestEmail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rules\NotIn;
 
 class AdminController extends Controller
 {
@@ -1056,5 +1058,10 @@ class AdminController extends Controller
 
         return true;
     }
-    public function downloadMissingBill($id) {}
+    public function downloadMissingBill($id)
+    {
+        $data = Data::findOrFail($id);
+
+        return Excel::download(new missingBillExport($data), 'missing_bills.xlsx');
+    }
 }
