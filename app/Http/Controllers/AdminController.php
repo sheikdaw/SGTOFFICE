@@ -660,7 +660,7 @@ class AdminController extends Controller
             }
         }
         $matchingPoints = $allDatas;
-        $areavariation = [];
+        $areavariations = [];
         foreach ($matchingPoints as $allData) {
 
             if ($allData->areavariation > 150) {
@@ -675,7 +675,7 @@ class AdminController extends Controller
         }
 
 
-        return $areavariation;
+        return $areavariations;
     }
 
     // Area variation
