@@ -27,23 +27,26 @@
                                     {{ $data['pointdatacount'] - $data['connected'] }}
                                 </p>
                             </div>
-                            <select name="road_name" id="road_name">
-                                <option value="">Select a road</option>
-                                @foreach ($data['road_name'] as $road)
-                                    <option value="{{ $road }}">{{ $road }}</option>
-                                @endforeach
-                            </select>
+
 
                             <div class="card-footer bg-light d-flex flex-wrap gap-2">
-                                <a href="{{ route('admin.area.variation', ['id' => $data['id']]) }}"
-                                    class="btn btn-primary btn-sm area-variation" data-id="{{ $data['id'] }}">
-                                    Area Variation
-                                </a>
+                                <div class="form-group">
+                                    <label for="road_name">Select Road Name:</label>
+                                    <select name="road_name" class="form-control" id="road_name">
+                                        <option value="all">All</option>
+                                        @foreach ($data['road_name'] as $road)
+                                            <option value="{{ $road }}">{{ $road }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-
-                                <a href="{{ route('admin.usage.variation', ['id' => $data['id']]) }}"
-                                    class="btn btn-secondary btn-sm usage-variation" data-id="{{ $data['id'] }}">Usage
+                                <a href="#" id="area_variation" class="btn btn-primary btn-sm area-variation">Area
                                     Variation</a>
+                                <a href="#" id="usage_variation"
+                                    class="btn btn-secondary btn-sm usage-variation">Usage Variation</a>
+                                <a href="#" id="missing_bill" class="btn btn-primary btn-sm surveyor-count">Missing
+                                    Bill</a>
+
                                 <a href="{{ route('admin.usageandarea.variation', ['id' => $data['id']]) }}"
                                     class="btn btn-success btn-sm usage-and-area-variation"
                                     data-id="{{ $data['id'] }}">Usage and Area Variation</a>
@@ -63,10 +66,7 @@
                                 <a href="{{ route('admin.downloadsteetwise', ['id' => $data['id']]) }}"
                                     class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">Street
                                     Wise</a>
-                                <a href="{{ route('admin.downloadMissingBill', ['id' => $data['id']]) }}"
-                                    class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">
-                                    Missing bill
-                                </a>
+
 
                             </div>
                         </div>
