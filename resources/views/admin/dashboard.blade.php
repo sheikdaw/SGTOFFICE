@@ -35,13 +35,13 @@
                             </select>
 
                             <div class="card-footer bg-light d-flex flex-wrap gap-2">
-                                <button {{-- href="{{ route('admin.area.variation', ['id' => $data['id']]) }}" --}} class="btn btn-primary btn-sm area-variation"
-                                    data-id="{{ $data['id'] }}">
+                                <button href="{{ route('admin.area.variation', ['id' => $data['id']]) }}"
+                                    class="btn btn-primary btn-sm area-variation" data-id="{{ $data['id'] }}">
                                     Area Variation
                                 </button>
-                                <button {{-- href="{{ route('admin.usage.variation', ['id' => $data['id']]) }}" --}} class="btn btn-secondary btn-sm usage-variation"
-                                    data-id="{{ $data['id'] }}">Usage
-                                    Variation</button>
+                                <a href="{{ route('admin.usage.variation', ['id' => $data['id']]) }}"
+                                    class="btn btn-secondary btn-sm usage-variation" data-id="{{ $data['id'] }}">Usage
+                                    Variation</a>
                                 <a href="{{ route('admin.usageandarea.variation', ['id' => $data['id']]) }}"
                                     class="btn btn-success btn-sm usage-and-area-variation"
                                     data-id="{{ $data['id'] }}">Usage and Area Variation</a>
@@ -61,10 +61,10 @@
                                 <a href="{{ route('admin.downloadsteetwise', ['id' => $data['id']]) }}"
                                     class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">Street
                                     Wise</a>
-                                <button {{-- href="{{ route('admin.downloadMissingBill', ['id' => $data['id']]) }}" --}} class="btn btn-primary btn-sm missing-bill"
-                                    data-id="{{ $data['id'] }}">
+                                <a href="{{ route('admin.downloadMissingBill', ['id' => $data['id']]) }}"
+                                    class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">
                                     Missing bill
-                                </button>
+                                </a>
 
                             </div>
                         </div>
@@ -166,103 +166,10 @@
             </div>
         </div>
     </div>
-    {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> --}}
     <script>
         const routes = {
             datastore: "{{ route('admin.datastore') }}",
-            areavariation: "{{ route('admin.area.variation') }}",
+
         };
-
-        $(document).ready(function() {
-            // Handling clicks for .area-variation button
-            $(".area-variation").click(function() {
-                var dataId = $(this).data("id"); // Get the data-id attribute
-                var road_name = $("#road_name").val(); // Get the road name value
-
-                var data = {
-                    id: dataId,
-                    road_name: road_name
-                };
-
-                console.log('Data Sent:', data); // Log the data being sent
-
-                $.ajax({
-                    url: routes.areavariation, // Ensure this route is correct
-                    method: 'GET',
-                    data: data, // Send the data to the server
-                    success: function(response) {
-                        console.log('Response:', response); // Log the response from the server
-
-                        // Check if the response contains a download URL
-                        if (response.status === 'success' && response.download_url) {
-                            // Trigger the download by redirecting the user to the URL
-                            window.location.href = response.download_url;
-                        } else {
-                            alert("Failed to generate the file.");
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("AJAX Error: " + status + ", " + error); // Handle errors
-                    }
-                });
-            });
-            // Handling clicks for .variation button
-            $(".usage-variation").click(function() {
-                var dataId = $(this).data("id"); // Get the data-id attribute
-                var road_name = $("#road_name").val(); // Get the road name value
-
-                var data = {
-                    id: dataId,
-                    road_name: road_name
-                };
-
-                // Show alert for testing purposes
-                alert("Variation - Data ID: " + dataId + " Road Name: " + road_name);
-
-                // Perform the AJAX request for Variation
-                $.ajax({
-                    url: route('admin.variation'), // Adjust the route URL accordingly
-                    method: 'GET', // Use POST if needed
-                    data: data, // Send the data to the server
-                    success: function(response) {
-                        console.log(response); // Handle the server's response
-                        // Optionally, update the page with the response data
-                        // Example: $('#some-element').html(response);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("AJAX Error: " + status + ", " + error); // Handle errors
-                    }
-                });
-            });
-
-            // Handling clicks for .missing-bill button
-            $(".missing-bill").click(function() {
-                var dataId = $(this).data("id"); // Get the data-id attribute
-                var road_name = $("#road_name").val(); // Get the road name value
-
-                var data = {
-                    id: dataId,
-                    road_name: road_name
-                };
-
-                // Show alert for testing purposes
-                alert("Missing Bill - Data ID: " + dataId + " Road Name: " + road_name);
-
-                // Perform the AJAX request for Missing Bill
-                $.ajax({
-                    url: route('admin.missing.bill'), // Adjust the route URL accordingly
-                    method: 'GET', // Use POST if needed
-                    data: data, // Send the data to the server
-                    success: function(response) {
-                        console.log(response); // Handle the server's response
-                        // Optionally, update the page with the response data
-                        // Example: $('#some-element').html(response);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("AJAX Error: " + status + ", " + error); // Handle errors
-                    }
-                });
-            });
-        });
     </script>
 @endsection
