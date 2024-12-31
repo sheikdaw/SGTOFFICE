@@ -39,7 +39,7 @@ Route::middleware('admin')->group(function () {
     Route::delete('/surveyor/{id}', [AdminController::class, 'surveyorDestroy'])->name('admin.surveyorDelete');
     Route::get('area/variation/{id}', [AdminController::class, 'areaVariation'])->name('admin.area.variation');
 
-    Route::get('variation/{id}', [AdminController::class, 'usageVariation'])->name('admin.usage.variation');
+    Route::post('variation', [AdminController::class, 'usageVariation'])->name('admin.usage.variation');
 
     Route::get('and-area/variation/{id}', [AdminController::class, 'usageAndAreaVariation'])->name('admin.usageandarea.variation');
 

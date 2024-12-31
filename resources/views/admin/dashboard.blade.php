@@ -189,7 +189,7 @@
                 // Perform the AJAX request for Area Variation
                 $.ajax({
                     url: route('admin.area.variation'), // Adjust the route URL accordingly
-                    method: 'GET', // Use POST if you need to send data securely
+                    method: 'post', // Use POST if you need to send data securely
                     data: data, // Send the data to the server
                     success: function(response) {
                         console.log(response); // Handle the server's response
