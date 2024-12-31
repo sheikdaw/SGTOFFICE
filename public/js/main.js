@@ -1268,27 +1268,7 @@ $(document).ready(function () {
             },
         });
     });
-    const areaVariationBaseUrl =
-        "{{ route('admin.area.variation', ['id' => $data['id']]) }}";
-    const usageVariationBaseUrl =
-        "{{ route('admin.usage.variation', ['id' => $data['id']]) }}";
-    const missingBillBaseUrl =
-        "{{ route('admin.downloadMissingBill', ['id' => $data['id']]) }}";
-
-    // Function to update URLs based on selected road name
-    $("#road_name").change(function () {
-        const selectedRoad = $(this).val();
-        const roadQuery =
-            selectedRoad !== "all"
-                ? `?road_name=${encodeURIComponent(selectedRoad)}`
-                : "";
-
-        // Update links dynamically
-        $("#area_variation").attr("href", areaVariationBaseUrl + roadQuery);
-        $("#usage_variation").attr("href", usageVariationBaseUrl + roadQuery);
-        $("#missing_bill").attr("href", missingBillBaseUrl + roadQuery);
+    $(".area-variation").click(function () {
+        alert("test");
     });
-
-    // Trigger the change event on page load to set default links
-    $("#road_name").trigger("change");
 });
