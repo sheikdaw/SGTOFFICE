@@ -675,7 +675,7 @@ class AdminController extends Controller
         }
 
 
-        return $areavariation;
+        return $matchingPoints;
     }
 
     // Area variation
@@ -1056,4 +1056,5 @@ class AdminController extends Controller
 
         return true;
     }
+    public function downloadMissingBill($id) {}
 }
