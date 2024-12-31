@@ -183,25 +183,23 @@
                     road_name: road_name
                 };
 
-                // Show alert for testing purposes
-                alert("Area Variation - Data ID: " + dataId + " Road Name: " + road_name);
+                console.log('Data Sent:', data); // Log the data being sent
 
-                // Perform the AJAX request for Area Variation
                 $.ajax({
-                    url: route('admin.area.variation'), // Adjust the route URL accordingly
-                    method: 'post', // Use POST if you need to send data securely
+                    url: route(
+                    'admin.area.variation'), // Laravel route helper will generate the correct URL
+                    method: 'GET', // Or 'POST' if you're submitting sensitive data
                     data: data, // Send the data to the server
                     success: function(response) {
-                        console.log(response); // Handle the server's response
-                        // Optionally, update the page with the response data
-                        // Example: $('#some-element').html(response);
+                        console.log('Response:', response); // Log the response from the server
+                        // Do something with the response, like updating the UI
+                        // Example: $('#response-container').html(response.message);
                     },
                     error: function(xhr, status, error) {
                         console.error("AJAX Error: " + status + ", " + error); // Handle errors
                     }
                 });
             });
-
             // Handling clicks for .variation button
             $(".usage-variation").click(function() {
                 var dataId = $(this).data("id"); // Get the data-id attribute
