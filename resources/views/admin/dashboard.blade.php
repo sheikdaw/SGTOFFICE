@@ -35,19 +35,18 @@
                             </select>
 
                             <div class="card-footer bg-light d-flex flex-wrap gap-2">
-                                <a href="{{ route('admin.area.variation', ['id' => $data['id']]) }}"
+                                <a href="{{ route('admin.area.variation', ['id' => $data['id'], 'road_name' => '']) }}"
                                     class="btn btn-primary btn-sm area-variation" data-id="{{ $data['id'] }}">
                                     Area Variation
                                 </a>
-                                <a href="{{ route('admin.usage.variation', ['id' => $data['id']]) }}"
+                                <a href="{{ route('admin.usage.variation', ['id' => $data['id'], 'road_name' => '']) }}"
                                     class="btn btn-secondary btn-sm usage-variation" data-id="{{ $data['id'] }}">
                                     Usage Variation
                                 </a>
-                                <a href="{{ route('admin.downloadMissingBill', ['id' => $data['id']]) }}"
+                                <a href="{{ route('admin.downloadMissingBill', ['id' => $data['id'], 'road_name' => '']) }}"
                                     class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">
                                     Missing Bill
                                 </a>
-
                                 <a href="{{ route('admin.usageandarea.variation', ['id' => $data['id']]) }}"
                                     class="btn btn-success btn-sm usage-and-area-variation"
                                     data-id="{{ $data['id'] }}">Usage and Area Variation</a>
@@ -175,36 +174,19 @@
 
         };
 
-        function addRoadNameToLinks(roadName) {
-            // Get all links with specific classes
-            const areaLink = document.querySelector('.area-variation');
-            const usageLink = document.querySelector('.usage-variation');
-            const missingBillLink = document.querySelector('.surveyor-count');
+        document.getElementById('road_name').addEventListener('change', function() {
+            const selectedRoad = this.value;
 
-            // Update the 'href' attribute for each link by adding road_name
-            if (areaLink) {
-                let areaUrl = areaLink.getAttribute('href');
-                areaUrl = new URL(areaUrl); // Create URL object to manipulate query params
-                areaUrl.searchParams.set('road_name', roadName);
-                areaLink.setAttribute('href', areaUrl.toString());
-            }
-
-            if (usageLink) {
-                let usageUrl = usageLink.getAttribute('href');
-                usageUrl = new URL(usageUrl);
-                usageUrl.searchParams.set('road_name', roadName);
-                usageLink.setAttribute('href', usageUrl.toString());
-            }
-
-            if (missingBillLink) {
-                let missingBillUrl = missingBillLink.getAttribute('href');
-                missingBillUrl = new URL(missingBillUrl);
-                missingBillUrl.searchParams.set('road_name', roadName);
-                missingBillLink.setAttribute('href', missingBillUrl.toString());
-            }
-        }
-
-        // Example usage: Add road_name 'new_value' to all links
-        addRoadNameToLinks('new_value');
+            // Update the links dynamically with the selected road name
+            document.querySelectorAll('.area-variation').forEach(link => {
+                link.href = link.href.split('?')[0] + '?id={{ $data['id'] }}&road_name=' + selectedRoad;
+            });
+            document.querySelectorAll('.usage-variation').forEach(link => {
+                link.href = link.href.split('?')[0] + '?id={{ $data['id'] }}&road_name=' + selectedRoad;
+            });
+            document.querySelectorAll('.surveyor-count').forEach(link => {
+                link.href = link.href.split('?')[0] + '?id={{ $data['id'] }}&road_name=' + selectedRoad;
+            });
+        });
     </script>
 @endsection
