@@ -171,5 +171,11 @@
             datastore: "{{ route('admin.datastore') }}",
 
         };
+
+        $(document).ready(function() {
+            $(".area-variation").click(function() {
+                alert("test");
+            });
+        });
     </script>
 @endsection

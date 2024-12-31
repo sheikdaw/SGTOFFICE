@@ -1268,7 +1268,4 @@ $(document).ready(function () {
             },
         });
     });
-    $(".area-variation").click(function () {
-        alert("test");
-    });
 });
