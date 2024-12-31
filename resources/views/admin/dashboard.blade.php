@@ -187,13 +187,19 @@
                 console.log('Data Sent:', data); // Log the data being sent
 
                 $.ajax({
-                    url: routes.areavariation, // Laravel route helper will generate the correct URL
-                    method: 'GET', // Or 'POST' if you're submitting sensitive data
+                    url: routes.areavariation, // Ensure this route is correct
+                    method: 'GET',
                     data: data, // Send the data to the server
                     success: function(response) {
                         console.log('Response:', response); // Log the response from the server
-                        // Do something with the response, like updating the UI
-                        // Example: $('#response-container').html(response.message);
+
+                        // Check if the response contains a download URL
+                        if (response.status === 'success' && response.download_url) {
+                            // Trigger the download by redirecting the user to the URL
+                            window.location.href = response.download_url;
+                        } else {
+                            alert("Failed to generate the file.");
+                        }
                     },
                     error: function(xhr, status, error) {
                         console.error("AJAX Error: " + status + ", " + error); // Handle errors
