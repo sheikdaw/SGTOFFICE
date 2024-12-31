@@ -34,19 +34,21 @@
                                 @endforeach
                             </select>
 
+
                             <div class="card-footer bg-light d-flex flex-wrap gap-2">
-                                <a href="{{ route('admin.area.variation', ['id' => $data['id'], 'road_name' => '']) }}"
+                                <a href="{{ route('admin.area.variation', ['id' => $data['id']]) }}"
                                     class="btn btn-primary btn-sm area-variation" data-id="{{ $data['id'] }}">
                                     Area Variation
                                 </a>
-                                <a href="{{ route('admin.usage.variation', ['id' => $data['id'], 'road_name' => '']) }}"
+                                <a href="{{ route('admin.usage.variation', ['id' => $data['id']]) }}"
                                     class="btn btn-secondary btn-sm usage-variation" data-id="{{ $data['id'] }}">
                                     Usage Variation
                                 </a>
-                                <a href="{{ route('admin.downloadMissingBill', ['id' => $data['id'], 'road_name' => '']) }}"
+                                <a href="{{ route('admin.downloadMissingBill', ['id' => $data['id']]) }}"
                                     class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">
                                     Missing Bill
                                 </a>
+
                                 <a href="{{ route('admin.usageandarea.variation', ['id' => $data['id']]) }}"
                                     class="btn btn-success btn-sm usage-and-area-variation"
                                     data-id="{{ $data['id'] }}">Usage and Area Variation</a>
@@ -173,20 +175,24 @@
             datastore: "{{ route('admin.datastore') }}",
 
         };
+        $(document).ready(function() {
+            // Listen for change event on the select element
+            $('#road_name').change(function() {
+                // Get the selected road name
+                const selectedRoad = $(this).val();
 
-        document.getElementById('road_name').addEventListener('change', function() {
-            const selectedRoad = this.value;
+                // Store the selected road name in localStorage
+                if (selectedRoad) {
+                    localStorage.setItem('road_name', selectedRoad);
+                }
+            });
 
-            // Update the links dynamically with the selected road name
-            document.querySelectorAll('.area-variation').forEach(link => {
-                link.href = link.href.split('?')[0] + '?id={{ $data['id'] }}&road_name=' + selectedRoad;
-            });
-            document.querySelectorAll('.usage-variation').forEach(link => {
-                link.href = link.href.split('?')[0] + '?id={{ $data['id'] }}&road_name=' + selectedRoad;
-            });
-            document.querySelectorAll('.surveyor-count').forEach(link => {
-                link.href = link.href.split('?')[0] + '?id={{ $data['id'] }}&road_name=' + selectedRoad;
-            });
+            // On page load, check if a road name is saved in localStorage
+            const savedRoadName = localStorage.getItem('road_name');
+            if (savedRoadName) {
+                // Set the previously selected road name as selected in the dropdown
+                $('#road_name').val(savedRoadName);
+            }
         });
     </script>
 @endsection
