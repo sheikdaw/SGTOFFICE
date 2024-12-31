@@ -675,7 +675,7 @@ class AdminController extends Controller
         }
 
 
-        return $areavariations;
+        return $allDatas->toArray();
     }
 
     // Area variation
