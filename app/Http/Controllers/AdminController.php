@@ -688,7 +688,7 @@ class AdminController extends Controller
     // Area variation
     public function areaVariation($id, Request $request)
     {
-        return response()->json($request->all());
+        // return response()->json($request->all());
         $data = Data::findOrFail($id);
 
         if (is_null($data->mis) || is_null($data->pointdata) || is_null($data->polygon)) {
