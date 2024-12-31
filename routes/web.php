@@ -50,7 +50,7 @@ Route::middleware('admin')->group(function () {
     Route::get('/download-Street/{id}', [AdminController::class, 'downloadSteetWise'])->name('admin.downloadsteetwise');
 
     Route::get('surveyor/count/{id}', [AdminController::class, 'surveyorCount'])->name('surveyor.count');
-    Route::get('admin/missingBill/{id]', [AdminController::class, 'downloadMissingBill'])->name('admin.download-missing-bill');
+    Route::get('/download-missing-bill/{id}', [AdminController::class, 'admin.downloadMissingBill']);
 });
 Route::post('/processImage', [AdminController::class, 'processImage'])->name('process.image');
 
