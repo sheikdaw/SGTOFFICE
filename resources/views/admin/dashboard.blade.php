@@ -166,6 +166,7 @@
             </div>
         </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
         const routes = {
             datastore: "{{ route('admin.datastore') }}",
@@ -187,7 +188,8 @@
 
                 $.ajax({
                     url: route(
-                    'admin.area.variation'), // Laravel route helper will generate the correct URL
+                        'admin.area.variation'
+                        ), // Laravel route helper will generate the correct URL
                     method: 'GET', // Or 'POST' if you're submitting sensitive data
                     data: data, // Send the data to the server
                     success: function(response) {
