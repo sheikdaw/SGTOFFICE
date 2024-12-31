@@ -666,16 +666,16 @@ class AdminController extends Controller
             if ($allData->areavariation > 150) {
                 if ($allData->areavariation > 350) {
                     if (!in_array($allData->building_type, ['Flat', 'apartment', 'Flat-Multistoried'])) {
-                        $areavariation[] = $allData;
+                        $areavariations[] = $allData;
                     }
                 } else if ($allData->bill_usage === 'commercial') {
-                    $areavariation[] = $allData;
+                    $areavariations[] = $allData;
                 }
             }
         }
 
 
-        return $allDatas->toArray();
+        return $areavariations;
     }
 
     // Area variation
