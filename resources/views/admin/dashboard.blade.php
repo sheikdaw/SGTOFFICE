@@ -35,10 +35,10 @@
                             </select>
 
                             <div class="card-footer bg-light d-flex flex-wrap gap-2">
-                                <button href="{{ route('admin.area.variation', ['id' => $data['id']]) }}"
+                                <a href="{{ route('admin.area.variation', ['id' => $data['id']]) }}"
                                     class="btn btn-primary btn-sm area-variation" data-id="{{ $data['id'] }}">
                                     Area Variation
-                                </button>
+                                </a>
                                 <a href="{{ route('admin.usage.variation', ['id' => $data['id']]) }}"
                                     class="btn btn-secondary btn-sm usage-variation" data-id="{{ $data['id'] }}">Usage
                                     Variation</a>
