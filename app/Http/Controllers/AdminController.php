@@ -1086,7 +1086,7 @@ class AdminController extends Controller
                 $misArray = is_array($data->mis) ? $data->mis : explode(',', $data->mis);
 
                 $notConnectedDataCount = DB::table($data->pointdata)
-                    ->where('worker_name', $surveyor->name)
+                    // ->where('worker_name', $surveyor->name)
                     ->whereNotIn('assessment', $misArray)
                     ->count();
 
