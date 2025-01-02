@@ -1087,19 +1087,19 @@ class AdminController extends Controller
 
                 $notConnected = DB::table($data->pointdata)
                     ->whereNotIn('assessment', $misArray)
-                    ->get();
-
-                $notConnectedDataCount = $notConnected
-                    ->filter(function ($item) use ($surveyor) {
-                        return $item->worker_name === $surveyor->name;
-                    })
                     ->count();
+
+                // $notConnectedDataCount = $notConnected
+                //     ->filter(function ($item) use ($surveyor) {
+                //         return $item->worker_name === $surveyor->name;
+                //     })
+                //     ->count();
 
 
                 $results[] = [
                     'surveyor' => $surveyor->name,
                     'surveyed_count' => $surveyedDataCount,
-                    'not_connected_count' => $notConnectedDataCount,
+                    'not_connected_count' => $notConnected,
                 ];
             }
 
