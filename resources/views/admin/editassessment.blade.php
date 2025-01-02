@@ -18,7 +18,7 @@
     <script>
         $(document).ready(function() {
             var response = @json($pointData); // Assuming $pointData is a Laravel variable
-            var data_id = @json($data_id); // Global data_id for deletion, passed from the backend
+            var WARD = @json($data_id); // Global data_id for deletion, passed from the backend
 
             console.log(data_id); // Check if data_id is being passed correctly
 
@@ -50,12 +50,10 @@
                     });
 
                     // Ensure data_id exists in item and assign it to the input field
-                    var rowDataId = item.data_id ||
-                    ''; // Get 'data_id' from item (or default to empty string)
-                    console.log("rowDataId for item with ID " + item.id + ": " + rowDataId); // Debug log
+
 
                     // Add 'data_id' field (it should not be editable)
-                    var dataIdTd = $("<td>").html("<input type='text' value='" + rowDataId +
+                    var dataIdTd = $("<td>").html("<input type='text' value='" + WARD +
                         "' name='data_id' readonly>");
 
                     console.log("Appending data_id input to row: ", dataIdTd); // Debug log for appending
@@ -77,7 +75,7 @@
 
             } else {
                 $("#tableBody").html(
-                "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
+                    "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
             }
 
             // Update button click handler
