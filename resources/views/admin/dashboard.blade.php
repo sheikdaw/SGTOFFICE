@@ -70,6 +70,13 @@
                                 <a href="{{ route('admin.downloadsteetwise', ['id' => $data['id']]) }}"
                                     class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">Street
                                     Wise</a>
+                                <a href="{{ route('admin.downloadpointdata', ['id' => $data['id']]) }}"
+                                    class="btn btn-primary btn-sm surveyor-count"
+                                    data-id="{{ $data['id'] }}">pointData</a>
+
+                                <a href="{{ route('admin.downloadbuildingdata', ['id' => $data['id']]) }}"
+                                    class="btn btn-primary btn-sm surveyor-count"
+                                    data-id="{{ $data['id'] }}">buildingData</a>
 
 
                             </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\AreaVariationExport;
 use App\Exports\missingBillExport;
 use App\Exports\MultiStreetExport;
+use App\Exports\PointDataExport;
 use App\Exports\StreetExport;
 use App\Exports\SurveyorsExport;
 use App\Exports\UsageAreaVariationExport;
@@ -1108,5 +1109,11 @@ class AdminController extends Controller
 
         // Export results to Excel.
         return Excel::download(new SurveyorsExport($results), 'surveyors.xlsx');
+    }
+    public function downloadPointData($id)
+    {
+        $data = Data::findOrFail($id);
+        $pointdata = DB::table($data->pointdata)->get();
+        return Excel::download(new PointDataExport($pointdata), 'pointdata' . $data->ward . '.xlsx');
     }
 }

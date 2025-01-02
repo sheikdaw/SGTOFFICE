@@ -52,6 +52,8 @@ Route::middleware('admin')->group(function () {
     Route::get('surveyor/count/{id}', [AdminController::class, 'surveyorCount'])->name('surveyor.count');
     Route::get('/download-missing-bill/{id}', [AdminController::class, 'downloadMissingBill'])->name('admin.downloadMissingBill');
     Route::get('/surveyors-count/{id}', [AdminController::class, 'surveyorsCount'])->name('admin.surveyorsCount');
+    Route::get('admin/downloadpointdata/{id}', [AdminController::class, 'downloadPointData'])->name('admin.downloadpointdata');
+    Route::get('admin/downloadbuildingdata/{id}', [AdminController::class, 'downloadBuildingData'])->name('admin.downloadbuildingdata');
 });
 Route::post('/processImage', [AdminController::class, 'processImage'])->name('process.image');
 
