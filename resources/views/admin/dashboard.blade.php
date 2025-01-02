@@ -171,25 +171,11 @@
             </div>
         </div>
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
     <script>
         const routes = {
             datastore: "{{ route('admin.datastore') }}",
 
         };
-
-        $(document).ready(function() {
-            $('#road_name').change(function() {
-                const selectedRoad = $(this).val();
-                if (selectedRoad) {
-                    localStorage.setItem('road_name', selectedRoad);
-
-                }
-            });
-            const savedRoadName = localStorage.getItem('road_name');
-            if (savedRoadName) {
-                $('#road_name').val(savedRoadName);
-            }
-        });
     </script>
 @endsection
