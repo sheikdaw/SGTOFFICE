@@ -1,5 +1,6 @@
 @extends('layout.main-layout')
 
+
 @section('content')
     <div id="flash-message-container"></div>
     <div class="table-responsive">
@@ -16,9 +17,9 @@
 
     <script>
         $(document).ready(function() {
-            // Ensure pointData and data_id are correctly passed to JS
-            var response = @json($pointData); // Ensure this data is correctly passed from the controller
+            var response = @json($pointData);
             var data_id = @json($data_id);
+
             console.log(response);
 
             $("#tableHeaders").empty();
@@ -27,13 +28,11 @@
             if (response.length > 0) {
                 var headers = Object.keys(response[0]);
 
-                // Dynamically create headers
                 headers.forEach(function(header) {
                     $("<th>").text(header).appendTo("#tableHeaders");
                 });
                 $("<th>").text("Action").appendTo("#tableHeaders");
 
-                // Loop through the response to create table rows
                 response.forEach(function(item) {
                     var row = $("<tr id='row-" + item.id + "'>");
                     headers.forEach(function(header) {
@@ -45,16 +44,17 @@
                         }
                     });
 
-                    // Add hidden data_id field
-                    $("<td>").html("<input type='hidden' value='" + data_id + "' name='data_id' " +
-                        readOnly + ">").appendTo(row);
 
-                    // Add action buttons for update and delete
+                    // Check if the surveyor's name matches the worker_name to allow update
+
                     $("<td>").html(
                             "<button type='button' class='btn btn-success updateBtn'>Update</button>")
                         .appendTo(row);
-                    $("<td>").html("<button type='button' class='btn btn-danger deleteBtn'>Delete</button>")
+                    $("<td>").html(
+                            "<button type='button' class='btn btn-success dateteBtn'>Delete</button>")
                         .appendTo(row);
+
+
 
                     $("#tableBody").append(row);
                 });
@@ -63,7 +63,6 @@
                     "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
             }
 
-            // Update button click handler
             $(document).on("click", ".updateBtn", function() {
                 var row = $(this).closest("tr");
                 var rowData = {};
