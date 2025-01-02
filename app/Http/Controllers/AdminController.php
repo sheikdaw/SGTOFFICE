@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\AreaVariationExport;
+use App\Exports\AssessmentDetailsExport;
 use App\Exports\missingBillExport;
 use App\Exports\MultiStreetExport;
 use App\Exports\PointDataExport;
@@ -1114,6 +1115,6 @@ class AdminController extends Controller
     {
         $data = Data::findOrFail($id);
         $pointdata = DB::table($data->pointdata)->get();
-        return Excel::download(new PointDataExport($pointdata), 'pointdata' . $data->ward . '.xlsx');
+        return Excel::download(new AssessmentDetailsExport($pointdata), 'pointdata' . $data->ward . '.xlsx');
     }
 }
