@@ -681,7 +681,6 @@ class AdminController extends Controller
             }
         }
 
-
         return $areavariations;
     }
 
@@ -1069,5 +1068,35 @@ class AdminController extends Controller
         $data = Data::findOrFail($id);
 
         return Excel::download(new missingBillExport($data), 'missing_bills.xlsx');
+    }
+    public function surveyorsCount($id)
+    {
+        $data = Data::findOrFail($id); // Retrieve the Data record or throw a 404 error if not found.
+        $surveyors = Surveyor::where('data_id', $id)->get(); // Execute the query to retrieve surveyors.
+
+        if ($surveyors->isNotEmpty()) {
+            $results = [];
+
+            foreach ($surveyors as $surveyor) {
+                $surveyedDataCount = DB::table($data->pointdata)
+                    ->where('worker_name', $surveyor->name)
+                    ->count();
+
+                $notConnectedDataCount = DB::table($data->pointdata)
+                    ->where('worker_name', $surveyor->name)
+                    ->whereNotIn('assessment', $data->mis)
+                    ->count();
+
+                $results[] = [
+                    'surveyor' => $surveyor->name,
+                    'surveyed_count' => $surveyedDataCount,
+                    'not_connected_count' => $notConnectedDataCount,
+                ];
+            }
+
+            return $results; // Return the aggregated results.
+        }
+
+        return []; // Return an empty array if there are no surveyors.
     }
 }

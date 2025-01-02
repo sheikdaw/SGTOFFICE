@@ -63,8 +63,9 @@
                                 <a href="{{ route('admin.downloadLines', ['id' => $data['id']]) }}"
                                     class="btn btn-dark btn-sm download-lines" data-id="{{ $data['id'] }}">Download
                                     Lines</a>
-                                <a href="#" class="btn btn-danger btn-sm surveyor-count"
-                                    data-id="{{ $data['id'] }}">Surveyor Count</a>
+                                <a href="{{ route('admin.surveyorsCount', ['id' => $data['id']]) }}"
+                                    class="btn btn-danger btn-sm surveyor-count" data-id="{{ $data['id'] }}">Surveyor
+                                    Count</a>
                                 <a href="{{ route('admin.downloadsteetwise', ['id' => $data['id']]) }}"
                                     class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">Street
                                     Wise</a>
