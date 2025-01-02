@@ -191,5 +191,20 @@
                 $('#road_name').val(savedRoadName);
             }
         });
+        $(document).ready(function() {
+            $('#road_name').change(function() {
+                const selectedRoad = $(this).val();
+                if (selectedRoad) {
+                    console.log('Selected Road: ' +
+                        selectedRoad); // Log the selected road name to the console
+                }
+            });
+
+            // Optional: If you want to automatically set the saved road name (if any)
+            const savedRoadName = localStorage.getItem('road_name');
+            if (savedRoadName) {
+                $('#road_name').val(savedRoadName);
+            }
+        });
     </script>
 @endsection
