@@ -1139,30 +1139,28 @@ class AdminController extends Controller
         if (!$data) {
             return redirect()->back()->with('error', 'No data found for the surveyor.');
         }
+
         $data_id = $data->id;
         // Fetch all point data by gisid
         $pointData = DB::table($data->pointdata)
             ->where('point_gisid', $gisid)
-            ->get(); // Fetch all records
-        if ($pointData->isEmpty()) {
+            ->get();
 
+        if ($pointData->isEmpty()) {
             $pointData = DB::table($data->pointdata)
                 ->where('assessment', $gisid)
-                ->get(); // Fetch all records
+                ->get();
             if ($pointData->isEmpty()) {
                 return view('admin.editassessment', [
                     'pointData' => [],
-
+                    'data_id' => $data_id
                 ])->with('error', 'No data found for the provided GISID.');
             }
-
-
-            return view('admin.editassessment', compact('pointData', 'data_id')); // Return the view with all matching records
         }
 
-
-        return view('admin.editassessment', compact('pointData', 'data_id')); // Return the view with all matching records
+        return view('admin.editassessment', compact('pointData', 'data_id'));
     }
+
 
     public function updateAssessment(Request $request)
     {

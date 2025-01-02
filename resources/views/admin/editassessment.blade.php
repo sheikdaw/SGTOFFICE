@@ -16,8 +16,8 @@
 
     <script>
         $(document).ready(function() {
-            var response = @json($pointData);
-
+            // Ensure pointData and data_id are correctly passed to JS
+            var response = @json($pointData); // Ensure this data is correctly passed from the controller
             var data_id = @json($data_id);
 
             $("#tableHeaders").empty();
@@ -32,6 +32,7 @@
                 });
                 $("<th>").text("Action").appendTo("#tableHeaders");
 
+                // Loop through the response to create table rows
                 response.forEach(function(item) {
                     var row = $("<tr id='row-" + item.id + "'>");
                     headers.forEach(function(header) {
@@ -58,7 +59,7 @@
                 });
             } else {
                 $("#tableBody").html(
-                    "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
+                "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
             }
 
             // Update button click handler
@@ -100,7 +101,7 @@
 
                 // Send AJAX request to delete
                 $.ajax({
-                    url: "{{ route('admin.deleteAssessment') }}", // Correct route for delete
+                    url: "{{ route('admin.deleteAssessment') }}",
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken
