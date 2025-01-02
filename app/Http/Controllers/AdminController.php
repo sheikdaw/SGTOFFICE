@@ -1157,11 +1157,11 @@ class AdminController extends Controller
             }
 
 
-            return view('admin.editgisid', compact('pointData', 'surveyor', 'data_id')); // Return the view with all matching records
+            return view('admin.editgisid', compact('pointData', 'data_id')); // Return the view with all matching records
         }
 
 
-        return view('admin.editgisid', compact('pointData', 'surveyor', 'data_id')); // Return the view with all matching records
+        return view('admin.editgisid', compact('pointData', 'data_id')); // Return the view with all matching records
     }
 
     public function updateAssessment(Request $request)
