@@ -1092,8 +1092,9 @@ class AdminController extends Controller
                 ->where('worker_name', $surveyor->name)
                 ->count();
 
+            // Count where the assessment is not equal to mis.
             $notConnected = DB::table($data->pointdata)
-                ->where('assessment', $data->mis)
+                ->where('assessment', '!=', $data->mis) // Use '!=' to get "not equal"
                 ->count();
 
             $results[] = [
