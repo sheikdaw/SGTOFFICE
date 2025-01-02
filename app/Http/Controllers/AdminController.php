@@ -6,6 +6,7 @@ use App\Exports\AreaVariationExport;
 use App\Exports\missingBillExport;
 use App\Exports\MultiStreetExport;
 use App\Exports\StreetExport;
+use App\Exports\SurveyorsExport;
 use App\Exports\UsageAreaVariationExport;
 use App\Exports\UsageVariationExport;
 use App\Exports\UsageVariationsExport;
@@ -1096,9 +1097,9 @@ class AdminController extends Controller
                 ];
             }
 
-            return $results; // Return the aggregated results.
+            return Excel::download(new SurveyorsExport($results), 'surveyors.xlsx');
         }
 
-        return []; // Return an empty array if there are no surveyors.
+        return response()->json(['message' => 'No surveyors found.'], 404);
     }
 }
