@@ -1122,7 +1122,7 @@ class AdminController extends Controller
     {
         // Fetch the specific building record
         $data = Data::findOrFail($id);
-        $buildingdata = DB::table($data->buildingdata)->get();
+        $buildingdata = DB::table($data->polygondata)->get();
 
         // Export the building details to Excel
         return Excel::download(new BuildingDetailsExport($buildingdata), 'building_details_' . $data->ward . '.xlsx');
