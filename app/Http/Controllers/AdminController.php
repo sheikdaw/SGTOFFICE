@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\AreaVariationExport;
 use App\Exports\AssessmentDetailsExport;
+use App\Exports\BuildingDetailsExport;
 use App\Exports\missingBillExport;
 use App\Exports\MultiStreetExport;
 use App\Exports\PointDataExport;
@@ -1116,5 +1117,14 @@ class AdminController extends Controller
         $data = Data::findOrFail($id);
         $pointdata = DB::table($data->pointdata)->get();
         return Excel::download(new AssessmentDetailsExport($pointdata), 'pointdata' . $data->ward . '.xlsx');
+    }
+    public function downloadBuildingData($id)
+    {
+        // Fetch the specific building record
+        $data = Data::findOrFail($id);
+        $buildingdata = DB::table($data->buildingdata)->get();
+
+        // Export the building details to Excel
+        return Excel::download(new BuildingDetailsExport($buildingdata), 'building_details_' . $data->ward . '.xlsx');
     }
 }
