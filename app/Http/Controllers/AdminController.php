@@ -1096,11 +1096,12 @@ class AdminController extends Controller
                 ->where('worker_name', $surveyor->name)
                 ->count();
 
-            $notConnected =   $connectedCount;
+            $notConnected = $surveyedDataCount -  $connectedCount;
 
             $results[] = [
                 'surveyor' => $surveyor->name,
                 'surveyed_count' => $surveyedDataCount,
+                'connected_count' => $connectedCount,
                 'not_connected_count' => $notConnected,
             ];
         }
