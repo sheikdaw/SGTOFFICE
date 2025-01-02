@@ -19,6 +19,7 @@
             // Ensure pointData and data_id are correctly passed to JS
             var response = @json($pointData); // Ensure this data is correctly passed from the controller
             var data_id = @json($data_id);
+            console.log(response);
 
             $("#tableHeaders").empty();
             $("#tableBody").empty();
@@ -59,7 +60,7 @@
                 });
             } else {
                 $("#tableBody").html(
-                "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
+                    "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
             }
 
             // Update button click handler
