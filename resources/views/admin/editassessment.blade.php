@@ -43,7 +43,8 @@
                                 "' name='" + header + "' " + readOnly + ">").appendTo(row);
                         }
                     });
-
+                    $("<td>").html("<input type='text' value='" + data_id +
+                        "' name='data_id' " + readOnly + ">").appendTo(row);
 
                     // Check if the surveyor's name matches the worker_name to allow update
 
