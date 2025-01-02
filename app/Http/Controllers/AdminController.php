@@ -1085,11 +1085,14 @@ class AdminController extends Controller
                     ->where('worker_name', $surveyor->name)
                     ->count();
 
-                // Count "not connected" data for the surveyor
-                $notConnectedDataCount = DB::table($data->pointdata)
-                    ->whereNotIn('assessment', $misArray)
+                // Retrieve "not connected" data for the surveyor
+                $notConnectedData = DB::table($data->pointdata)
                     ->where('worker_name', $surveyor->name)
-                    ->count();
+                    ->whereNotIn('assessment', $misArray)
+                    ->get();
+
+                // Count the "not connected" data
+                $notConnectedDataCount = $notConnectedData->count();
 
                 $results[] = [
                     'surveyor' => $surveyor->name,
