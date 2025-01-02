@@ -1073,21 +1073,22 @@ class AdminController extends Controller
     public function surveyorsCount($id)
     {
         $data = Data::findOrFail($id); // Retrieve the Data record or throw a 404 error if not found.
-        $surveyors = Surveyor::where('data_id', $id)->get(); // Execute the query to retrieve surveyors.
+        $surveyors = Surveyor::where('data_id', $id)->get(); // Retrieve surveyors related to the data.
 
         if ($surveyors->isNotEmpty()) {
+            $misArray = is_array($data->mis) ? $data->mis : explode(',', $data->mis); // Ensure $data->mis is an array.
             $results = [];
 
             foreach ($surveyors as $surveyor) {
+                // Count surveyed data for the surveyor
                 $surveyedDataCount = DB::table($data->pointdata)
                     ->where('worker_name', $surveyor->name)
                     ->count();
 
-                $misArray = is_array($data->mis) ? $data->mis : explode(',', $data->mis);
-
+                // Count "not connected" data for the surveyor
                 $notConnectedDataCount = DB::table($data->pointdata)
-                    // ->where('worker_name', $surveyor->name)
                     ->whereNotIn('assessment', $misArray)
+                    ->where('worker_name', $surveyor->name)
                     ->count();
 
                 $results[] = [
@@ -1097,6 +1098,7 @@ class AdminController extends Controller
                 ];
             }
 
+            // Export data to Excel
             return Excel::download(new SurveyorsExport($results), 'surveyors.xlsx');
         }
 
