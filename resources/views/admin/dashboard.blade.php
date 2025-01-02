@@ -177,21 +177,15 @@
 
         };
         $(document).ready(function() {
-            // Listen for change event on the select element
             $('#road_name').change(function() {
-                // Get the selected road name
                 const selectedRoad = $(this).val();
-
-                // Store the selected road name in localStorage
                 if (selectedRoad) {
                     localStorage.setItem('road_name', selectedRoad);
+                    alert("selectedRoad");
                 }
             });
-
-            // On page load, check if a road name is saved in localStorage
             const savedRoadName = localStorage.getItem('road_name');
             if (savedRoadName) {
-                // Set the previously selected road name as selected in the dropdown
                 $('#road_name').val(savedRoadName);
             }
         });
