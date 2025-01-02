@@ -1114,6 +1114,6 @@ class AdminController extends Controller
     {
         $data = Data::findOrFail($id);
         $pointdata = DB::table($data->pointdata)->get();
-        return Excel::download(new PointDataExport($pointdata), 'pointdata' . $data->ward . '.xlsx');
+        return Excel::download(new pointDataExport($pointdata), 'pointdata' . $data->ward . '.xlsx');
     }
 }
