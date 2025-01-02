@@ -20,7 +20,7 @@
             var response = @json($pointData);
             var data_id = @json($data_id);
 
-            console.log(response);
+            console.log(data_id);
 
             $("#tableHeaders").empty();
             $("#tableBody").empty();
@@ -35,6 +35,7 @@
 
                 response.forEach(function(item) {
                     var row = $("<tr id='row-" + item.id + "'>");
+
                     headers.forEach(function(header) {
                         if (header !== 'created_at' && header !== 'updated_at') {
                             var readOnly = (header === 'corporation_id' || header === 'id') ?
@@ -43,22 +44,25 @@
                                 "' name='" + header + "' " + readOnly + ">").appendTo(row);
                         }
                     });
+
+                    // Ensure data_id exists in item and assign it to the input field
+                    var data_id = item.data_id || ''; // Set a default value if data_id is not present
                     $("<td>").html("<input type='text' value='" + data_id +
-                        "' name='data_id' " + readOnly + ">").appendTo(row);
+                        "' name='data_id' " + 'readonly' + ">").appendTo(row); // Make data_id read-only
 
-                    // Check if the surveyor's name matches the worker_name to allow update
-
+                    // Add Update button
                     $("<td>").html(
                             "<button type='button' class='btn btn-success updateBtn'>Update</button>")
                         .appendTo(row);
-                    $("<td>").html(
-                            "<button type='button' class='btn btn-success dateteBtn'>Delete</button>")
+
+                    // Add Delete button
+                    $("<td>").html("<button type='button' class='btn btn-danger deleteBtn'>Delete</button>")
                         .appendTo(row);
 
-
-
+                    // Append the row to the table body
                     $("#tableBody").append(row);
                 });
+
             } else {
                 $("#tableBody").html(
                     "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
