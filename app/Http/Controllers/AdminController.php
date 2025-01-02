@@ -1131,11 +1131,9 @@ class AdminController extends Controller
     public function findGisid(Request $request)
     {
         $gisid = $request->sgisid;
-        $surveyor = auth()->guard('surveyor')->user();
-
         // Fetch related data using surveyor's data_id
         $data = DB::table('data')
-            ->where('id', $surveyor->data_id)
+            ->where('id', $request->id)
             ->first();
 
         if (!$data) {
@@ -1154,7 +1152,7 @@ class AdminController extends Controller
             if ($pointData->isEmpty()) {
                 return view('surveyor.editgisid', [
                     'pointData' => [],
-                    'surveyor' => $surveyor // Assuming $surveyor is defined somewhere in your method
+
                 ])->with('error', 'No data found for the provided GISID.');
             }
 
