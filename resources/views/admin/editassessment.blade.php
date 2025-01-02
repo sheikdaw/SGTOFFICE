@@ -17,19 +17,23 @@
 
     <script>
         $(document).ready(function() {
-            var response = @json($pointData);
-            var data_id = @json($data_id);
+            var response = @json($pointData); // Assuming $pointData is a Laravel variable
+            var data_id = @json($data_id); // Global data_id for deletion, passed from the backend
 
-            console.log(data_id);
+            console.log(data_id); // Check if data_id is being passed correctly
 
+            // Clear the table headers and body initially
             $("#tableHeaders").empty();
             $("#tableBody").empty();
 
             if (response.length > 0) {
                 var headers = Object.keys(response[0]);
 
+                // Dynamically create table headers, excluding 'created_at' and 'updated_at'
                 headers.forEach(function(header) {
-                    $("<th>").text(header).appendTo("#tableHeaders");
+                    if (header !== 'created_at' && header !== 'updated_at') {
+                        $("<th>").text(header).appendTo("#tableHeaders");
+                    }
                 });
                 $("<th>").text("Action").appendTo("#tableHeaders");
 
@@ -45,10 +49,11 @@
                         }
                     });
 
-                    // Ensure data_id exists in item and assign it to the input field
-                    var data_id = item.data_id || ''; // Set a default value if data_id is not present
-                    $("<td>").html("<input type='text' value='" + data_id +
-                        "' name='data_id' " + 'readonly' + ">").appendTo(row); // Make data_id read-only
+                    // Add 'data_id' field (it should not be editable)
+                    var rowDataId = item.data_id ||
+                    ''; // Get 'data_id' from item (or default to empty string)
+                    $("<td>").html("<input type='text' value='" + rowDataId +
+                        "' name='data_id' readonly>").appendTo(row); // Make data_id read-only
 
                     // Add Update button
                     $("<td>").html(
@@ -65,22 +70,25 @@
 
             } else {
                 $("#tableBody").html(
-                    "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
+                "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
             }
 
+            // Update button click handler
             $(document).on("click", ".updateBtn", function() {
                 var row = $(this).closest("tr");
                 var rowData = {};
+
                 row.find("input").each(function() {
                     rowData[$(this).attr("name")] = $(this).val();
                 });
+
                 var rowId = row.attr("id").replace("row-", "");
                 console.log("Input values for row with ID " + rowId + ":", rowData);
 
                 var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
                 $.ajax({
-                    url: "{{ route('admin.updateAssessment') }}",
+                    url: "{{ route('admin.updateAssessment') }}", // Ensure the route is correct
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken
@@ -106,14 +114,14 @@
 
                 // Send AJAX request to delete
                 $.ajax({
-                    url: "{{ route('admin.deleteAssessment') }}",
+                    url: "{{ route('admin.deleteAssessment') }}", // Ensure the route is correct
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken
                     },
                     data: {
                         id: rowId,
-                        data_id: data_id
+                        data_id: data_id // This value should be passed to the backend for deletion
                     },
                     success: function(response) {
                         row.remove();
