@@ -1073,39 +1073,37 @@ class AdminController extends Controller
     public function surveyorsCount($id)
     {
         $data = Data::findOrFail($id); // Retrieve the Data record or throw a 404 error if not found.
-        $surveyors = Surveyor::where('data_id', $id)->get(); // Execute the query to retrieve surveyors.
+        $surveyors = Surveyor::where('data_id', $id)->get(); // Retrieve surveyors linked to this data record.
 
-        if ($surveyors->isNotEmpty()) {
-            $results = [];
-
-            foreach ($surveyors as $surveyor) {
-                $surveyedDataCount = DB::table($data->pointdata)
-                    ->where('worker_name', $surveyor->name)
-                    ->count();
-
-
-
-                $notConnected = DB::table($data->pointdata)
-                    ->where('assessment', $data->mis)
-                    ->count();
-
-                // $notConnectedDataCount = $notConnected
-                //     ->filter(function ($item) use ($surveyor) {
-                //         return $item->worker_name === $surveyor->name;
-                //     })
-                //     ->count();
-
-
-                $results[] = [
-                    'surveyor' => $surveyor->name,
-                    'surveyed_count' => $surveyedDataCount,
-                    'not_connected_count' => $notConnected,
-                ];
-            }
-
-            return Excel::download(new SurveyorsExport($results), 'surveyors.xlsx');
+        if ($surveyors->isEmpty()) {
+            return response()->json(['message' => 'No surveyors found.'], 404);
         }
 
-        return response()->json(['message' => 'No surveyors found.'], 404);
+        // Validate that the pointdata table exists.
+        if (!Schema::hasTable($data->pointdata)) {
+            return response()->json(['message' => 'Table not found: ' . $data->pointdata], 404);
+        }
+
+        $results = [];
+
+        foreach ($surveyors as $surveyor) {
+            // Retrieve counts for the surveyor and data.
+            $surveyedDataCount = DB::table($data->pointdata)
+                ->where('worker_name', $surveyor->name)
+                ->count();
+
+            $notConnected = DB::table($data->pointdata)
+                ->where('assessment', $data->mis)
+                ->count();
+
+            $results[] = [
+                'surveyor' => $surveyor->name,
+                'surveyed_count' => $surveyedDataCount,
+                'not_connected_count' => $notConnected,
+            ];
+        }
+
+        // Export results to Excel.
+        return Excel::download(new SurveyorsExport($results), 'surveyors.xlsx');
     }
 }
