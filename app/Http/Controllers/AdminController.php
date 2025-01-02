@@ -1150,7 +1150,7 @@ class AdminController extends Controller
                 ->where('assessment', $gisid)
                 ->get(); // Fetch all records
             if ($pointData->isEmpty()) {
-                return view('surveyor.editgisid', [
+                return view('admin.editassessment', [
                     'pointData' => [],
 
                 ])->with('error', 'No data found for the provided GISID.');
