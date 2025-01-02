@@ -1083,10 +1083,10 @@ class AdminController extends Controller
                     ->where('worker_name', $surveyor->name)
                     ->count();
 
-                $misArray = is_array($data->mis) ? $data->mis : explode(',', $data->mis);
+
 
                 $notConnected = DB::table($data->pointdata)
-                    ->where('assessment', $misArray)
+                    ->where('assessment', $data->mis)
                     ->count();
 
                 // $notConnectedDataCount = $notConnected
