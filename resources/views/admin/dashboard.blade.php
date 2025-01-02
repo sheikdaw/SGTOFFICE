@@ -34,7 +34,7 @@
                                     <option value="{{ $road }}">{{ $road }}</option>
                                 @endforeach
                             </select>
-                            <form class="d-flex mt-3" action="{{ route('admin.findGisid') }}">
+                            <form class="d-flex mt-3" action="{{ route('admin.searchGisid') }}">
                                 <input class="form-control me-2" type="text" id="id" name="id"
                                     value="{{ $data['id'] }}">
                                 <input class="form-control me-2" type="text" id="sgisid" name="sgisid">

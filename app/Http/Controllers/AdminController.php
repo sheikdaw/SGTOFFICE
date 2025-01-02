@@ -1128,7 +1128,7 @@ class AdminController extends Controller
         // Export the building details to Excel
         return Excel::download(new BuildingDetailsExport($buildingdata), 'building_details_' . $data->ward . '.xlsx');
     }
-    public function findGisid(Request $request)
+    public function searchGisid(Request $request)
     {
         $gisid = $request->sgisid;
         // Fetch related data using surveyor's data_id
