@@ -93,18 +93,18 @@ class AdminController extends Controller
     public function dataStore(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'image' => 'required|image|mimes:jpeg,png,jpg',
+            'image' => 'required|image|mimes:jpeg,png,jpg',
             'corporation' => 'required',
             'zone' => 'required',
             'ward' => 'required',
             'polygon' => 'required',
             'point' => 'required',
-            // 'line' => 'required',
-            // 'mis' => 'required|file|mimes:xlsx,xls,csv',
-            // 'extend-right' => 'required',
-            // 'extend-left' => 'required',
-            // 'extend-top' => 'required',
-            // 'extend-bottom' => 'required'
+            'line' => 'required',
+            'mis' => 'required|file|mimes:xlsx,xls,csv',
+            'extend-right' => 'required',
+            'extend-left' => 'required',
+            'extend-top' => 'required',
+            'extend-bottom' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -255,25 +255,25 @@ class AdminController extends Controller
             }
         ];
 
-        // foreach ($tables as $name => $schema) {
-        //     if (!Schema::hasTable($tablePrefix . $name)) {
-        //         Schema::create($tablePrefix . $name, $schema);
-        //     }
-        // }
+        foreach ($tables as $name => $schema) {
+            if (!Schema::hasTable($tablePrefix . $name)) {
+                Schema::create($tablePrefix . $name, $schema);
+            }
+        }
 
         // Handle Import
-        // $file = $request->file('mis');
-        // if (!$file) {
-        //     return response()->json(['message' => 'No file uploaded'], 400);
-        // }
-        // $import = new MisImport($tablePrefix . 'mis');
+        $file = $request->file('mis');
+        if (!$file) {
+            return response()->json(['message' => 'No file uploaded'], 400);
+        }
+        $import = new MisImport($tablePrefix . 'mis');
 
-        // try {
-        //     Excel::import($import, $file);
-        // } catch (\Exception $e) {
-        //     Log::error('Import Error: ' . $e->getMessage());
-        //     return response()->json(['message' => 'Import failed'], 500);
-        // }
+        try {
+            Excel::import($import, $file);
+        } catch (\Exception $e) {
+            Log::error('Import Error: ' . $e->getMessage());
+            return response()->json(['message' => 'Import failed'], 500);
+        }
 
         // Handle Point File Upload
         if ($request->hasFile('point')) {
@@ -292,20 +292,20 @@ class AdminController extends Controller
         }
 
         // Handle Line File Upload
-        // if ($request->hasFile('line')) {
-        //     $lineFile = $request->file('line');
-        //     $lineData = json_decode(file_get_contents($lineFile->getRealPath()), true);
-        //     $count = 0;
-        //     foreach ($lineData['features'] as $feature) {
-        //         DB::table($tablePrefix . 'lines')->insert([
-        //             'gisid' => $count++,
-        //             'type' => $feature['geometry']['type'] ?? null,
-        //             'coordinates' => json_encode($feature['geometry']['coordinates']),
-        //             'created_at' => now(),
-        //             'updated_at' => now(),
-        //         ]);
-        //     }
-        // }
+        if ($request->hasFile('line')) {
+            $lineFile = $request->file('line');
+            $lineData = json_decode(file_get_contents($lineFile->getRealPath()), true);
+            $count = 0;
+            foreach ($lineData['features'] as $feature) {
+                DB::table($tablePrefix . 'lines')->insert([
+                    'gisid' => $count++,
+                    'type' => $feature['geometry']['type'] ?? null,
+                    'coordinates' => json_encode($feature['geometry']['coordinates']),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
         if ($request->hasFile('polygon')) {
             $lineFile = $request->file('polygon');
             $lineData = json_decode(file_get_contents($lineFile->getRealPath()), true);
@@ -323,22 +323,22 @@ class AdminController extends Controller
         }
         // return response()->json(['message' => 'Success', 'data' => 'Data added successfully']);
 
-        // $imagePath = null;
-        // if ($request->hasFile('image')) {
-        //     $imageFile = $request->file('image');
-        //     $imageName = 'image' . '.' . $imageFile->getClientOriginalExtension();
-        //     $corporationPath = public_path('corporations/' . $corporation . '/' . $zone . '/' . $ward);
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imageFile = $request->file('image');
+            $imageName = 'image' . '.' . $imageFile->getClientOriginalExtension();
+            $corporationPath = public_path('corporations/' . $corporation . '/' . $zone . '/' . $ward);
 
-        //     // Create the directory if it doesn't exist
-        //     if (!File::exists($corporationPath)) {
-        //         File::makeDirectory($corporationPath, 0755, true);
-        //     }
+            // Create the directory if it doesn't exist
+            if (!File::exists($corporationPath)) {
+                File::makeDirectory($corporationPath, 0755, true);
+            }
 
-        //     // Move the image file
-        //     $imageFile->move($corporationPath, $imageName);
-        //     $imagePath = 'corporations/' . $corporation . '/' . $zone . '/' . $ward . '/' . $imageName;
-        // }
-        return response()->json("success");
+            // Move the image file
+            $imageFile->move($corporationPath, $imageName);
+            $imagePath = 'corporations/' . $corporation . '/' . $zone . '/' . $ward . '/' . $imageName;
+        }
+
         // Save Data
         $data = new Data();
         $data->corporation_id = $cbe->id;
