@@ -54,7 +54,7 @@ Route::middleware('admin')->group(function () {
     Route::get('/surveyors-count/{id}', [AdminController::class, 'surveyorsCount'])->name('admin.surveyorsCount');
     Route::get('admin/downloadpointdata/{id}', [AdminController::class, 'downloadPointData'])->name('admin.downloadpointdata');
     Route::get('admin/downloadbuildingdata/{id}', [AdminController::class, 'downloadBuildingData'])->name('admin.downloadbuildingdata');
-    Route::get('/surveyor/find-gisid', [AdminController::class, 'findGisid'])->name('admin.findGisid');
+    Route::get('/admin/find-gisid', [AdminController::class, 'findGisid'])->name('admin.findGisid');
     Route::post('/admin/update-assessment', [AdminController::class, 'updateAssessment'])->name('admin.updateAssessment');
     Route::post('/admin/delete-assessment', [AdminController::class, 'deleteAssessment'])->name('admin.deleteAssessment');
 });
