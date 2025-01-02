@@ -27,17 +27,18 @@
                                     {{ $data['pointdatacount'] - $data['connected'] }}
                                 </p>
                             </div>
-                            <select name="road_name" class="form-control" id="road_name">
+                            <select name="road_name" class="form-control" id="road_name_{{ $data['id'] }}"
+                                onchange="updateAreaVariationLink({{ $data['id'] }})">
                                 <option value="">Select a road</option>
                                 @foreach ($data['road_name'] as $road)
                                     <option value="{{ $road }}">{{ $road }}</option>
                                 @endforeach
                             </select>
 
-
                             <div class="card-footer bg-light d-flex flex-wrap gap-2">
-                                <a href="{{ route('admin.area.variation', ['id' => $data['id']]) }}"
-                                    class="btn btn-primary btn-sm area-variation" data-id="{{ $data['id'] }}">
+                                <a href="{{ route('admin.area.variation', ['id' => $data['id'], 'road_name' => '']) }}"
+                                    class="btn btn-primary btn-sm area-variation"
+                                    id="area-variation-link-{{ $data['id'] }}" data-id="{{ $data['id'] }}">
                                     Area Variation
                                 </a>
                                 <a href="{{ route('admin.usage.variation', ['id' => $data['id']]) }}"
@@ -177,5 +178,20 @@
             datastore: "{{ route('admin.datastore') }}",
 
         };
+
+        function updateAreaVariationLink(id) {
+            // Get the selected road name
+            const selectedRoad = document.getElementById(`road_name_${id}`).value;
+
+            // Find the link element
+            const link = document.getElementById(`area-variation-link-${id}`);
+
+            // Update the href attribute with the selected road name
+            const baseUrl = "{{ route('admin.area.variation', ['id' => '__ID__', 'road_name' => '__ROAD_NAME__']) }}"
+                .replace('__ID__', id)
+                .replace('__ROAD_NAME__', encodeURIComponent(selectedRoad || ''));
+
+            link.href = baseUrl;
+        }
     </script>
 @endsection
