@@ -1091,11 +1091,12 @@ class AdminController extends Controller
             $surveyedDataCount = DB::table($data->pointdata)
                 ->where('worker_name', $surveyor->name)
                 ->count();
-
-            $notConnected = DB::table($data->pointdata)
-                ->where('worker_name', $surveyor->name) // Filter by surveyor's name
-                ->where('assessment', '!=', $data->mis) // Filter where assessment is not equal to mis
+            $connectedCount = DB::table($data->pointdata)
+                ->whereIn('assessment', DB::table($data->mis)->pluck('assessment'))
+                ->where('worker_name', $surveyor->name)
                 ->count();
+
+            $notConnected =   $connectedCount;
 
             $results[] = [
                 'surveyor' => $surveyor->name,
