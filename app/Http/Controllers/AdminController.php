@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use ZipArchive;
 use App\Mail\TestEmail;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\NotIn;
@@ -1126,5 +1127,107 @@ class AdminController extends Controller
 
         // Export the building details to Excel
         return Excel::download(new BuildingDetailsExport($buildingdata), 'building_details_' . $data->ward . '.xlsx');
+    }
+    public function findGisid(Request $request)
+    {
+        $gisid = $request->sgisid;
+        $surveyor = auth()->guard('surveyor')->user();
+
+        // Fetch related data using surveyor's data_id
+        $data = DB::table('data')
+            ->where('id', $surveyor->data_id)
+            ->first();
+
+        if (!$data) {
+            return redirect()->back()->with('error', 'No data found for the surveyor.');
+        }
+        $data_id = $data->id;
+        // Fetch all point data by gisid
+        $pointData = DB::table($data->pointdata)
+            ->where('point_gisid', $gisid)
+            ->get(); // Fetch all records
+        if ($pointData->isEmpty()) {
+
+            $pointData = DB::table($data->pointdata)
+                ->where('assessment', $gisid)
+                ->get(); // Fetch all records
+            if ($pointData->isEmpty()) {
+                return view('surveyor.editgisid', [
+                    'pointData' => [],
+                    'surveyor' => $surveyor // Assuming $surveyor is defined somewhere in your method
+                ])->with('error', 'No data found for the provided GISID.');
+            }
+
+
+            return view('admin.editgisid', compact('pointData', 'surveyor', 'data_id')); // Return the view with all matching records
+        }
+
+
+        return view('admin.editgisid', compact('pointData', 'surveyor', 'data_id')); // Return the view with all matching records
+    }
+
+    public function updateAssessment(Request $request)
+    {
+        $id = $request->data_id; // Get the data_id from the request
+
+        // Retrieve the data record associated with the data_id
+        $data = Data::findOrFail($id);
+        $tableName = $data->pointdata; // Table name associated with the data
+
+        // Get the updated data from the request
+        $updatedData = $request->only([
+            'assessment',
+            'old_assessment',
+            'floor',
+            'bill_usage',
+            'aadhar_no',
+            'ration_no',
+            'phone_number',
+            'owner_name',
+            'present_owner_name',
+            'point_gisid',
+            'old_door_no',
+            'new_door_no',
+            'remarks',
+        ]);
+
+        // Define validation rules
+        $rules = [
+            'assessment' => 'required',
+            'old_assessment' => 'required',
+            'floor' => 'required',
+            'bill_usage' => 'required',
+            'aadhar_no' => 'nullable',
+            'ration_no' => 'nullable',
+            'phone_number' => 'required',
+            'owner_name' => 'required',
+            'present_owner_name' => 'required',
+            'point_gisid' => 'required',
+            'old_door_no' => 'required',
+            'new_door_no' => 'required',
+            'remarks' => 'nullable',
+        ];
+
+
+        $validator = Validator::make($updatedData, $rules);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $updatedData['updated_at'] = Carbon::now();
+        unset($updatedData['created_at']);
+
+        DB::table($tableName)->where('id', $id)->update($updatedData);
+        return response()->json(['message' => 'Data updated successfully'], 200);
+    }
+    public function deleteAssessment(Request $request)
+    {
+        $id = $request->id;
+        $data_id = $request->data_id;
+        $data = Data::findOrFail($data_id);
+        $tableName = $data->pointdata;
+        DB::table($tableName)->where('id', $id)->delete();
+        return response()->json(['message' => 'Data deleted successfully'], 200);
     }
 }
