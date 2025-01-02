@@ -177,12 +177,13 @@
             datastore: "{{ route('admin.datastore') }}",
 
         };
+        alert("selectedRoad");
         $(document).ready(function() {
             $('#road_name').change(function() {
                 const selectedRoad = $(this).val();
                 if (selectedRoad) {
                     localStorage.setItem('road_name', selectedRoad);
-                    alert("selectedRoad");
+
                 }
             });
             const savedRoadName = localStorage.getItem('road_name');
