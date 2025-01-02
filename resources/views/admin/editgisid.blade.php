@@ -17,7 +17,7 @@
     <script>
         $(document).ready(function() {
             var response = @json($pointData);
-            var surveyor = @json($surveyor); // Pass surveyor data to JavaScript
+
             var data_id = @json($data_id);
 
             $("#tableHeaders").empty();
