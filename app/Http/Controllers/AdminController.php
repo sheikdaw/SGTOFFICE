@@ -1130,21 +1130,24 @@ class AdminController extends Controller
     }
     public function searchGisid(Request $request)
     {
-        $gisid = $request->sgisid;
+        $gisid = $request->input('sgisid');
+        $dataId = $request->input('id');
 
         // Fetch related data using surveyor's data_id
-        $data = DB::table('data')->where('id', $request->id)->first();
+        $data = DB::table('data')->find($dataId);
 
         if (!$data) {
             return redirect()->back()->with('error', 'No data found for the surveyor.');
         }
 
-        $data_id = $data->id;
         $pointdataTable = $data->pointdata;
+
+        // Validate the existence of the table
         if (!Schema::hasTable($pointdataTable)) {
             return redirect()->back()->with('error', 'Invalid point data table.');
         }
 
+        // Fetch point data using GISID or assessment
         $pointData = DB::table($pointdataTable)
             ->where('point_gisid', $gisid)
             ->orWhere('assessment', $gisid)
@@ -1153,12 +1156,18 @@ class AdminController extends Controller
         if ($pointData->isEmpty()) {
             return view('admin.editassessment', [
                 'pointData' => [],
-                'data_id' => $data_id,
+                'data_id' => $dataId,
             ])->with('error', 'No data found for the provided GISID.');
         }
 
-        return view('admin.editassessment', compact('pointData', 'data_id'));
+        // Add additional fields to the point data
+        $pointData->each(function ($pdata) use ($data) {
+            $pdata->val = $data->id;
+        });
+
+        return view('admin.editassessment', compact('pointData', 'dataId'));
     }
+
 
 
     public function updateAssessment(Request $request)
