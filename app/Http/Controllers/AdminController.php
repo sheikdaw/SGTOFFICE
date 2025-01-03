@@ -1172,59 +1172,48 @@ class AdminController extends Controller
 
     public function updateAssessment(Request $request)
     {
-        $id = $request->val; // Get the data_id from the request
-
-        // Retrieve the data record associated with the data_id
-        $data = Data::findOrFail($id);
-        $tableName = $data->pointdata; // Table name associated with the data
-
-        // Get the updated data from the request
-        $updatedData = $request->only([
-            'assessment',
-            'old_assessment',
-            'floor',
-            'bill_usage',
-            'aadhar_no',
-            'ration_no',
-            'phone_number',
-            'owner_name',
-            'present_owner_name',
-            'point_gisid',
-            'old_door_no',
-            'new_door_no',
-            'remarks',
-        ]);
-
-        // Define validation rules
-        $rules = [
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'val' => 'required|exists:data,id',
             'assessment' => 'required',
             'old_assessment' => 'required',
             'floor' => 'required',
             'bill_usage' => 'required',
-            'aadhar_no' => 'nullable',
-            'ration_no' => 'nullable',
-            'phone_number' => 'required',
-            'owner_name' => 'required',
-            'present_owner_name' => 'required',
-            'point_gisid' => 'required',
-            'old_door_no' => 'required',
-            'new_door_no' => 'required',
-            'remarks' => 'nullable',
-        ];
+            'aadhar_no' => 'nullable|string',
+            'ration_no' => 'nullable|string',
+            'phone_number' => 'required|string',
+            'owner_name' => 'required|string',
+            'present_owner_name' => 'required|string',
+            'point_gisid' => 'required|string',
+            'old_door_no' => 'required|string',
+            'new_door_no' => 'required|string',
+            'remarks' => 'nullable|string',
+        ]);
 
+        // Retrieve the data record associated with the data_id
+        $data = Data::findOrFail($validatedData['val']);
+        $tableName = $data->pointdata; // Dynamic table name
 
-        $validator = Validator::make($updatedData, $rules);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+        // Validate the existence of the dynamic table
+        if (!Schema::hasTable($tableName)) {
+            return response()->json(['error' => 'Invalid point data table.'], 400);
         }
 
-        $updatedData['updated_at'] = Carbon::now();
-        unset($updatedData['created_at']);
+        // Add the `updated_at` timestamp to the data
+        $validatedData['updated_at'] = now();
 
-        DB::table($tableName)->where('id', $request->id)->update($updatedData);
+        // Perform the update on the dynamic table
+        $updateResult = DB::table($tableName)
+            ->where('id', $request->input('id'))
+            ->update($validatedData);
+
+        if (!$updateResult) {
+            return response()->json(['error' => 'Failed to update the data.'], 500);
+        }
+
         return response()->json(['message' => 'Data updated successfully'], 200);
     }
+
     public function deleteAssessment(Request $request)
     {
         $id = $request->id;
