@@ -85,7 +85,7 @@
                         'X-CSRF-TOKEN': csrfToken
                     },
                     data: {
-                        id: rowId,
+
                         data: rowData
                     },
                     success: function(response) {
