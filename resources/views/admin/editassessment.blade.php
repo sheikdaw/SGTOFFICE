@@ -18,7 +18,7 @@
     <script>
         $(document).ready(function() {
             var response = @json($pointData);
-            var surveyor = @json($surveyor);
+
             console.log(response);
 
             $("#tableHeaders").empty();
@@ -36,8 +36,8 @@
                     var row = $("<tr id='row-" + item.id + "'>");
                     headers.forEach(function(header) {
                         if (header !== 'created_at' && header !== 'updated_at') {
-                            var readOnly = (header === 'corporation_id' || header === 'id') ?
-                                'readonly' : '';
+                            var readOnly = (header === 'corporation_id' || header === 'id' ||
+                                header === 'val') ? 'readonly' : '';
                             $("<td>").html("<input type='text' value='" + item[header] +
                                 "' name='" + header + "' " + readOnly + ">").appendTo(row);
                         }
@@ -45,12 +45,14 @@
 
 
                     // Check if the surveyor's name matches the worker_name to allow update
-                    if (item['worker_name'] === surveyor.name || surveyor.name === "sgt" || surveyor
-                        .name === "sir" || surveyor.name === "Anand") {
-                        $("<td>").html(
-                                "<button type='button' class='btn btn-success updateBtn'>Update</button>")
-                            .appendTo(row);
-                    }
+
+                    $("<td>").html(
+                            "<button type='button' class='btn btn-success updateBtn'>Update</button>")
+                        .appendTo(row);
+                    $("<td>").html(
+                            "<button type='button' class='btn btn-danger deleteBtn'>Delete</button>")
+                        .appendTo(row);
+
 
 
                     $("#tableBody").append(row);
