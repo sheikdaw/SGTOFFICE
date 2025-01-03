@@ -18,10 +18,6 @@
     <script>
         $(document).ready(function() {
             var response = @json($pointData); // Assuming $pointData is a Laravel variable
-            // Global data_id for deletion, passed from the backend
-
-            console.log(data_id); // Check if data_id is being passed correctly
-
             // Clear the table headers and body initially
             $("#tableHeaders").empty();
             $("#tableBody").empty();
