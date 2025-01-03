@@ -1172,69 +1172,47 @@ class AdminController extends Controller
 
     public function updateAssessment(Request $request)
     {
+        $id = $request->id;
+        return response()->json($id);
+        // $updatedData = $request->data;
 
-        // Return the 'val' in the response
+        // Fetch the correct table name based on your data structure
 
+        $data = DB::table('data')->where('id', $surveyor->data_id)->first();
+        $tableName = $data->pointdata;
 
-        // Retrieve and validate the updated data
-        $updatedData = $request->only([
-            'assessment',
-            'old_assessment',
-            'floor',
-            'bill_usage',
-            'aadhar_no',
-            'ration_no',
-            'phone_number',
-            'owner_name',
-            'present_owner_name',
-            'point_gisid',
-            'old_door_no',
-            'new_door_no',
-            'remarks',
-        ]);
-
+        // Define validation rules
         $rules = [
-            'assessment' => 'required|string',
-            'old_assessment' => 'required|string',
-            'floor' => 'required|string',
-            'bill_usage' => 'required|string',
-            'aadhar_no' => 'nullable|string',
-            'ration_no' => 'nullable|string',
-            'phone_number' => 'required|string',
-            'owner_name' => 'required|string',
-            'present_owner_name' => 'required|string',
-            'point_gisid' => 'required|string',
-            'old_door_no' => 'required|string',
-            'new_door_no' => 'required|string',
-            'remarks' => 'nullable|string',
-            'val' => 'required'
+            'assessment' => 'required',
+            'old_assessment' => 'required',
+            'floor' => 'required',
+            'bill_usage' => 'required',
+            'aadhar_no' => 'nullable',
+            'ration_no' => 'nullable',
+            'phone_number' => 'required',
+            'owner_name' => 'required',
+            'present_owner_name' => 'required',
+            'point_gisid' => 'required',
+            'old_door_no' => 'required',
+            'new_door_no' => 'required',
+            'remarks' => 'nullable',
         ];
 
+        // Validate the updated data
         $validator = Validator::make($updatedData, $rules);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        try {
-            // Retrieve the data model based on the provided 'val'
-            $data = Data::findOrFail($request->input('val'));
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Data not found.'], 404);
-        }
 
-        // Determine the table name
-        $tableName = $data->pointdata;
-
-
-        // Add the updated_at timestamp
+        // Set the updated_at field to the current timestamp
         $updatedData['updated_at'] = Carbon::now();
 
-        try {
-            // Perform the database update
-            DB::table($tableName)->where('id', $request->input('id'))->update($updatedData);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to update data.', 'details' => $e->getMessage()], 500);
-        }
+        // Ensure created_at is not set to null
+        unset($updatedData['created_at']);
+
+        // Update the data in the database
+        DB::table($tableName)->where('id', $id)->update($updatedData);
 
         return response()->json(['message' => 'Data updated successfully'], 200);
     }
