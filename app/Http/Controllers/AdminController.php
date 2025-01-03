@@ -1139,6 +1139,8 @@ class AdminController extends Controller
         if (!$data) {
             return redirect()->back()->with('error', 'No data found for the surveyor.');
         }
+        return response()->json($data, 200);
+
 
         $data_id = $data->id;
         // Fetch all point data by gisid
@@ -1157,7 +1159,6 @@ class AdminController extends Controller
                 ])->with('error', 'No data found for the provided GISID.');
             }
         }
-        return response()->json($pointData, 200);
 
         return view('admin.editassessment', compact('pointData', 'data_id'));
     }
