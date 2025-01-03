@@ -1172,6 +1172,7 @@ class AdminController extends Controller
 
     public function updateAssessment(Request $request)
     {
+        return response()->json($request->all());
         try {
             $data = Data::findOrFail($request->val);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
