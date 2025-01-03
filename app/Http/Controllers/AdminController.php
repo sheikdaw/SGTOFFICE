@@ -1172,53 +1172,59 @@ class AdminController extends Controller
 
     public function updateAssessment(Request $request)
     {
-        // Validate the incoming request data
-        $validatedData = $request->validate([
-            'id' => 'required|integer', // The record ID in the dynamic table
-            'val' => 'required|exists:data,id', // The data ID for dynamic table association
-            'assessment' => 'required|string',
-            'old_assessment' => 'required|string',
-            'floor' => 'required|string',
-            'bill_usage' => 'required|string',
-            'aadhar_no' => 'nullable|string',
-            'ration_no' => 'nullable|string',
-            'phone_number' => 'required|string',
-            'owner_name' => 'required|string',
-            'present_owner_name' => 'required|string',
-            'point_gisid' => 'required|string',
-            'old_door_no' => 'required|string',
-            'new_door_no' => 'required|string',
-            'remarks' => 'nullable|string',
-        ]);
+        $data_id = $request->val; // Get the data_id from the request
 
         // Retrieve the data record associated with the data_id
-        $data = Data::findOrFail($validatedData['val']);
-        $tableName = $data->pointdata; // Dynamic table name
+        $data = Data::findOrFail($request->val);
+        $tableName = $data->pointdata; // Table name associated with the data
+        return response()->json($data, 200);
+        // Get the updated data from the request
+        $updatedData = $request->only([
+            'assessment',
+            'old_assessment',
+            'floor',
+            'bill_usage',
+            'aadhar_no',
+            'ration_no',
+            'phone_number',
+            'owner_name',
+            'present_owner_name',
+            'point_gisid',
+            'old_door_no',
+            'new_door_no',
+            'remarks',
+        ]);
 
-        // Validate the existence of the dynamic table
-        if (!Schema::hasTable($tableName)) {
-            return response()->json(['error' => 'The specified point data table does not exist.'], 400);
+        // Define validation rules
+        $rules = [
+            'assessment' => 'required',
+            'old_assessment' => 'required',
+            'floor' => 'required',
+            'bill_usage' => 'required',
+            'aadhar_no' => 'nullable',
+            'ration_no' => 'nullable',
+            'phone_number' => 'required',
+            'owner_name' => 'required',
+            'present_owner_name' => 'required',
+            'point_gisid' => 'required',
+            'old_door_no' => 'required',
+            'new_door_no' => 'required',
+            'remarks' => 'nullable',
+        ];
+
+
+        $validator = Validator::make($updatedData, $rules);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Add the `updated_at` timestamp to the validated data
-        $updateData = collect($validatedData)
-            ->except(['val', 'id']) // Exclude fields not required for the dynamic table
-            ->put('updated_at', now())
-            ->toArray();
+        $updatedData['updated_at'] = Carbon::now();
+        unset($updatedData['created_at']);
 
-        // Perform the update on the dynamic table
-        $updateResult = DB::table($tableName)
-            ->where('id', $validatedData['id'])
-            ->update($updateData);
-
-        if (!$updateResult) {
-            return response()->json(['error' => 'Failed to update the data. Please try again.'], 500);
-        }
-
-        return response()->json(['message' => 'Data updated successfully.'], 200);
+        DB::table($tableName)->where('id', $request->id)->update($updatedData);
+        return response()->json(['message' => 'Data updated successfully'], 200);
     }
-
-
     public function deleteAssessment(Request $request)
     {
         $id = $request->id;
