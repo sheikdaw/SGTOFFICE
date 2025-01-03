@@ -1172,19 +1172,9 @@ class AdminController extends Controller
 
     public function updateAssessment(Request $request)
     {
-        $val = $request->input('val');
 
         // Return the 'val' in the response
-        return response()->json(['val' => $val], 200);
-        try {
-            // Retrieve the data model based on the provided 'val'
-            $data = Data::findOrFail($request->input('val'));
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['error' => 'Data not found.'], 404);
-        }
 
-        // Determine the table name
-        $tableName = $data->pointdata;
 
         // Retrieve and validate the updated data
         $updatedData = $request->only([
@@ -1217,6 +1207,7 @@ class AdminController extends Controller
             'old_door_no' => 'required|string',
             'new_door_no' => 'required|string',
             'remarks' => 'nullable|string',
+            'val' => 'required'
         ];
 
         $validator = Validator::make($updatedData, $rules);
@@ -1224,6 +1215,16 @@ class AdminController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
+        try {
+            // Retrieve the data model based on the provided 'val'
+            $data = Data::findOrFail($request->input('val'));
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Data not found.'], 404);
+        }
+
+        // Determine the table name
+        $tableName = $data->pointdata;
+
 
         // Add the updated_at timestamp
         $updatedData['updated_at'] = Carbon::now();
