@@ -1172,6 +1172,9 @@ class AdminController extends Controller
 
     public function updateAssessment(Request $request)
     {
+        // Log all incoming request data for debugging
+        \Log::info('Incoming request data:', $request->all());
+
         try {
             $data = Data::findOrFail($request->val);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -1226,6 +1229,7 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'Data updated successfully'], 200);
     }
+
 
     public function deleteAssessment(Request $request)
     {
