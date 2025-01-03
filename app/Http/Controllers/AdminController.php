@@ -1140,14 +1140,11 @@ class AdminController extends Controller
         }
 
         $data_id = $data->id;
-
-        // Validate and use the dynamic table name
-        $pointdataTable = $data->pointdata; // Ensure this value is sanitized
+        $pointdataTable = $data->pointdata;
         if (!Schema::hasTable($pointdataTable)) {
             return redirect()->back()->with('error', 'Invalid point data table.');
         }
 
-        // Fetch point data by GIS ID or assessment
         $pointData = DB::table($pointdataTable)
             ->where('point_gisid', $gisid)
             ->orWhere('assessment', $gisid)
