@@ -1172,7 +1172,7 @@ class AdminController extends Controller
 
     public function updateAssessment(Request $request)
     {
-        $id = $request->data_id; // Get the data_id from the request
+        $id = $request->val; // Get the data_id from the request
 
         // Retrieve the data record associated with the data_id
         $data = Data::findOrFail($id);
@@ -1222,13 +1222,13 @@ class AdminController extends Controller
         $updatedData['updated_at'] = Carbon::now();
         unset($updatedData['created_at']);
 
-        DB::table($tableName)->where('id', $id)->update($updatedData);
+        DB::table($tableName)->where('id', $request->id)->update($updatedData);
         return response()->json(['message' => 'Data updated successfully'], 200);
     }
     public function deleteAssessment(Request $request)
     {
         $id = $request->id;
-        $data_id = $request->data_id;
+        $data_id = $request->val;
         $data = Data::findOrFail($data_id);
         $tableName = $data->pointdata;
         DB::table($tableName)->where('id', $id)->delete();
