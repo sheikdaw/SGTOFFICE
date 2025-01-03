@@ -1172,13 +1172,15 @@ class AdminController extends Controller
 
     public function updateAssessment(Request $request)
     {
-        $data_id = $request->val; // Get the data_id from the request
+        try {
+            $data = Data::findOrFail($request->val);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Data not found.'], 404);
+        }
 
-        // Retrieve the data record associated with the data_id
-        $data = Data::findOrFail($request->val);
-        $tableName = $data->pointdata; // Table name associated with the data
-        return response()->json($data, 200);
-        // Get the updated data from the request
+        $tableName = $data->pointdata;
+
+        // Retrieve and validate updated data
         $updatedData = $request->only([
             'assessment',
             'old_assessment',
@@ -1195,7 +1197,6 @@ class AdminController extends Controller
             'remarks',
         ]);
 
-        // Define validation rules
         $rules = [
             'assessment' => 'required',
             'old_assessment' => 'required',
@@ -1212,7 +1213,6 @@ class AdminController extends Controller
             'remarks' => 'nullable',
         ];
 
-
         $validator = Validator::make($updatedData, $rules);
 
         if ($validator->fails()) {
@@ -1223,8 +1223,10 @@ class AdminController extends Controller
         unset($updatedData['created_at']);
 
         DB::table($tableName)->where('id', $request->id)->update($updatedData);
+
         return response()->json(['message' => 'Data updated successfully'], 200);
     }
+
     public function deleteAssessment(Request $request)
     {
         $id = $request->id;
