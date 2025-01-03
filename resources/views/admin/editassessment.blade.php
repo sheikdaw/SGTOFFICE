@@ -49,19 +49,6 @@
                         }
                     });
 
-                    // Ensure data_id exists in item and assign it to the input field
-                    var rowDataId = item.data_id ||
-                        ''; // Get 'data_id' from item (or default to empty string)
-                    console.log("rowDataId for item with ID " + item.id + ": " + rowDataId); // Debug log
-
-                    // Add 'data_id' field (it should not be editable)
-                    var dataIdTd = $("<td>").html("<input type='text' value='" + rowDataId +
-                        "' name='data_id' readonly>");
-
-                    console.log("Appending data_id input to row: ", dataIdTd); // Debug log for appending
-
-                    row.append(dataIdTd); // Append the 'data_id' input field to the row
-
                     // Add Update button
                     $("<td>").html(
                             "<button type='button' class='btn btn-success updateBtn'>Update</button>")
