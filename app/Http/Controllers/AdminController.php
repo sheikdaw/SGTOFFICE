@@ -1174,11 +1174,12 @@ class AdminController extends Controller
     {
         // Validate the incoming request data
         $validatedData = $request->validate([
-            'val' => 'required|exists:data,id',
-            'assessment' => 'required',
-            'old_assessment' => 'required',
-            'floor' => 'required',
-            'bill_usage' => 'required',
+            'id' => 'required|integer', // The record ID in the dynamic table
+            'val' => 'required|exists:data,id', // The data ID for dynamic table association
+            'assessment' => 'required|string',
+            'old_assessment' => 'required|string',
+            'floor' => 'required|string',
+            'bill_usage' => 'required|string',
             'aadhar_no' => 'nullable|string',
             'ration_no' => 'nullable|string',
             'phone_number' => 'required|string',
@@ -1196,23 +1197,27 @@ class AdminController extends Controller
 
         // Validate the existence of the dynamic table
         if (!Schema::hasTable($tableName)) {
-            return response()->json(['error' => 'Invalid point data table.'], 400);
+            return response()->json(['error' => 'The specified point data table does not exist.'], 400);
         }
 
-        // Add the `updated_at` timestamp to the data
-        $validatedData['updated_at'] = now();
+        // Add the `updated_at` timestamp to the validated data
+        $updateData = collect($validatedData)
+            ->except(['val', 'id']) // Exclude fields not required for the dynamic table
+            ->put('updated_at', now())
+            ->toArray();
 
         // Perform the update on the dynamic table
         $updateResult = DB::table($tableName)
-            ->where('id', $request->input('id'))
-            ->update($validatedData);
+            ->where('id', $validatedData['id'])
+            ->update($updateData);
 
         if (!$updateResult) {
-            return response()->json(['error' => 'Failed to update the data.'], 500);
+            return response()->json(['error' => 'Failed to update the data. Please try again.'], 500);
         }
 
-        return response()->json(['message' => 'Data updated successfully'], 200);
+        return response()->json(['message' => 'Data updated successfully.'], 200);
     }
+
 
     public function deleteAssessment(Request $request)
     {

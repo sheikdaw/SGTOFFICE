@@ -1,6 +1,5 @@
 @extends('layout.main-layout')
 
-
 @section('content')
     <div id="flash-message-container"></div>
     <div class="table-responsive">
@@ -18,67 +17,69 @@
     <script>
         $(document).ready(function() {
             var response = @json($pointData); // Assuming $pointData is a Laravel variable
-            // Clear the table headers and body initially
-            $("#tableHeaders").empty();
-            $("#tableBody").empty();
 
-            if (response.length > 0) {
-                var headers = Object.keys(response[0]);
-
-                // Dynamically create table headers, excluding 'created_at' and 'updated_at'
+            // Utility function to create table headers
+            function createTableHeaders(headers) {
                 headers.forEach(function(header) {
                     if (header !== 'created_at' && header !== 'updated_at') {
                         $("<th>").text(header).appendTo("#tableHeaders");
                     }
                 });
                 $("<th>").text("Action").appendTo("#tableHeaders");
-
-                response.forEach(function(item) {
-                    var row = $("<tr id='row-" + item.id + "'>");
-
-                    headers.forEach(function(header) {
-                        if (header !== 'created_at' && header !== 'updated_at') {
-                            var readOnly = (header === 'corporation_id' || header === 'id') ?
-                                'readonly' : '';
-                            $("<td>").html("<input type='text' value='" + item[header] +
-                                "' name='" + header + "' " + readOnly + ">").appendTo(row);
-                        }
-                    });
-
-                    // Add Update button
-                    $("<td>").html(
-                            "<button type='button' class='btn btn-success updateBtn'>Update</button>")
-                        .appendTo(row);
-
-                    // Add Delete button
-                    $("<td>").html("<button type='button' class='btn btn-danger deleteBtn'>Delete</button>")
-                        .appendTo(row);
-
-                    // Append the row to the table body
-                    $("#tableBody").append(row);
-                });
-
-            } else {
-                $("#tableBody").html(
-                    "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
             }
 
-            // Update button click handler
+            // Utility function to create table rows
+            function createTableRow(item, headers) {
+                var row = $("<tr id='row-" + item.id + "'>");
+
+                headers.forEach(function(header) {
+                    if (header !== 'created_at' && header !== 'updated_at') {
+                        var readOnly = (header === 'corporation_id' || header === 'id') ? 'readonly' : '';
+                        $("<td>").html("<input type='text' value='" + item[header] +
+                            "' name='" + header + "' " + readOnly + ">").appendTo(row);
+                    }
+                });
+
+                // Add Action buttons
+                $("<td>").html("<button type='button' class='btn btn-success updateBtn'>Update</button>").appendTo(
+                    row);
+                $("<td>").html("<button type='button' class='btn btn-danger deleteBtn'>Delete</button>").appendTo(
+                    row);
+
+                $("#tableBody").append(row);
+            }
+
+            // Populate table dynamically
+            function populateTable(data) {
+                if (data.length > 0) {
+                    var headers = Object.keys(data[0]);
+                    createTableHeaders(headers);
+
+                    data.forEach(function(item) {
+                        createTableRow(item, headers);
+                    });
+                } else {
+                    $("#tableBody").html(
+                        "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
+                }
+            }
+
+            // Populate table on load
+            populateTable(response);
+
+            // Update button handler
             $(document).on("click", ".updateBtn", function() {
                 var row = $(this).closest("tr");
                 var rowData = {};
-
                 row.find("input").each(function() {
                     rowData[$(this).attr("name")] = $(this).val();
                 });
 
                 var rowId = row.attr("id").replace("row-", "");
-                console.log("Input values for row with ID " + rowId + ":", rowData);
-
                 var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
                 $.ajax({
-                    url: "{{ route('admin.updateAssessment') }}", // Ensure the route is correct
+                    url: "{{ route('admin.updateAssessment') }}",
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken
@@ -90,35 +91,33 @@
                     success: function(response) {
                         alert("Update successful");
                     },
-                    error: function(xhr, status, error) {
-                        alert("Update error");
+                    error: function(xhr) {
+                        alert("Update error: " + xhr.responseJSON?.message || "Unknown error");
                     }
                 });
             });
 
-            // Delete button click handler
+            // Delete button handler
             $(document).on("click", ".deleteBtn", function() {
                 var row = $(this).closest("tr");
                 var rowId = row.attr("id").replace("row-", "");
                 var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
-                // Send AJAX request to delete
                 $.ajax({
-                    url: "{{ route('admin.deleteAssessment') }}", // Ensure the route is correct
+                    url: "{{ route('admin.deleteAssessment') }}",
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken
                     },
                     data: {
-                        id: rowId,
-                        data_id: data_id // This value should be passed to the backend for deletion
+                        id: rowId
                     },
                     success: function(response) {
                         row.remove();
                         alert("Delete successful");
                     },
-                    error: function(xhr, status, error) {
-                        alert("Delete error");
+                    error: function(xhr) {
+                        alert("Delete error: " + xhr.responseJSON?.message || "Unknown error");
                     }
                 });
             });
