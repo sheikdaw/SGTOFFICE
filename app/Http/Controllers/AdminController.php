@@ -1153,7 +1153,7 @@ class AdminController extends Controller
             if ($pointData->isEmpty()) {
                 return view('admin.editassessment', [
                     'pointData' => [],
-                    'data_id' => $data_id
+                    'data_id' => $request->id
                 ])->with('error', 'No data found for the provided GISID.');
             }
         }
