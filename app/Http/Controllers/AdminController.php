@@ -1157,6 +1157,7 @@ class AdminController extends Controller
                 ])->with('error', 'No data found for the provided GISID.');
             }
         }
+        return response()->json($pointData, 200);
 
         return view('admin.editassessment', compact('pointData', 'data_id'));
     }
