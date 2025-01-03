@@ -1,5 +1,6 @@
 @extends('layout.main-layout')
 
+
 @section('content')
     <div id="flash-message-container"></div>
     <div class="table-responsive">
@@ -16,66 +17,58 @@
 
     <script>
         $(document).ready(function() {
-            var response = @json($pointData); // Assuming $pointData is a Laravel variable
+            var response = @json($pointData);
+            var surveyor = @json($surveyor);
+            console.log(response);
 
-            // Utility function to create table headers
-            function createTableHeaders(headers) {
+            $("#tableHeaders").empty();
+            $("#tableBody").empty();
+
+            if (response.length > 0) {
+                var headers = Object.keys(response[0]);
+
                 headers.forEach(function(header) {
-                    if (header !== 'created_at' && header !== 'updated_at') {
-                        $("<th>").text(header).appendTo("#tableHeaders");
-                    }
+                    $("<th>").text(header).appendTo("#tableHeaders");
                 });
                 $("<th>").text("Action").appendTo("#tableHeaders");
-            }
 
-            // Utility function to create table rows
-            function createTableRow(item, headers) {
-                var row = $("<tr id='row-" + item.id + "'>");
-
-                headers.forEach(function(header) {
-                    if (header !== 'created_at' && header !== 'updated_at') {
-                        var readOnly = (header === 'corporation_id' || header === 'id') ? 'readonly' : '';
-                        $("<td>").html("<input type='text' value='" + item[header] +
-                            "' name='" + header + "' " + readOnly + ">").appendTo(row);
-                    }
-                });
-
-                // Add Action buttons
-                $("<td>").html("<button type='button' class='btn btn-success updateBtn'>Update</button>").appendTo(
-                    row);
-                $("<td>").html("<button type='button' class='btn btn-danger deleteBtn'>Delete</button>").appendTo(
-                    row);
-
-                $("#tableBody").append(row);
-            }
-
-            // Populate table dynamically
-            function populateTable(data) {
-                if (data.length > 0) {
-                    var headers = Object.keys(data[0]);
-                    createTableHeaders(headers);
-
-                    data.forEach(function(item) {
-                        createTableRow(item, headers);
+                response.forEach(function(item) {
+                    var row = $("<tr id='row-" + item.id + "'>");
+                    headers.forEach(function(header) {
+                        if (header !== 'created_at' && header !== 'updated_at') {
+                            var readOnly = (header === 'corporation_id' || header === 'id') ?
+                                'readonly' : '';
+                            $("<td>").html("<input type='text' value='" + item[header] +
+                                "' name='" + header + "' " + readOnly + ">").appendTo(row);
+                        }
                     });
-                } else {
-                    $("#tableBody").html(
-                        "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
-                }
+
+
+                    // Check if the surveyor's name matches the worker_name to allow update
+                    if (item['worker_name'] === surveyor.name || surveyor.name === "sgt" || surveyor
+                        .name === "sir" || surveyor.name === "Anand") {
+                        $("<td>").html(
+                                "<button type='button' class='btn btn-success updateBtn'>Update</button>")
+                            .appendTo(row);
+                    }
+
+
+                    $("#tableBody").append(row);
+                });
+            } else {
+                $("#tableBody").html(
+                    "<tr><td colspan='5' class='text-center form-control'>No data found</td></tr>");
             }
 
-            // Populate table on load
-            populateTable(response);
-
-            // Update button handler
             $(document).on("click", ".updateBtn", function() {
                 var row = $(this).closest("tr");
                 var rowData = {};
                 row.find("input").each(function() {
                     rowData[$(this).attr("name")] = $(this).val();
                 });
-
                 var rowId = row.attr("id").replace("row-", "");
+                console.log("Input values for row with ID " + rowId + ":", rowData);
+
                 var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
                 $.ajax({
@@ -85,17 +78,20 @@
                         'X-CSRF-TOKEN': csrfToken
                     },
                     data: {
-
+                        id: rowId,
                         data: rowData
                     },
                     success: function(response) {
-                        alert("Update successful");
+
+                        alert("update successfully");
                     },
-                    error: function(xhr) {
-                        alert("Update error: " + xhr.responseJSON?.message || "Unknown error");
+                    error: function(xhr, status, error) {
+                        alert("update error");
                     }
                 });
             });
+
+            // delete btn click
 
             // Delete button handler
             $(document).on("click", ".deleteBtn", function() {
