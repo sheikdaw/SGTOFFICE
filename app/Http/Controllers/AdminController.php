@@ -1172,16 +1172,17 @@ class AdminController extends Controller
 
     public function updateAssessment(Request $request)
     {
-        return response()->json($request->all());
         try {
-            $data = Data::findOrFail($request->val);
+            // Retrieve the data model based on the provided 'val'
+            $data = Data::findOrFail($request->input('val'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['error' => 'Data not found.'], 404);
         }
 
+        // Determine the table name
         $tableName = $data->pointdata;
 
-        // Retrieve and validate updated data
+        // Retrieve and validate the updated data
         $updatedData = $request->only([
             'assessment',
             'old_assessment',
@@ -1199,19 +1200,19 @@ class AdminController extends Controller
         ]);
 
         $rules = [
-            'assessment' => 'required',
-            'old_assessment' => 'required',
-            'floor' => 'required',
-            'bill_usage' => 'required',
-            'aadhar_no' => 'nullable',
-            'ration_no' => 'nullable',
-            'phone_number' => 'required',
-            'owner_name' => 'required',
-            'present_owner_name' => 'required',
-            'point_gisid' => 'required',
-            'old_door_no' => 'required',
-            'new_door_no' => 'required',
-            'remarks' => 'nullable',
+            'assessment' => 'required|string',
+            'old_assessment' => 'required|string',
+            'floor' => 'required|string',
+            'bill_usage' => 'required|string',
+            'aadhar_no' => 'nullable|string',
+            'ration_no' => 'nullable|string',
+            'phone_number' => 'required|string',
+            'owner_name' => 'required|string',
+            'present_owner_name' => 'required|string',
+            'point_gisid' => 'required|string',
+            'old_door_no' => 'required|string',
+            'new_door_no' => 'required|string',
+            'remarks' => 'nullable|string',
         ];
 
         $validator = Validator::make($updatedData, $rules);
@@ -1220,10 +1221,15 @@ class AdminController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        // Add the updated_at timestamp
         $updatedData['updated_at'] = Carbon::now();
-        unset($updatedData['created_at']);
 
-        DB::table($tableName)->where('id', $request->id)->update($updatedData);
+        try {
+            // Perform the database update
+            DB::table($tableName)->where('id', $request->input('id'))->update($updatedData);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update data.', 'details' => $e->getMessage()], 500);
+        }
 
         return response()->json(['message' => 'Data updated successfully'], 200);
     }
