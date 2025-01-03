@@ -1172,6 +1172,7 @@ class AdminController extends Controller
 
     public function updateAssessment(Request $request)
     {
+        return response()->json($request->val);
         try {
             // Retrieve the data model based on the provided 'val'
             $data = Data::findOrFail($request->input('val'));
