@@ -919,7 +919,8 @@ class AdminController extends Controller
             return response()->json(['message' => "$exportCount PDF files generated successfully"], 200);
         } catch (\Exception $e) {
             Log::error("Error exporting usage variation: " . $e->getMessage());
-            return response()->json(['error' => 'An error occurred while generating PDFs'], 500);
+            Log::error($e->getTraceAsString()); // Log the full stack trace for debugging
+            return response()->json(['error' => 'An error occurred while generating PDFs: ' . $e->getMessage()], 500);
         }
     }
 
