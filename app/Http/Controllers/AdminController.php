@@ -812,14 +812,10 @@ class AdminController extends Controller
                 if (!empty($filteredUsage)) {
                     $filePath = "usage/{$misRoadName}_UsageVariation.xlsx";
                     Excel::store(new UsageVariationExport($filteredUsage, $misRoadName), $filePath, 'public');
-                    $pdf = Pdf::loadView('pdf.usagevariation', [
-                        'roadName' => $misRoadName,
-                        'usageVariations' => $filteredUsage,
-                    ]);
+                    $pdf = PDF::loadView('pdf._UsageVariation', compact('filteredUsage', 'misRoadName'));
 
-                    // Save the PDF
-                    $filePath = "{$exportDir}/{$misRoadName}_UsageVariation.pdf";
-                    $pdf->save($filePath);
+                    // Return the generated PDF
+                    return $pdf->download('data_export.pdf');
                     $exportCount++;
                 }
             }

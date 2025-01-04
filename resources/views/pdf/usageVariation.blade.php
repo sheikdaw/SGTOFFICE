@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <h1>Usage Variation for Road: {{ $roadName }}</h1>
+    <h1>Usage Variation for Road: {{ $misRoadName }}</h1>
     <table border="1">
         <thead>
             <tr>
@@ -26,7 +26,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($usageVariation as $point)
+            @foreach ($filteredUsage as $point)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $point['point_gisid'] ?? 'N/A' }}</td>
