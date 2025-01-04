@@ -782,7 +782,7 @@ class AdminController extends Controller
     //         return response()->json(['error' => 'An error occurred during export.'], 500);
     //     }
     // }
-    public function usageAndAreaVariationss($id)
+    public function usageAndAreaVariation($id)
     {
         $data = Data::findOrFail($id);
 
@@ -812,11 +812,20 @@ class AdminController extends Controller
                 if (!empty($filteredUsage)) {
                     $filePath = "usage/{$misRoadName}_UsageVariation.xlsx";
                     Excel::store(new UsageVariationExport($filteredUsage, $misRoadName), $filePath, 'public');
+                    $pdf = Pdf::loadView('pdf.usagevariation', [
+                        'roadName' => $misRoadName,
+                        'usageVariations' => $filteredUsage,
+                    ]);
+
+                    // Save the PDF
+                    $filePath = "{$exportDir}/{$misRoadName}_UsageVariation.pdf";
+                    $pdf->save($filePath);
                     $exportCount++;
                 }
             }
 
-            return $this->usageAndAreaVariations($id);
+            // return $this->usageAndAreaVariations($id);
+            return response()->json("true");
         } catch (\Exception $e) {
             Log::error("Error exporting usage variation: " . $e->getMessage());
             return response()->json(['error' => 'An error occurred during export.'], 500);
@@ -863,66 +872,7 @@ class AdminController extends Controller
         }
     }
 
-    public function usageAndAreaVariation($id)
-    {
-        $data = Data::findOrFail($id);
 
-        // Validate table names
-        if (empty($data->mis) || empty($data->pointdata) || empty($data->polygon)) {
-            return response()->json(['error' => 'Invalid table names'], 400);
-        }
-
-        try {
-            // Fetch usage variations
-            $usageVariation = $this->usageVariations($data)->toArray();
-            $misRoadNames = DB::table($data->mis)->pluck('road_name');
-
-            // Setup export directory
-            $exportDir = storage_path('app/public/usage');
-            $exportDirZip = storage_path('app/public/usage.zip');
-            if (File::exists($exportDir)) {
-                File::deleteDirectory($exportDir);
-            }
-            File::makeDirectory($exportDir, 0755, true);
-
-            $exportCount = 0;
-            foreach ($misRoadNames as $misRoadName) {
-                // Filter usage variations
-                $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
-
-                if (!empty($filteredUsage)) {
-                    // Generate PDF
-                    $pdf = Pdf::loadView('pdf.usagevariation', [
-                        'roadName' => $misRoadName,
-                        'usageVariations' => $filteredUsage,
-                    ]);
-
-                    // Save the PDF
-                    $filePath = "{$exportDir}/{$misRoadName}_UsageVariation.pdf";
-                    $pdf->save($filePath);
-
-                    $exportCount++;
-                }
-            }
-
-            // Zip the PDFs if needed (optional)
-            // if ($exportCount > 0) {
-            //     $zip = new \ZipArchive();
-            //     if ($zip->open($exportDirZip, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
-            //         foreach (File::files($exportDir) as $file) {
-            //             $zip->addFile($file->getRealPath(), $file->getFilename());
-            //         }
-            //         $zip->close();
-            //     }
-            // }
-
-            return response()->json(['message' => "$exportCount PDF files generated successfully"], 200);
-        } catch (\Exception $e) {
-            Log::error("Error exporting usage variation: " . $e->getMessage());
-            Log::error($e->getTraceAsString()); // Log the full stack trace for debugging
-            return response()->json(['error' => 'An error occurred while generating PDFs: ' . $e->getMessage()], 500);
-        }
-    }
 
 
 
