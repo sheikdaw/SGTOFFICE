@@ -808,7 +808,7 @@ class AdminController extends Controller
                 $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
 
                 if (!empty($filteredUsage)) {
-                    $filePath = "exports/{$misRoadName}_UsageVariation.xlsx";
+                    $filePath = "usage/{$misRoadName}_UsageVariation.xlsx";
                     Excel::store(new UsageVariationExport($filteredUsage, $misRoadName), $filePath, 'public');
                     $exportCount++;
                 }
@@ -848,7 +848,7 @@ class AdminController extends Controller
                 $filteredArea = array_filter($areaVariation, fn($item) => $item->road_name === $misRoadName);
 
                 if (!empty($filteredArea)) {
-                    $filePath = "exports/{$misRoadName}_AreaVariation.xlsx";
+                    $filePath = "area/{$misRoadName}_AreaVariation.xlsx";
                     Excel::store(new AreaVariationExport($filteredArea, $misRoadName), $filePath, 'public');
                     $exportCount++;
                 }
