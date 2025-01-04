@@ -815,7 +815,7 @@ class AdminController extends Controller
                     $pdf = PDF::loadView('pdf._UsageVariation', compact('filteredUsage', 'misRoadName'));
 
                     // Return the generated PDF
-                    return $pdf->download('data_export.pdf');
+                    $pdf->download('data_export.pdf');
                     $exportCount++;
                 }
             }
