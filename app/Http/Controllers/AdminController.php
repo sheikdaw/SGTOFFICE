@@ -782,7 +782,7 @@ class AdminController extends Controller
     //         return response()->json(['error' => 'An error occurred during export.'], 500);
     //     }
     // }
-    public function usageAndAreaVariationss($id)
+    public function usageAndAreaVariation($id)
     {
         $data = Data::findOrFail($id);
 
@@ -798,6 +798,7 @@ class AdminController extends Controller
 
             // Setup export directory
             $exportDir = storage_path('app/public/usage');
+            $exportDir = storage_path('app/public/usagepdf');
             $exportDirZip = storage_path('app/public/usage.zip');
             if (File::exists($exportDir)) {
                 File::deleteDirectory($exportDir);
@@ -812,6 +813,12 @@ class AdminController extends Controller
                 if (!empty($filteredUsage)) {
                     $filePath = "usage/{$misRoadName}_UsageVariation.xlsx";
                     Excel::store(new UsageVariationExport($filteredUsage, $misRoadName), $filePath, 'public');
+                    $exportCount++;
+                    $pdf = FacadePdf::loadView('pdf.usageVariation', ['usageVariation' => $filteredUsage, 'roadName' => $misRoadName]);
+
+                    // Save PDF to storage
+                    $filePath = "usagepdf/{$misRoadName}_UsageVariation.pdf";
+                    $pdf->save(storage_path("app/public/{$filePath}"));
                     $exportCount++;
                 }
             }
@@ -863,7 +870,7 @@ class AdminController extends Controller
             return response()->json(['error' => 'An error occurred during export.'], 500);
         }
     }
-    public function usageAndAreaVariation($id)
+    public function usageAndAreaVariationssspdf($id)
     {
         $data = Data::findOrFail($id);
 
