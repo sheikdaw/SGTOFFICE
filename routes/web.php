@@ -27,6 +27,7 @@ Route::middleware('guest:admin,surveyor,cbe,taxcollector')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Admin dashboard route, protected by 'admin' middleware group
 Route::middleware('admin')->group(function () {
+    Route::get('/export-pdf', [AdminController::class, 'exportToPdf']);
     Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/surveyors', [AdminController::class, 'surveyors'])->name('admin.surveyors');
     Route::post('/admin/surveyors', [AdminController::class, 'storeSurveyor'])->name('admin.store-Surveyor');

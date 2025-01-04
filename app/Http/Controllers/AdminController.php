@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use ZipArchive;
 use App\Mail\TestEmail;
+use Barryvdh\DomPDF\PDF;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
@@ -1308,5 +1309,17 @@ class AdminController extends Controller
         $tableName = $data->pointdata;
         DB::table($tableName)->where('id', $id)->delete();
         return response()->json(['message' => 'Data deleted successfully'], 200);
+    }
+
+    public function exportToPdf()
+    {
+        // Fetch all data from the model
+        $data = Data::all();
+
+        // Load the view and pass the data
+        $pdf = PDF::loadView('pdf.your_model_export', compact('data'));
+
+        // Return the generated PDF
+        return $pdf->download('data_export.pdf');
     }
 }
