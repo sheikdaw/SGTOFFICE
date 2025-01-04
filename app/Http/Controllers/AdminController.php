@@ -782,59 +782,48 @@ class AdminController extends Controller
     //         return response()->json(['error' => 'An error occurred during export.'], 500);
     //     }
     // }
-    public function usageAndAreaVariation($id)
+    public function usageAndAreaVariationff($id)
     {
         $data = Data::findOrFail($id);
 
+        // Validate table names
         if (empty($data->mis) || empty($data->pointdata) || empty($data->polygon)) {
             return response()->json(['error' => 'Invalid table names'], 400);
         }
 
         try {
+            // Fetch usage variations
             $usageVariation = $this->usageVariations($data)->toArray();
             $misRoadNames = DB::table($data->mis)->pluck('road_name');
 
+            // Setup export directory
             $exportDir = storage_path('app/public/usage');
             $exportDirZip = storage_path('app/public/usage.zip');
-
-            if (!File::exists($exportDir)) {
-                File::makeDirectory($exportDir, 0755, true);
+            if (File::exists($exportDir)) {
+                File::deleteDirectory($exportDir);
             }
+            File::makeDirectory($exportDir, 0755, true);
 
             $exportCount = 0;
             foreach ($misRoadNames as $misRoadName) {
+                // Filter usage variations
                 $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
 
                 if (!empty($filteredUsage)) {
-                    $filePath = "{$exportDir}/{$misRoadName}_UsageVariation.xlsx";
-                    Excel::store(new UsageVariationExport($filteredUsage, $misRoadName), $filePath, 'local');
-
-                    $pdfPath = "{$exportDir}/{$misRoadName}_UsageVariation.pdf";
-                    $pdf = PDF::loadView('pdf._UsageVariation', compact('filteredUsage', 'misRoadName'));
-                    File::put($pdfPath, $pdf->output());
+                    $filePath = "usage/{$misRoadName}_UsageVariation.xlsx";
+                    Excel::store(new UsageVariationExport($filteredUsage, $misRoadName), $filePath, 'public');
 
                     $exportCount++;
                 }
             }
 
-            $zip = new \ZipArchive();
-            if ($zip->open($exportDirZip, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
-                foreach (File::files($exportDir) as $file) {
-                    $zip->addFile($file->getRealPath(), $file->getFilename());
-                }
-                $zip->close();
-            }
-
-            return response()->json(['message' => 'Files exported successfully.', 'zip_url' => asset('storage/usage.zip')]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            Log::error("Database error: " . $e->getMessage());
-            return response()->json(['error' => 'Database error occurred.'], 500);
-        } catch (\Throwable $e) {
-            Log::error("Unexpected error: " . $e->getMessage());
-            return response()->json(['error' => 'An unexpected error occurred.'], 500);
+            // return $this->usageAndAreaVariations($id);
+            return response()->json("true");
+        } catch (\Exception $e) {
+            Log::error("Error exporting usage variation: " . $e->getMessage());
+            return response()->json(['error' => 'An error occurred during export.'], 500);
         }
     }
-
     private function usageAndAreaVariations($id)
     {
         $data = Data::findOrFail($id);
@@ -872,6 +861,49 @@ class AdminController extends Controller
             return response()->json("true");
         } catch (\Exception $e) {
             Log::error("Error exporting area variation: " . $e->getMessage());
+            return response()->json(['error' => 'An error occurred during export.'], 500);
+        }
+    }
+    public function usageAndAreaVariation($id)
+    {
+        $data = Data::findOrFail($id);
+
+        if (empty($data->mis) || empty($data->pointdata) || empty($data->polygon)) {
+            return response()->json(['error' => 'Invalid table names'], 400);
+        }
+
+        try {
+            // Fetch usage variations
+            $usageVariation = $this->usageVariations($data)->toArray();
+            $misRoadNames = DB::table($data->mis)->pluck('road_name');
+
+            // Setup export directory
+            $exportDir = storage_path('app/public/usage');
+            if (!File::exists($exportDir)) {
+                File::makeDirectory($exportDir, 0755, true);
+            }
+
+            $exportCount = 0;
+
+            foreach ($misRoadNames as $misRoadName) {
+                // Filter usage variations based on road name
+                $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
+
+                if (!empty($filteredUsage)) {
+                    // Generate PDF for the filtered data
+                    $pdf = PDF::loadView('pdf._UsageVariation', compact('filteredUsage', 'misRoadName'));
+                    $pdfPath = "{$exportDir}/{$misRoadName}_UsageVariation.pdf";
+
+                    // Save the PDF file to the export directory
+                    File::put($pdfPath, $pdf->output());
+                    $exportCount++;
+                }
+            }
+
+            // Return success response with link to the generated PDFs
+            return response()->json(['message' => 'PDFs exported successfully.', 'pdf_files' => asset('storage/usage')]);
+        } catch (\Exception $e) {
+            Log::error("Error exporting PDF: " . $e->getMessage());
             return response()->json(['error' => 'An error occurred during export.'], 500);
         }
     }
