@@ -32,12 +32,12 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use ZipArchive;
 use App\Mail\TestEmail;
+use Barryvdh\DomPDF\PDF as DomPDFPDF;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\NotIn;
-use Barryvdh\DomPDF\Facade as PDF;
-use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminController extends Controller
 {
@@ -814,7 +814,7 @@ class AdminController extends Controller
                     $filePath = "usage/{$misRoadName}_UsageVariation.xlsx";
                     Excel::store(new UsageVariationExport($filteredUsage, $misRoadName), $filePath, 'public');
                     $exportCount++;
-                    $pdf = FacadePdf::loadView('pdf.usageVariation', ['usageVariation' => $filteredUsage, 'roadName' => $misRoadName]);
+                    $pdf = PDF::loadView('pdf.usageVariation', ['usageVariation' => $filteredUsage, 'roadName' => $misRoadName]);
 
                     // Save PDF to storage
                     $filePath = "usagepdf/{$misRoadName}_UsageVariation.pdf";
@@ -899,7 +899,7 @@ class AdminController extends Controller
 
                 if (!empty($filteredUsage)) {
                     // Create PDF using DomPDF
-                    $pdf = FacadePdf::loadView('pdf.usageVariation', ['usageVariation' => $filteredUsage, 'roadName' => $misRoadName]);
+                    $pdf = pdf::loadView('pdf.usageVariation', ['usageVariation' => $filteredUsage, 'roadName' => $misRoadName]);
 
                     // Save PDF to storage
                     $filePath = "usagepdf/{$misRoadName}_UsageVariation.pdf";
@@ -944,7 +944,7 @@ class AdminController extends Controller
 
                 if (!empty($filteredArea)) {
                     // Create PDF using DomPDF
-                    $pdf = FacadePdf::loadView('pdf.areaVariation', ['areaVariation' => $filteredArea, 'roadName' => $misRoadName]);
+                    $pdf = pdf::loadView('pdf.areaVariation', ['areaVariation' => $filteredArea, 'roadName' => $misRoadName]);
 
                     // Save PDF to storage
                     $filePath = "areapdf/{$misRoadName}_AreaVariation.pdf";
