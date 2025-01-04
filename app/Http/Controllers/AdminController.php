@@ -706,6 +706,80 @@ class AdminController extends Controller
     }
 
 
+    // public function usageAndAreaVariation($id)
+    // {
+    //     $data = Data::findOrFail($id);
+
+    //     // Validate table names
+    //     if (empty($data->mis) || empty($data->pointdata) || empty($data->polygon)) {
+    //         return response()->json(['error' => 'Invalid table names'], 400);
+    //     }
+
+    //     try {
+    //         // Fetch variations
+    //         $areaVariation = $this->areaVariations($data);
+    //         $usageVariation = $this->usageVariations($data)->toArray();
+    //         $misRoadNames = DB::table($data->mis)->pluck('road_name');
+
+    //         // Setup export directory
+    //         $exportDir = storage_path('app/public/exports');
+    //         $exportDirZip = storage_path('app/public/exports.zip');
+    //         if (File::exists($exportDir)) {
+    //             File::deleteDirectory($exportDir);
+    //         }
+    //         File::makeDirectory($exportDir, 0755, true);
+
+    //         $exportCount = 0;
+    //         foreach ($misRoadNames as $misRoadName) {
+    //             // Filter variations
+    //             $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
+    //             $filteredArea = array_filter($areaVariation, fn($item) => $item->road_name === $misRoadName);
+
+    //             if (!empty($filteredUsage) || !empty($filteredArea)) {
+    //                 $filePath = "exports/{$misRoadName}_UsageAreaVariation.xlsx";
+    //                 Excel::store(new UsageAreaVariationExport($filteredUsage, $filteredArea, $misRoadName), $filePath, 'public');
+    //                 $exportCount++;
+    //             }
+    //         }
+
+
+    //         $zip = new ZipArchive;
+    //         $zipFileName = 'exports.zip';
+    //         $zipFilePath = storage_path("app/public/{$zipFileName}");
+
+    //         if (file_exists($zipFilePath)) {
+    //             unlink($zipFilePath); // Delete existing zip file if it exists
+    //         }
+
+    //         if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+    //             $exportPath = storage_path('app/public/exports');
+    //             $files = new \RecursiveIteratorIterator(
+    //                 new \RecursiveDirectoryIterator($exportPath),
+    //                 \RecursiveIteratorIterator::LEAVES_ONLY
+    //             );
+
+    //             foreach ($files as $file) {
+    //                 if (!$file->isDir()) {
+    //                     $zip->addFile($file->getRealPath(), 'exports/' . substr($file->getRealPath(), strlen($exportPath) + 1));
+    //                 }
+    //             }
+
+    //             $zip->close();
+
+    //             // Clean up the exported files
+    //             foreach (File::allFiles($exportPath) as $file) {
+    //                 File::delete($file);
+    //             }
+
+    //             return response()->download($zipFilePath)->deleteFileAfterSend(true);
+    //         } else {
+    //             return response()->json(['error' => 'Could not create zip file'], 500);
+    //         }
+    //     } catch (\Exception $e) {
+    //         Log::error("Error exporting usage and area variations: " . $e->getMessage());
+    //         return response()->json(['error' => 'An error occurred during export.'], 500);
+    //     }
+    // }
     public function usageAndAreaVariation($id)
     {
         $data = Data::findOrFail($id);
@@ -716,14 +790,13 @@ class AdminController extends Controller
         }
 
         try {
-            // Fetch variations
-            $areaVariation = $this->areaVariations($data);
+            // Fetch usage variations
             $usageVariation = $this->usageVariations($data)->toArray();
             $misRoadNames = DB::table($data->mis)->pluck('road_name');
 
             // Setup export directory
-            $exportDir = storage_path('app/public/exports');
-            $exportDirZip = storage_path('app/public/exports.zip');
+            $exportDir = storage_path('app/public/usage');
+            $exportDirZip = storage_path('app/public/usage.zip');
             if (File::exists($exportDir)) {
                 File::deleteDirectory($exportDir);
             }
@@ -731,55 +804,63 @@ class AdminController extends Controller
 
             $exportCount = 0;
             foreach ($misRoadNames as $misRoadName) {
-                // Filter variations
+                // Filter usage variations
                 $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
-                $filteredArea = array_filter($areaVariation, fn($item) => $item->road_name === $misRoadName);
 
-                if (!empty($filteredUsage) || !empty($filteredArea)) {
-                    $filePath = "exports/{$misRoadName}_UsageAreaVariation.xlsx";
-                    Excel::store(new UsageAreaVariationExport($filteredUsage, $filteredArea, $misRoadName), $filePath, 'public');
+                if (!empty($filteredUsage)) {
+                    $filePath = "exports/{$misRoadName}_UsageVariation.xlsx";
+                    Excel::store(new UsageVariationExport($filteredUsage, $misRoadName), $filePath, 'public');
                     $exportCount++;
                 }
             }
 
-
-            $zip = new ZipArchive;
-            $zipFileName = 'exports.zip';
-            $zipFilePath = storage_path("app/public/{$zipFileName}");
-
-            if (file_exists($zipFilePath)) {
-                unlink($zipFilePath); // Delete existing zip file if it exists
-            }
-
-            if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
-                $exportPath = storage_path('app/public/exports');
-                $files = new \RecursiveIteratorIterator(
-                    new \RecursiveDirectoryIterator($exportPath),
-                    \RecursiveIteratorIterator::LEAVES_ONLY
-                );
-
-                foreach ($files as $file) {
-                    if (!$file->isDir()) {
-                        $zip->addFile($file->getRealPath(), 'exports/' . substr($file->getRealPath(), strlen($exportPath) + 1));
-                    }
-                }
-
-                $zip->close();
-
-                // Clean up the exported files
-                foreach (File::allFiles($exportPath) as $file) {
-                    File::delete($file);
-                }
-
-                return response()->download($zipFilePath)->deleteFileAfterSend(true);
-            } else {
-                return response()->json(['error' => 'Could not create zip file'], 500);
-            }
+            return $this->usageAndAreaVariations($id);
         } catch (\Exception $e) {
-            Log::error("Error exporting usage and area variations: " . $e->getMessage());
+            Log::error("Error exporting usage variation: " . $e->getMessage());
             return response()->json(['error' => 'An error occurred during export.'], 500);
         }
     }
+    private function usageAndAreaVariations($id)
+    {
+        $data = Data::findOrFail($id);
+
+        // Validate table names
+        if (empty($data->mis) || empty($data->pointdata) || empty($data->polygon)) {
+            return response()->json(['error' => 'Invalid table names'], 400);
+        }
+
+        try {
+            // Fetch area variations
+            $areaVariation = $this->areaVariations($data);
+            $misRoadNames = DB::table($data->mis)->pluck('road_name');
+
+            // Setup export directory
+            $exportDir = storage_path('app/public/area');
+            $exportDirZip = storage_path('app/public/area.zip');
+            if (File::exists($exportDir)) {
+                File::deleteDirectory($exportDir);
+            }
+            File::makeDirectory($exportDir, 0755, true);
+
+            $exportCount = 0;
+            foreach ($misRoadNames as $misRoadName) {
+                // Filter area variations
+                $filteredArea = array_filter($areaVariation, fn($item) => $item->road_name === $misRoadName);
+
+                if (!empty($filteredArea)) {
+                    $filePath = "exports/{$misRoadName}_AreaVariation.xlsx";
+                    Excel::store(new AreaVariationExport($filteredArea, $misRoadName), $filePath, 'public');
+                    $exportCount++;
+                }
+            }
+
+            return response()->json("true");
+        } catch (\Exception $e) {
+            Log::error("Error exporting area variation: " . $e->getMessage());
+            return response()->json(['error' => 'An error occurred during export.'], 500);
+        }
+    }
+
 
 
 
