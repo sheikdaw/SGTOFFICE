@@ -782,7 +782,7 @@ class AdminController extends Controller
     //         return response()->json(['error' => 'An error occurred during export.'], 500);
     //     }
     // }
-    public function usageAndAreaVariation($id)
+    public function usageAndAreaVariationss($id)
     {
         $data = Data::findOrFail($id);
 
@@ -863,7 +863,7 @@ class AdminController extends Controller
             return response()->json(['error' => 'An error occurred during export.'], 500);
         }
     }
-    public function pdfusageAndAreaVariation($id)
+    public function usageAndAreaVariation($id)
     {
         $data = Data::findOrFail($id);
 
