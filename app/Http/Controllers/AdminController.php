@@ -32,12 +32,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use ZipArchive;
 use App\Mail\TestEmail;
-use Barryvdh\DomPDF\PDF as DomPDFPDF;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\NotIn;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminController extends Controller
 {
@@ -798,7 +796,6 @@ class AdminController extends Controller
 
             // Setup export directory
             $exportDir = storage_path('app/public/usage');
-            $exportDir = storage_path('app/public/usagepdf');
             $exportDirZip = storage_path('app/public/usage.zip');
             if (File::exists($exportDir)) {
                 File::deleteDirectory($exportDir);
@@ -814,15 +811,8 @@ class AdminController extends Controller
                     $filePath = "usage/{$misRoadName}_UsageVariation.xlsx";
                     Excel::store(new UsageVariationExport($filteredUsage, $misRoadName), $filePath, 'public');
                     $exportCount++;
-                    $pdf = PDF::loadView('pdf.usageVariation', ['usageVariation' => $filteredUsage, 'roadName' => $misRoadName]);
-
-                    // Save PDF to storage
-                    $filePath = "usagepdf/{$misRoadName}_UsageVariation.pdf";
-                    $pdf->save(storage_path("app/public/{$filePath}"));
-                    $exportCount++;
                 }
             }
-            // $this->pdfusageAndAreaVariation($id);
 
             return $this->usageAndAreaVariations($id);
         } catch (\Exception $e) {
@@ -860,95 +850,6 @@ class AdminController extends Controller
                 if (!empty($filteredArea)) {
                     $filePath = "area/{$misRoadName}_AreaVariation.xlsx";
                     Excel::store(new AreaVariationExport($filteredArea, $misRoadName), $filePath, 'public');
-                    $exportCount++;
-                }
-            }
-            // $this->pdfusageAndAreaVariations($id);
-            return response()->json("true");
-        } catch (\Exception $e) {
-            Log::error("Error exporting area variation: " . $e->getMessage());
-            return response()->json(['error' => 'An error occurred during export.'], 500);
-        }
-    }
-    public function usageAndAreaVariationssspdf($id)
-    {
-        $data = Data::findOrFail($id);
-
-        // Validate table names
-        if (empty($data->mis) || empty($data->pointdata) || empty($data->polygon)) {
-            return response()->json(['error' => 'Invalid table names'], 400);
-        }
-
-        try {
-            // Fetch usage variations
-            $usageVariation = $this->usageVariations($data)->toArray();
-            $misRoadNames = DB::table($data->mis)->pluck('road_name');
-
-            // Setup export directory
-            $exportDir = storage_path('app/public/usagepdf');
-            $exportDirZip = storage_path('app/public/usagepdf.zip');
-            if (File::exists($exportDir)) {
-                File::deleteDirectory($exportDir);
-            }
-            File::makeDirectory($exportDir, 0755, true);
-
-            $exportCount = 0;
-            foreach ($misRoadNames as $misRoadName) {
-                // Filter usage variations
-                $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
-
-                if (!empty($filteredUsage)) {
-                    // Create PDF using DomPDF
-                    $pdf = pdf::loadView('pdf.usageVariation', ['usageVariation' => $filteredUsage, 'roadName' => $misRoadName]);
-
-                    // Save PDF to storage
-                    $filePath = "usagepdf/{$misRoadName}_UsageVariation.pdf";
-                    $pdf->save(storage_path("app/public/{$filePath}"));
-                    $exportCount++;
-                }
-            }
-
-            return $this->pdfusageAndAreaVariations($id);
-        } catch (\Exception $e) {
-            Log::error("Error exporting usage variation: " . $e->getMessage());
-            return response()->json(['error' => 'An error occurred during export.'], 500);
-        }
-    }
-
-    private function pdfusageAndAreaVariations($id)
-    {
-        $data = Data::findOrFail($id);
-
-        // Validate table names
-        if (empty($data->mis) || empty($data->pointdata) || empty($data->polygon)) {
-            return response()->json(['error' => 'Invalid table names'], 400);
-        }
-
-        try {
-            // Fetch area variations
-            $areaVariation = $this->areaVariations($data);
-            $misRoadNames = DB::table($data->mis)->pluck('road_name');
-
-            // Setup export directory
-            $exportDir = storage_path('app/public/areapdf');
-            $exportDirZip = storage_path('app/public/areapdf.zip');
-            if (File::exists($exportDir)) {
-                File::deleteDirectory($exportDir);
-            }
-            File::makeDirectory($exportDir, 0755, true);
-
-            $exportCount = 0;
-            foreach ($misRoadNames as $misRoadName) {
-                // Filter area variations
-                $filteredArea = array_filter($areaVariation, fn($item) => $item->road_name === $misRoadName);
-
-                if (!empty($filteredArea)) {
-                    // Create PDF using DomPDF
-                    $pdf = pdf::loadView('pdf.areaVariation', ['areaVariation' => $filteredArea, 'roadName' => $misRoadName]);
-
-                    // Save PDF to storage
-                    $filePath = "areapdf/{$misRoadName}_AreaVariation.pdf";
-                    $pdf->save(storage_path("app/public/{$filePath}"));
                     $exportCount++;
                 }
             }
