@@ -1135,6 +1135,7 @@ class AdminController extends Controller
 
         // Fetch related data using surveyor's data_id
         $data = DB::table('data')->find($dataId);
+        $dataId = $data->id;
 
         if (!$data) {
             return redirect()->back()->with('error', 'No data found for the surveyor.');
