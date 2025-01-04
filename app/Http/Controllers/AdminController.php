@@ -892,7 +892,7 @@ class AdminController extends Controller
 
                 if (!empty($filteredUsage)) {
                     // Generate PDF
-                    $pdf = Pdf::loadView('pdf.usage_variation', [
+                    $pdf = Pdf::loadView('pdf.usagevariation', [
                         'roadName' => $misRoadName,
                         'usageVariations' => $filteredUsage,
                     ]);
