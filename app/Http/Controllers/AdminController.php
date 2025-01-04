@@ -816,9 +816,12 @@ class AdminController extends Controller
         }
         File::makeDirectory($exportDir, 0755, true);
 
+        // Convert the Collection to an array
+        $variationsArray = $variations->toArray();
+
         foreach ($misRoadNames as $roadName) {
             // Filter variations by road name
-            $filteredVariations = array_filter($variations, fn($item) => $item->road_name === $roadName);
+            $filteredVariations = array_filter($variationsArray, fn($item) => $item['road_name'] === $roadName);
 
             if (!empty($filteredVariations)) {
                 // Export to Excel or PDF
@@ -827,8 +830,9 @@ class AdminController extends Controller
         }
 
         // Generate PDFs
-        $this->generatePdf($type, $variations, $misRoadNames);
+        $this->generatePdf($type, $variationsArray, $misRoadNames);
     }
+
 
     private function storeExport($type, $filteredVariations, $roadName)
     {
