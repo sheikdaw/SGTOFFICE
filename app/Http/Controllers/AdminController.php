@@ -868,6 +868,7 @@ class AdminController extends Controller
     {
         $data = Data::findOrFail($id);
 
+        // Validate if necessary table data exists
         if (empty($data->mis) || empty($data->pointdata) || empty($data->polygon)) {
             return response()->json(['error' => 'Invalid table names'], 400);
         }
@@ -885,6 +886,7 @@ class AdminController extends Controller
 
             $exportCount = 0;
 
+            // Generate and save PDFs for each road name
             foreach ($misRoadNames as $misRoadName) {
                 // Filter usage variations based on road name
                 $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
@@ -900,13 +902,18 @@ class AdminController extends Controller
                 }
             }
 
-            // Return success response with link to the generated PDFs
-            return response()->json(['message' => 'PDFs exported successfully.', 'pdf_files' => asset('storage/usage')]);
+            // Return success response with links to the generated PDFs
+            return response()->json([
+                'message' => 'PDFs exported successfully.',
+                'pdf_files' => asset('storage/usage')
+            ]);
         } catch (\Exception $e) {
+            // Log the error in case of any issue
             Log::error("Error exporting PDF: " . $e->getMessage());
             return response()->json(['error' => 'An error occurred during export.'], 500);
         }
     }
+
 
 
 
