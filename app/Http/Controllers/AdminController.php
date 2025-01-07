@@ -1185,6 +1185,7 @@ class AdminController extends Controller
         $id = $request->id;
 
         $val = (int)$request->val;
+        return response()->json($request->all());
 
         $data = DB::table('data')->where('id', $val)->first();
         return response()->json($data);
