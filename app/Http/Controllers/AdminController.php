@@ -1204,7 +1204,7 @@ class AdminController extends Controller
             ->get();
 
         if ($polygonData->isEmpty()) {
-            return view('admin.editassessment', [
+            return view('admin.editbuilding', [
                 'polygonData' => [],
                 'data_id' => $dataId,
             ])->with('error', 'No data found for the provided GISID.');
