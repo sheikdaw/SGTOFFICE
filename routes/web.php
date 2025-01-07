@@ -56,8 +56,11 @@ Route::middleware('admin')->group(function () {
     Route::get('admin/downloadpointdata/{id}', [AdminController::class, 'downloadPointData'])->name('admin.downloadpointdata');
     Route::get('admin/downloadbuildingdata/{id}', [AdminController::class, 'downloadBuildingData'])->name('admin.downloadbuildingdata');
     Route::get('/admin/search-gisid', [AdminController::class, 'searchGisid'])->name('admin.searchGisid');
+    Route::get('/admin/search-building-gisid', [AdminController::class, 'searchbuildingGisid'])->name('admin.searchbuildingGisid');
     Route::post('/admin/update-assessment', [AdminController::class, 'updateAssessment'])->name('admin.updateAssessment');
+    Route::post('/admin/update-buildingdata', [AdminController::class, 'updatebuildingdata'])->name('admin.updatebuildingdata');
     Route::post('/admin/delete-assessment', [AdminController::class, 'deleteAssessment'])->name('admin.deleteAssessment');
+    Route::post('/admin/delete-buildingData', [AdminController::class, 'deleteBuildingData'])->name('admin.deleteBuildingData');
 });
 Route::post('/processImage', [AdminController::class, 'processImage'])->name('process.image');
 

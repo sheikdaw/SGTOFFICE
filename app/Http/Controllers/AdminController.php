@@ -1177,7 +1177,109 @@ class AdminController extends Controller
 
         return view('admin.editassessment', compact('pointData', 'dataId'));
     }
+    public function searchbuildingGisid(Request $request)
+    {
+        $gisid = $request->input('sgisid');
+        $dataId = $request->input('id');
 
+        // Fetch related data using surveyor's data_id
+        $data = DB::table('data')->find($dataId);
+        $dataId = $data->id;
+
+        if (!$data) {
+            return redirect()->back()->with('error', 'No data found for the surveyor.');
+        }
+
+        $polygondataTable = $data->polygondata;
+
+        // Validate the existence of the table
+        if (!Schema::hasTable($polygondataTable)) {
+            return redirect()->back()->with('error', 'Invalid point data table.');
+        }
+
+        // Fetch point data using GISID or assessment
+        $polygonData = DB::table($polygondataTable)
+            ->where('gisid', $gisid)
+
+            ->get();
+
+        if ($polygonData->isEmpty()) {
+            return view('admin.editassessment', [
+                'polygonData' => [],
+                'data_id' => $dataId,
+            ])->with('error', 'No data found for the provided GISID.');
+        }
+
+        // Add additional fields to the point data
+        $polygonData->each(function ($pdata) use ($data) {
+            $pdata->val = $data->id;
+        });
+
+        return view('admin.editbuilding', compact('polygonData', 'dataId'));
+    }
+    public function updatebuildingdata(Request $request)
+    {
+        $id = $request->id;
+
+        // Access the nested 'val' key and convert it to an integer
+        $val = (int)$request->input('data.val');
+
+        // Fetch the corresponding row from the 'data' table
+        $data = DB::table('data')->where('id', $val)->first();
+
+        // Check if $data is null
+        if (!$data) {
+            return response()->json(['error' => 'Data not found'], 404);
+        }
+
+        $tableName = $data->polygondata;
+
+        // Extract the updated data from the request
+        $updatedData = $request->input('data');
+
+        // Validation rules
+        $rules = [
+            'gisid' => 'required',
+            'building_usage' => 'required',
+            'building_type' => 'required',
+            'bill_usage' => 'required',
+
+            'remarks' => 'nullable',
+        ];
+
+        // Validate the updated data
+        $validator = Validator::make($updatedData, $rules);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Set the updated_at field to the current timestamp
+        $updatedData['updated_at'] = Carbon::now();
+        unset($updatedData['val']);
+        // Ensure created_at is not accidentally overwritten
+        unset($updatedData['created_at']);
+
+        // Update the data in the specified table
+        try {
+            DB::table($tableName)->where('id', $id)->update($updatedData);
+            return response()->json(['message' => 'Data updated successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update data', 'details' => $e->getMessage()], 500);
+        }
+    }
+    public function deleteBuildingData(Request $request)
+    {
+        $id = $request->id;
+
+
+        $val = (int)$request->input('data.val');
+        $data = DB::table('data')->where('id', $val)->first();
+
+        $tableName = $data->polygondata;
+        DB::table($tableName)->where('id', $id)->delete();
+        return response()->json(['message' => 'Data deleted successfully'], 200);
+    }
 
 
     public function updateAssessment(Request $request)

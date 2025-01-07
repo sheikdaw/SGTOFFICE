@@ -41,6 +41,13 @@
                                 <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i>
                                     Search</button>
                             </form>
+                            <form class="d-flex mt-3" action="{{ route('admin.searchbuildingGisid') }}">
+                                <input class="form-control me-2" type="text" id="id" name="id"
+                                    value="{{ $data['id'] }}">
+                                <input class="form-control me-2" type="text" id="sgisid" name="sgisid">
+                                <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i>
+                                    Search</button>
+                            </form>
 
                             <div class="card-footer bg-light d-flex flex-wrap gap-2">
                                 <a href="{{ route('admin.area.variation', ['id' => $data['id'], 'road_name' => '']) }}"
