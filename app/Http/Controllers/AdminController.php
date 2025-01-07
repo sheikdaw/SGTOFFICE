@@ -1188,7 +1188,7 @@ class AdminController extends Controller
 
         // Fetch the correct table name based on your data structure
 
-        $data = DB::table('data')->where('id', $surveyor->data_id)->first();
+        $data = DB::table('data')->where('id', $request->val)->first();
         $tableName = $data->pointdata;
 
         // Define validation rules
