@@ -1184,10 +1184,13 @@ class AdminController extends Controller
     {
         $id = $request->id;
 
-        $val = (int)$request->val;
-        return response()->json($request->all());
+        // Access the nested 'val' key inside the 'data' object and convert it to an integer
+        $val = (int)$request->input('data.val');
 
+        // Fetch the record from the 'data' table based on the 'val'
         $data = DB::table('data')->where('id', $val)->first();
+
+        // Return the fetched data as JSON
         return response()->json($data);
         $tableName = $data->pointdata;
         $rules = [
