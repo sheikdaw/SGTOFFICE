@@ -17,7 +17,7 @@
 
     <script>
         $(document).ready(function() {
-            var response = @json($pointData);
+            var response = @json($polygonData);
 
             console.log(response);
 
