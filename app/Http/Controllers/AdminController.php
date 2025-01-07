@@ -1255,13 +1255,9 @@ class AdminController extends Controller
 
     public function exportToPdf()
     {
-        // Fetch all data from the model
         $data = Data::all();
 
-        // Load the view and pass the data
         $pdf = PDF::loadView('pdf.your_model_export', compact('data'));
-
-        // Return the generated PDF
         return $pdf->download('data_export.pdf');
     }
 }

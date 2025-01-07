@@ -98,7 +98,13 @@
             // Delete button handler
             $(document).on("click", ".deleteBtn", function() {
                 var row = $(this).closest("tr");
+                var rowData = {};
+                row.find("input").each(function() {
+                    rowData[$(this).attr("name")] = $(this).val();
+                });
                 var rowId = row.attr("id").replace("row-", "");
+                console.log("Input values for row with ID " + rowId + ":", rowData);
+
                 var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
                 $.ajax({
@@ -108,7 +114,8 @@
                         'X-CSRF-TOKEN': csrfToken
                     },
                     data: {
-                        id: rowId
+                        id: rowId,
+                        data: rowData
                     },
                     success: function(response) {
                         row.remove();
