@@ -1183,12 +1183,13 @@ class AdminController extends Controller
     public function updateAssessment(Request $request)
     {
         $id = $request->id;
-        return response()->json($request->all());
+
         // $updatedData = $request->data;
 
         // Fetch the correct table name based on your data structure
 
         $data = DB::table('data')->where('id', $request->val)->first();
+        return response()->json($data);
         $tableName = $data->pointdata;
 
         // Define validation rules
