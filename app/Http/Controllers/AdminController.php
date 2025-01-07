@@ -1184,15 +1184,23 @@ class AdminController extends Controller
     {
         $id = $request->id;
 
-        // Access the nested 'val' key inside the 'data' object and convert it to an integer
+        // Access the nested 'val' key and convert it to an integer
         $val = (int)$request->input('data.val');
 
-        // Fetch the record from the 'data' table based on the 'val'
+        // Fetch the corresponding row from the 'data' table
         $data = DB::table('data')->where('id', $val)->first();
 
-        // Return the fetched data as JSON
-        return response()->json($data);
+        // Check if $data is null
+        if (!$data) {
+            return response()->json(['error' => 'Data not found'], 404);
+        }
+
         $tableName = $data->pointdata;
+
+        // Extract the updated data from the request
+        $updatedData = $request->input('data');
+
+        // Validation rules
         $rules = [
             'assessment' => 'required',
             'old_assessment' => 'required',
@@ -1219,13 +1227,16 @@ class AdminController extends Controller
         // Set the updated_at field to the current timestamp
         $updatedData['updated_at'] = Carbon::now();
 
-        // Ensure created_at is not set to null
+        // Ensure created_at is not accidentally overwritten
         unset($updatedData['created_at']);
 
-        // Update the data in the database
-        DB::table($tableName)->where('id', $id)->update($updatedData);
-
-        return response()->json(['message' => 'Data updated successfully'], 200);
+        // Update the data in the specified table
+        try {
+            DB::table($tableName)->where('id', $id)->update($updatedData);
+            return response()->json(['message' => 'Data updated successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update data', 'details' => $e->getMessage()], 500);
+        }
     }
 
 
