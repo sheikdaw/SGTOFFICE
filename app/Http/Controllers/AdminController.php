@@ -1125,10 +1125,59 @@ class AdminController extends Controller
     public function downloadPointData($id)
     {
         $data = Data::findOrFail($id);
+
+        // Execute the query to fetch the data
         $pointdata = DB::table("{$data->pointdata} as pd")
-            ->join("{$data->polygondata} as polyd", 'polyd.gisid', '=', 'pd.point_gisid');
+            ->join("{$data->polygondata} as polyd", 'polyd.gisid', '=', 'pd.point_gisid')
+            ->select(
+                'pd.id',
+                'pd.data_id',
+                'pd.point_gisid',
+                'polyd.road_name',
+                'pd.worker_name',
+                'pd.assessment',
+                'pd.old_assessment',
+                'pd.owner_name',
+                'pd.present_owner_name',
+                'pd.eb',
+                'pd.floor',
+                'pd.bill_usage',
+                'pd.aadhar_no',
+                'pd.ration_no',
+                'pd.phone_number',
+                'pd.shop_floor',
+                'pd.shop_name',
+                'pd.shop_owner_name',
+                'pd.old_door_no',
+                'pd.new_door_no',
+                'pd.shop_category',
+                'pd.shop_mobile',
+                'pd.license',
+                'pd.professional_tax',
+                'pd.gst',
+                'pd.number_of_employee',
+                'pd.trade_income',
+                'pd.establishment_remarks',
+                'pd.remarks',
+                'pd.plot_area',
+                'pd.water_tax',
+                'pd.halfyeartax',
+                'pd.balance',
+                'pd.building_data_id',
+                'pd.qc_area',
+                'pd.qc_usage',
+                'pd.qc_name',
+                'pd.qc_remarks',
+                'pd.otsarea',
+                'pd.created_at',
+                'pd.updated_at'
+            )
+            ->get();
+
+        // Export the fetched data
         return Excel::download(new AssessmentDetailsExport($pointdata), 'pointdata_' . $data->ward . '.xlsx');
     }
+
 
     public function downloadBuildingData($id)
     {
