@@ -1226,7 +1226,7 @@ class AdminController extends Controller
 
         // Set the updated_at field to the current timestamp
         $updatedData['updated_at'] = Carbon::now();
-
+        unset($updatedData['val']);
         // Ensure created_at is not accidentally overwritten
         unset($updatedData['created_at']);
 
