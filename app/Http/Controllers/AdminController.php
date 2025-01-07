@@ -1242,7 +1242,7 @@ class AdminController extends Controller
             'gisid' => 'required',
             'building_usage' => 'required',
             'building_type' => 'required',
-            'bill_usage' => 'required',
+            // 'bill_usage' => 'required',
 
             'remarks' => 'nullable',
         ];
