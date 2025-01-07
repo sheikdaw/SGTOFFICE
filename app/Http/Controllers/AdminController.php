@@ -1125,9 +1125,12 @@ class AdminController extends Controller
     public function downloadPointData($id)
     {
         $data = Data::findOrFail($id);
-        $pointdata = DB::table($data->pointdata)->join("{$data->polygondata} as polyd", 'polyd.gisid', '=', 'pd.point_gisid')->get();
-        return Excel::download(new AssessmentDetailsExport($pointdata), 'pointdata' . $data->ward . '.xlsx');
+        $pointdata = DB::table("{$data->pointdata} as pd")
+            ->join("{$data->polygondata} as polyd", 'polyd.gisid', '=', 'pd.point_gisid')
+            ->select('polyd.road_name');
+        return Excel::download(new AssessmentDetailsExport($pointdata), 'pointdata_' . $data->ward . '.xlsx');
     }
+
     public function downloadBuildingData($id)
     {
         // Fetch the specific building record
