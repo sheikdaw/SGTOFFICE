@@ -34,6 +34,7 @@
                                     <option value="{{ $road }}">{{ $road }}</option>
                                 @endforeach
                             </select>
+                            <h3>pointData</h3>
                             <form class="d-flex mt-3" action="{{ route('admin.searchGisid') }}">
                                 <input class="form-control me-2" type="text" id="id" name="id"
                                     value="{{ $data['id'] }}">
@@ -41,6 +42,7 @@
                                 <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i>
                                     Search</button>
                             </form>
+                            <h3>buildingData</h3>
                             <form class="d-flex mt-3" action="{{ route('admin.searchbuildingGisid') }}">
                                 <input class="form-control me-2" type="text" id="id" name="id"
                                     value="{{ $data['id'] }}">
