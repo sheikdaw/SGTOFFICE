@@ -1126,8 +1126,7 @@ class AdminController extends Controller
     {
         $data = Data::findOrFail($id);
         $pointdata = DB::table("{$data->pointdata} as pd")
-            ->join("{$data->polygondata} as polyd", 'polyd.gisid', '=', 'pd.point_gisid')
-            ->select('polyd.road_name');
+            ->join("{$data->polygondata} as polyd", 'polyd.gisid', '=', 'pd.point_gisid');
         return Excel::download(new AssessmentDetailsExport($pointdata), 'pointdata_' . $data->ward . '.xlsx');
     }
 
