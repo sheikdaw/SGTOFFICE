@@ -15,10 +15,10 @@ use App\Exports\UsageVariationExport;
 use App\Exports\UsageVariationsExport;
 use App\Exports\UsersExport;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\Surveyor; // Import Surveyor model
+use App\Models\Surveyor;
 use App\Models\Data;
 use App\Models\CBE;
-use App\Models\Mis; // Ensure your model is properly imported
+use App\Models\Mis;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Facades\Image;
@@ -579,39 +579,33 @@ class AdminController extends Controller
 
     private function calculatePolygonAreaInSquareFeet($coordinates)
     {
-        // Validate the coordinates structure
         if (!is_array($coordinates) || count($coordinates) === 0 || !is_array($coordinates[0])) {
-            return 0; // Invalid input
+            return 0;
         }
 
-        $numPoints = count($coordinates[0]); // Number of vertices in the polygon
+        $numPoints = count($coordinates[0]);
         $area = 0;
 
-        // Ensure there are at least 3 points to form a polygon
         if ($numPoints < 3) return 0;
 
         for ($i = 0; $i < $numPoints; $i++) {
-            // Validate each point
             if (!is_array($coordinates[0][$i]) || count($coordinates[0][$i]) !== 2) {
-                return 0; // Invalid point
+                return 0;
             }
-
-            // Ensure x and y are numeric
             $x = floatval($coordinates[0][$i][0]);
             $y = floatval($coordinates[0][$i][1]);
 
-            // Calculate area using the shoelace formula
-            $nextIndex = ($i + 1) % $numPoints; // Wrap around to the first point
+
+            $nextIndex = ($i + 1) % $numPoints;
             $xNext = floatval($coordinates[0][$nextIndex][0]);
             $yNext = floatval($coordinates[0][$nextIndex][1]);
 
             $area += ($x * $yNext) - ($y * $xNext);
         }
 
-        // The area is positive, and we divide by 2 to get the final area
         $area = abs($area) / 2;
 
-        return $area; // The area is in square feet assuming input coordinates are in feet
+        return $area;
     }
 
     private function areaVariations($data)
@@ -657,8 +651,6 @@ class AdminController extends Controller
                 $percentage = is_numeric($allData->percentage) ? (float)$allData->percentage / 100 : 0;
 
                 $allData->totaldronearea = $areaInSquareFeet * ($number_floor + $basement + $percentage);
-
-                // Calculate total plot area for the same GISID
                 $totalPlotArea = array_reduce($allDatas->toArray(), function ($carry, $item) use ($allData) {
                     if ($item->point_gisid === $allData->point_gisid) {
                         $carry += $item->plot_area;
@@ -1191,7 +1183,7 @@ class AdminController extends Controller
     public function updateAssessment(Request $request)
     {
         $id = $request->id;
-        return response()->json($id);
+        return response()->json($request->all());
         // $updatedData = $request->data;
 
         // Fetch the correct table name based on your data structure
