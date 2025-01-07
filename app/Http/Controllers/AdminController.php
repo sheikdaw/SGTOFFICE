@@ -1184,15 +1184,11 @@ class AdminController extends Controller
     {
         $id = $request->id;
 
-        // $updatedData = $request->data;
+        $val = (int)$request->val;
 
-        // Fetch the correct table name based on your data structure
-
-        $data = DB::table('data')->where('id', $request->val)->first();
+        $data = DB::table('data')->where('id', $val)->first();
         return response()->json($data);
         $tableName = $data->pointdata;
-
-        // Define validation rules
         $rules = [
             'assessment' => 'required',
             'old_assessment' => 'required',
