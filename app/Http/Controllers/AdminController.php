@@ -1243,8 +1243,11 @@ class AdminController extends Controller
     public function deleteAssessment(Request $request)
     {
         $id = $request->id;
-        $data_id = $request->val;
-        $data = Data::findOrFail($data_id);
+
+
+        $val = (int)$request->input('data.val');
+        $data = DB::table('data')->where('id', $val)->first();
+
         $tableName = $data->pointdata;
         DB::table($tableName)->where('id', $id)->delete();
         return response()->json(['message' => 'Data deleted successfully'], 200);
