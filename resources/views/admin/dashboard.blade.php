@@ -59,7 +59,9 @@
                                     <input class="form-control me-2" type="hidden" name="id"
                                         value="{{ $data['id'] }}">
                                     <input class="form-control me-2" type="text" name="dgisid1">
+                                    <div class="invalid-feedback" id="dgisid1_error"></div>
                                     <input class="form-control me-2" type="text" name="dgisid2">
+                                    <div class="invalid-feedback" id="dgisid2_error"></div>
                                     <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i>
                                         Replace gisid</button>
                                 </form>
