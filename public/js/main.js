@@ -40,6 +40,7 @@ $(document).ready(function () {
 
     // Data Store Form Submission
     $("#dataStoreform").submit(function (e) {
+        alert("hi");
         e.preventDefault(); // Prevent default form submission
         let formData = new FormData(this); // Gather form data
 
