@@ -1440,7 +1440,26 @@ class AdminController extends Controller
         DB::table($data->point)
             ->where('gisid', $dgisid1)
             ->update(['gisid' => $dgisid2]);
+        $minIdRow = DB::table($data->polygon)
+            ->where('gisid', $dgisid2)
+            ->orderBy('id', 'asc')
+            ->first();
 
+        if ($minIdRow) {
+            DB::table($data->polygon)
+                ->where('id', $minIdRow->id)
+                ->delete();
+        }
+        $minIdRowp = DB::table($data->point)
+            ->where('gisid', $dgisid2)
+            ->orderBy('id', 'asc')
+            ->first();
+
+        if ($minIdRowp) {
+            DB::table($data->point)
+                ->where('id', $minIdRowp->id)
+                ->delete();
+        }
         return response()->json(['success' => true, 'message' => "GIS ID replaced successfully."]);
     }
 }
