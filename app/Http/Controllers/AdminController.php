@@ -1416,7 +1416,6 @@ class AdminController extends Controller
 
     public function replaceGisid(Request $request)
     {
-        // Validate incoming request
         $request->validate([
             'id' => 'required|integer',
             'dgisid1' => 'required|string',
@@ -1427,40 +1426,21 @@ class AdminController extends Controller
         $dgisid1 = $request->input('dgisid1');
         $dgisid2 = $request->input('dgisid2');
 
-        try {
-            // Fetch the corresponding record from the Data model
-            $data = Data::findOrFail($id);
+        $data = Data::findOrFail($id);
+        $gisidsExist = DB::table($data->polygon)
+            ->whereIn('gisid', [$dgisid1, $dgisid2])
+            ->count();
 
-            $polygonTable = DB::table($data->polygon);
-            $pointTable = DB::table($data->point);
-
-            // Ensure `dgisid1` and `dgisid2` exist in the respective tables
-            $polygonExists = $polygonTable->where('gisid', $dgisid1)->exists();
-            $pointExists = $pointTable->where('gisid', $dgisid2)->exists();
-
-            if (!$polygonExists || !$pointExists) {
-                return response()->json(['error' => true, 'message' => "GIS IDs not found in the respective tables."], 404);
-            }
-
-            // Begin transaction for atomicity
-            DB::beginTransaction();
-
-            // Temporarily set `dgisid1` to a placeholder value in the polygon table
-            $tempGisid = 'temp_' . Str::random(10);
-            $polygonTable->where('gisid', $dgisid1)->update(['gisid' => $tempGisid]);
-
-            // Swap `gisid` values
-            $pointTable->where('gisid', $dgisid2)->update(['gisid' => $dgisid1]);
-            $polygonTable->where('gisid', $tempGisid)->update(['gisid' => $dgisid2]);
-
-            // Commit transaction
-            DB::commit();
-
-            return response()->json(['success' => true, 'message' => "GIS IDs swapped successfully."]);
-        } catch (\Exception $e) {
-            // Rollback in case of an error
-            DB::rollBack();
-            return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
+        if ($gisidsExist < 2) {
+            return response()->json(['error' => true, 'message' => "Data Not Found"], 404);
         }
+        DB::table($data->polygon)
+            ->where('gisid', $dgisid1)
+            ->update(['gisid' => $dgisid2]);
+        DB::table($data->point)
+            ->where('gisid', $dgisid1)
+            ->update(['gisid' => $dgisid2]);
+
+        return response()->json(['success' => true, 'message' => "GIS ID replaced successfully."]);
     }
 }
