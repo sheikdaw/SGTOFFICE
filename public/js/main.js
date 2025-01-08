@@ -1297,7 +1297,7 @@ $(document).ready(function () {
             var formId = form.attr("id"); // Get the dynamic ID of the form
 
             $.ajax({
-                url: form.attr("action"), // Action URL of the form
+                url: routes.delgisid, // Action URL of the form
                 method: "POST", // You can change the method if needed
                 data: form.serialize(), // Serialize the form data
                 success: function (response) {
