@@ -1307,13 +1307,24 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     // Handle the response (e.g., display a success message)
-                    alert("GIS ID replaced successfully for " + formId);
+                    showFlashMessage(response.message, "success");
                 },
                 error: function (xhr, status, error) {
-                    // Handle any errors
-                    alert(
-                        "An error occurred while replacing GIS ID for " + formId
-                    );
+                    let errorMsg =
+                        "An error occurred while processing your request. Please try again.";
+
+                    if (xhr.responseJSON && xhr.responseJSON.msg) {
+                        errorMsg = xhr.responseJSON.msg;
+                    }
+
+                    showFlashMessage(errorMsg, "error");
+
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        $.each(xhr.responseJSON.errors, function (key, value) {
+                            $("#" + key).addClass("is-invalid");
+                            $("#" + key + "_error").text(value[0]);
+                        });
+                    }
                 },
             });
         });
