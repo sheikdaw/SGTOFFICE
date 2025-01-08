@@ -1285,6 +1285,8 @@ $(document).ready(function () {
             },
         });
     });
+});
+$(document).ready(function () {
     // Loop through each form with the class "replaceGisidForm"
     $(".replaceGisidForm").each(function () {
         // Handle form submission
