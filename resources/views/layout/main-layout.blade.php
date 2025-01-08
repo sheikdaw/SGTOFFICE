@@ -222,7 +222,7 @@
 
     @yield('content')
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <Script>
+    {{-- <Script>
         document.addEventListener("contextmenu", function(e) {
             e.preventDefault();
         });
@@ -238,7 +238,7 @@
                 e.preventDefault();
             }
         });
-    </Script>
+    </Script> --}}
     <script src="{{ asset('js/main.js') }}"></script>
 </body>
 
