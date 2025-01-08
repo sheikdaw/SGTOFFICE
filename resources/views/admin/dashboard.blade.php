@@ -8,6 +8,7 @@
         <div class="container mt-4">
             <h2 class="text-center mb-4 text-primary">Data Overview</h2>
             <div class="row">
+                <button class="btn btn-primary" id="checkon">hrllo</button>
                 <!-- Dynamic Data Cards -->
                 @foreach ($datas as $data)
                     <div class="col-md-4 mb-4">
@@ -52,7 +53,7 @@
                                         Search</button>
                                 </form>
                                 <h6>replace gisid</h6>
-                                <button class="btn btn-primary" id="checkon">hrllo</button>
+
                                 <form id="replaceGisidForm">
                                     <input class="form-control me-2" type="hidden" id="id" name="id"
                                         value="{{ $data['id'] }}">
