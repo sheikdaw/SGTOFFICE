@@ -1285,4 +1285,48 @@ $(document).ready(function () {
             },
         });
     });
+
+    $("#replaceGisidForm").on("submit", function (e) {
+        e.preventDefault(); // Prevent form from submitting normally
+
+        let formData = $(this).serialize(); // Serialize form data
+        let responseMessage = $("#responseMessage"); // Element to display the response
+
+        $.ajax({
+            url: "{{ route('admin.replaceGisid') }}",
+            type: "POST",
+            data: formData,
+            headers: {
+                "X-CSRF-TOKEN": $('input[name="_token"]').val(), // Include CSRF token
+            },
+            success: function (response) {
+                if (response.message) {
+                    showFlashMessage(response.message, "success"); // Use actual message
+                } else {
+                    showFlashMessage(
+                        "Polygon deleted successfully.",
+                        "success"
+                    );
+                }
+            },
+            error: function (xhr, status, error) {
+                if (xhr.status === 401) {
+                    const errorMessage =
+                        xhr.responseJSON?.error ||
+                        "Surveyor not authenticated.";
+                    showFlashMessage(errorMessage, "error");
+                } else if (xhr.status === 404) {
+                    const errorMessage =
+                        xhr.responseJSON?.error || "Data not found.";
+                    showFlashMessage(errorMessage, "error");
+                } else {
+                    showFlashMessage(
+                        "An error occurred. Please try again later.",
+                        "error"
+                    );
+                }
+                $("#addedFeature").val("none");
+            },
+        });
+    });
 });
