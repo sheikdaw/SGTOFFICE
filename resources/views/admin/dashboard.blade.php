@@ -52,7 +52,7 @@
                                         Search</button>
                                 </form>
                                 <h6>replace gisid</h6>
-                                <form class="d-flex mt-3" id="replaceGisidForm">
+                                <form id="replaceGisidForm">
                                     <input class="form-control me-2" type="hidden" id="id" name="id"
                                         value="{{ $data['id'] }}">
                                     <input class="form-control me-2" type="text" id="dgisid1" name="dgisid1">
