@@ -13,7 +13,7 @@
 
 <body>
     @yield('content')
-    <Script>
+    {{-- <Script>
         // Disable right-click
         document.addEventListener("contextmenu", function(e) {
             e.preventDefault();
@@ -30,7 +30,7 @@
                 e.preventDefault();
             }
         });
-    </Script>
+    </Script> --}}
 </body>
 
 </html>
