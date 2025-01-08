@@ -1290,8 +1290,7 @@ $(document).ready(function () {
         e.preventDefault(); // Prevent form from submitting normally
 
         let formData = $(this).serialize(); // Serialize form data
-        let responseMessage = $("#responseMessage"); // Element to display the response
-
+        alert("hi");
         $.ajax({
             url: "{{ route('admin.replaceGisid') }}",
             type: "POST",
