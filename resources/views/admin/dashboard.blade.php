@@ -221,6 +221,10 @@
 
 
         $(document).ready(function() {
+            $("#check").click(function() {
+                alert("hi");
+            });
+
             function showFlashMessage(message, type) {
                 let flashId =
                     type === "success" ?
