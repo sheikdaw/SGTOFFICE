@@ -52,7 +52,7 @@
                                         Search</button>
                                 </form>
                                 <h6>replace gisid</h6>
-                                <form class="d-flex mt-3" id="replaceGisidForm">
+                                <form class="d-flex mt-3" method="POST" action="{{ route('admin.replaceGisid') }}">
                                     @csrf
                                     <input class="form-control me-2" type="hidden" id="id" name="id"
                                         value="{{ $data['id'] }}">
@@ -63,7 +63,6 @@
                                     <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i>
                                         Replace GIS ID</button>
                                 </form>
-                                <button class="btn btnprimary" id="check">hello</button>
 
                             </div>
 
@@ -215,81 +214,8 @@
     <script>
         const routes = {
             datastore: "{{ route('admin.datastore') }}",
-            delgisid: "{{ route('admin.replaceGisid') }}",
 
         };
-
-
-        $(document).ready(function() {
-            $("#check").click(function() {
-                alert("hi");
-            });
-
-            function showFlashMessage(message, type) {
-                let flashId =
-                    type === "success" ?
-                    "#flash-message-success" :
-                    "#flash-message-error";
-                let flashContentId =
-                    type === "success" ?
-                    "#flash-message-success-content" :
-                    "#flash-message-error-content";
-
-                // Clear previous messages
-                $(flashContentId).text(message);
-
-                // Fade in the flash message
-                $(flashId).fadeIn();
-
-                // Auto-hide the message after 3 seconds
-                setTimeout(function() {
-                    $(flashId).fadeOut();
-                }, 3000);
-            }
-            $("#replaceGisidForm").on("submit", function(e) {
-                e.preventDefault(); // Prevent form from submitting normally
-
-                let formData = $(this).serialize(); // Serialize form data
-                alert("hi");
-                $.ajax({
-                    url: routes.delgisid,
-                    type: "POST",
-                    data: formData,
-                    headers: {
-                        "X-CSRF-TOKEN": $('input[name="_token"]').val(), // Include CSRF token
-                    },
-                    success: function(response) {
-                        if (response.message) {
-                            showFlashMessage(response.message, "success"); // Use actual message
-                        } else {
-                            showFlashMessage(
-                                "Polygon deleted successfully.",
-                                "success"
-                            );
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        if (xhr.status === 401) {
-                            const errorMessage =
-                                xhr.responseJSON?.error ||
-                                "Surveyor not authenticated.";
-                            showFlashMessage(errorMessage, "error");
-                        } else if (xhr.status === 404) {
-                            const errorMessage =
-                                xhr.responseJSON?.error || "Data not found.";
-                            showFlashMessage(errorMessage, "error");
-                        } else {
-                            showFlashMessage(
-                                "An error occurred. Please try again later.",
-                                "error"
-                            );
-                        }
-                        $("#addedFeature").val("none");
-                    },
-                });
-            });
-        })
-
 
         function updateAreaVariationLink(id) {
             // Get the selected road name
