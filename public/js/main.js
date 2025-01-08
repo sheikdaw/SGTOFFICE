@@ -1285,14 +1285,18 @@ $(document).ready(function () {
             },
         });
     });
+});
+$(document).ready(function () {
+    // Data Store Form Submission
     $("#checkon").click(function () {
-        alert("hi");
+        console.log("hi");
     });
+    // Replace GIS ID Form Submission
     $("#replaceGisidForm").submit(function (e) {
         e.preventDefault(); // Prevent form from submitting normally
-        alert("hi");
+
         let formData = $(this).serialize(); // Serialize form data
-        alert("hi");
+
         $.ajax({
             url: routes.delgisid,
             type: "POST",
@@ -1305,7 +1309,7 @@ $(document).ready(function () {
                     showFlashMessage(response.message, "success"); // Use actual message
                 } else {
                     showFlashMessage(
-                        "Polygon deleted successfully.",
+                        "GIS ID replaced successfully.",
                         "success"
                     );
                 }
@@ -1326,8 +1330,12 @@ $(document).ready(function () {
                         "error"
                     );
                 }
-                $("#addedFeature").val("none");
             },
         });
+    });
+
+    // Check button click event
+    $("#checkon").click(function () {
+        alert("hi"); // Simple alert to ensure click is working
     });
 });
