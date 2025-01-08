@@ -1287,38 +1287,17 @@ $(document).ready(function () {
     });
 });
 $(document).ready(function () {
-    function showFlashMessage(message, type) {
-        let flashId =
-            type === "success"
-                ? "#flash-message-success"
-                : "#flash-message-error";
-        let flashContentId =
-            type === "success"
-                ? "#flash-message-success-content"
-                : "#flash-message-error-content";
-
-        // Clear previous messages
-        $(flashContentId).text(message);
-
-        // Fade in the flash message
-        $(flashId).fadeIn();
-
-        // Auto-hide the message after 3 seconds
-        setTimeout(function () {
-            $(flashId).fadeOut();
-        }, 3000);
-    }
     // Loop through each form with the class "replaceGisidForm"
     $(".replaceGisidForm").each(function () {
-        // Handle form submission
         $(this).on("submit", function (event) {
             event.preventDefault(); // Prevent the default form submission
-            console.log("Form submitted"); // Debugging
-            alert("check"); // This should show up
+            console.log("Form submitted");
 
             var form = $(this); // The current form being submitted
             var formId = form.attr("id"); // Get the dynamic ID of the form
-            console.log("Form ID:", formId); // Debugging
+            console.log("Form ID:", formId);
+
+            alert("check"); // Ensure alert is visible before AJAX call
 
             $.ajax({
                 url: routes.delgisid, // Action URL of the form
@@ -1330,11 +1309,11 @@ $(document).ready(function () {
                     ),
                 },
                 success: function (response) {
-                    console.log("Success:", response); // Debugging
+                    alert("Success Response: " + response.message); // Test alert in success
                     showFlashMessage(response.message, "success");
                 },
                 error: function (xhr, status, error) {
-                    console.log("Error:", xhr, status, error); // Debugging
+                    alert("Error Response: " + xhr.responseText); // Test alert in error
                     let errorMsg =
                         "An error occurred while processing your request. Please try again.";
 
