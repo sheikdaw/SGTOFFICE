@@ -20,7 +20,7 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-
+    <script src="{{ asset('js/main.js') }}"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         body {
@@ -239,6 +239,6 @@
         }
     });
 </Script>
-<script src="{{ asset('js/main.js') }}"></script>
+
 
 </html>
