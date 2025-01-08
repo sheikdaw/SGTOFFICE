@@ -28,8 +28,7 @@
                                 </p>
                             </div>
                             <div class="p-4">
-                                <select name="road_name" class="form-control" id="road_name_{{ $data['id'] }}"
-                                    onchange="updateAreaVariationLink({{ $data['id'] }})">
+                                <select name="road_name" class="form-control" id="road_name_{{ $data['id'] }}">
                                     <option value="">Select a road</option>
                                     @foreach ($data['road_name'] as $road)
                                         <option value="{{ $road }}">{{ $road }}</option>
@@ -64,7 +63,14 @@
                                         Replace GIS ID</button>
                                 </form>
 
-                            </div>
+                            </div> <button id="alertButton">Click Me</button>
+                            <script>
+                                $(document).ready(function() {
+                                    $('#alertButton').click(function() {
+                                        alert('Button clicked!');
+                                    });
+                                });
+                            </script>
 
                             <div class="card-footer bg-light d-flex flex-wrap gap-2">
                                 <a href="{{ route('admin.area.variation', ['id' => $data['id'], 'road_name' => '']) }}"
@@ -216,20 +222,5 @@
             datastore: "{{ route('admin.datastore') }}",
 
         };
-
-        function updateAreaVariationLink(id) {
-            // Get the selected road name
-            const selectedRoad = document.getElementById(`road_name_${id}`).value;
-
-            // Find the link element
-            const link = document.getElementById(`area-variation-link-${id}`);
-
-            // Update the href attribute with the selected road name
-            const baseUrl = "{{ route('admin.area.variation', ['id' => '__ID__', 'road_name' => '__ROAD_NAME__']) }}"
-                .replace('__ID__', id)
-                .replace('__ROAD_NAME__', encodeURIComponent(selectedRoad || ''));
-
-            link.href = baseUrl;
-        }
     </script>
 @endsection
