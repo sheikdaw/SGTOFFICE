@@ -1333,7 +1333,7 @@ $(document).ready(function () {
                     let errorMsg =
                         "An error occurred while processing your request. Please try again.";
 
-                    if (xhr.responseJSON && xhr.responseJSON.msg) {
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMsg = xhr.responseJSON.msg;
                     }
 
