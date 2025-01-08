@@ -1416,43 +1416,47 @@ class AdminController extends Controller
 
     public function replaceGisid(Request $request)
     {
-        // Validate the incoming request
         $request->validate([
             'id' => 'required|integer',
             'dgisid1' => 'required|string',
             'dgisid2' => 'required|string',
         ]);
 
-        // Retrieve the input data
-        $id = $request->input('id');
-        $dgisid1 = $request->input('dgisid1');
-        $dgisid2 = $request->input('dgisid2');
-
         try {
-            // Find the corresponding data record
-            $data = Data::findOrFail($id);
+            $data = Data::findOrFail($request->id);
 
-            // Check if the GIS IDs exist in both the polygon and point tables
             $polygonTable = DB::table($data->polygon);
             $pointTable = DB::table($data->point);
 
-            $polygonExists = $polygonTable->where('gisid', $dgisid2)->exists();
-            $pointExists = $pointTable->where('gisid', $dgisid2)->exists();
+            DB::beginTransaction();
 
-            if (!$polygonExists && !$pointExists) {
-                return response()->json(['error' => true, 'message' => "Data Not Found"], 404);
+
+            $polygonDeleted = $polygonTable->where('gisid', $request->dgisid2)->delete();
+            $pointDeleted = $pointTable->where('gisid', $request->dgisid2)->delete();
+
+
+            if (!$polygonDeleted && !$pointDeleted) {
+                DB::rollBack();
+                return response()->json(['error' => true, 'message' => "GIS ID not found."], 404);
             }
-            // Delete `dgisid2` from both tables
-            $polygonTable->where('gisid', $dgisid2)->delete();
-            $pointTable->where('gisid', $dgisid2)->delete();
-            // Update `dgisid1` to the value of `dgisid2` in both tables
-            $polygonTable->where('gisid', $dgisid1)->update(['gisid' => $dgisid2]);
-            $pointTable->where('gisid', $dgisid1)->update(['gisid' => $dgisid2]);
 
+            $polygonUpdated = $polygonTable->where('gisid', $request->dgisid1)->update(['gisid' => $request->dgisid2]);
+            $pointUpdated = $pointTable->where('gisid', $request->dgisid1)->update(['gisid' => $request->dgisid2]);
 
+            DB::commit();
 
-            return response()->json(['success' => true, 'message' => "GIS ID updated and deleted successfully."]);
+            return response()->json([
+                'success' => true,
+                'message' => "GIS ID updated and deleted successfully.",
+                'details' => [
+                    'polygon_deleted' => $polygonDeleted,
+                    'point_deleted' => $pointDeleted,
+                    'polygon_updated' => $polygonUpdated,
+                    'point_updated' => $pointUpdated,
+                ],
+            ]);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
         }
     }
