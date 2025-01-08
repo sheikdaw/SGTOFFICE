@@ -1287,55 +1287,30 @@ $(document).ready(function () {
     });
 });
 $(document).ready(function () {
-    // Data Store Form Submission
-    $("#checkon").click(function () {
-        console.log("hi");
-    });
-    // Replace GIS ID Form Submission
-    $("#replaceGisidForm").submit(function (e) {
-        e.preventDefault(); // Prevent form from submitting normally
+    // Loop through each form with the class "replaceGisidForm"
+    $(".replaceGisidForm").each(function () {
+        // Handle form submission
+        $(this).on("submit", function (event) {
+            event.preventDefault(); // Prevent the default form submission
 
-        let formData = $(this).serialize(); // Serialize form data
+            var form = $(this); // The current form being submitted
+            var formId = form.attr("id"); // Get the dynamic ID of the form
 
-        $.ajax({
-            url: routes.delgisid,
-            type: "POST",
-            data: formData,
-            headers: {
-                "X-CSRF-TOKEN": $('input[name="_token"]').val(), // Include CSRF token
-            },
-            success: function (response) {
-                if (response.message) {
-                    showFlashMessage(response.message, "success"); // Use actual message
-                } else {
-                    showFlashMessage(
-                        "GIS ID replaced successfully.",
-                        "success"
+            $.ajax({
+                url: form.attr("action"), // Action URL of the form
+                method: "POST", // You can change the method if needed
+                data: form.serialize(), // Serialize the form data
+                success: function (response) {
+                    // Handle the response (e.g., display a success message)
+                    alert("GIS ID replaced successfully for " + formId);
+                },
+                error: function (xhr, status, error) {
+                    // Handle any errors
+                    alert(
+                        "An error occurred while replacing GIS ID for " + formId
                     );
-                }
-            },
-            error: function (xhr, status, error) {
-                if (xhr.status === 401) {
-                    const errorMessage =
-                        xhr.responseJSON?.error ||
-                        "Surveyor not authenticated.";
-                    showFlashMessage(errorMessage, "error");
-                } else if (xhr.status === 404) {
-                    const errorMessage =
-                        xhr.responseJSON?.error || "Data not found.";
-                    showFlashMessage(errorMessage, "error");
-                } else {
-                    showFlashMessage(
-                        "An error occurred. Please try again later.",
-                        "error"
-                    );
-                }
-            },
+                },
+            });
         });
-    });
-
-    // Check button click event
-    $("#checkon").click(function () {
-        alert("hi"); // Simple alert to ensure click is working
     });
 });

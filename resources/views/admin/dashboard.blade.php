@@ -54,14 +54,16 @@
                                 </form>
                                 <h6>replace gisid</h6>
 
-                                <form id="replaceGisidForm">
-                                    <input class="form-control me-2" type="hidden" id="id" name="id"
+                                <form class="replaceGisidForm" id="replaceGisidForm{{ $data['id'] }}"
+                                    data-id="{{ $data['id'] }}">
+                                    <input class="form-control me-2" type="hidden" name="id"
                                         value="{{ $data['id'] }}">
-                                    <input class="form-control me-2" type="text" id="dgisid1" name="dgisid1">
-                                    <input class="form-control me-2" type="text" id="dgisid2" name="dgisid2">
+                                    <input class="form-control me-2" type="text" name="dgisid1">
+                                    <input class="form-control me-2" type="text" name="dgisid2">
                                     <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i>
                                         Replace gisid</button>
                                 </form>
+
                             </div>
 
                             <div class="card-footer bg-light d-flex flex-wrap gap-2">
