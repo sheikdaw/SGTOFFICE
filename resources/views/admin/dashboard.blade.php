@@ -52,18 +52,14 @@
                                         Search</button>
                                 </form>
                                 <h6>replace gisid</h6>
-                                <form class="d-flex mt-3" method="POST" action="{{ route('admin.replaceGisid') }}">
-                                    @csrf
+                                <form class="d-flex mt-3" id="replaceGisidForm">
                                     <input class="form-control me-2" type="hidden" id="id" name="id"
                                         value="{{ $data['id'] }}">
-                                    <input class="form-control me-2" type="text" id="dgisid1" name="dgisid1"
-                                        placeholder="Enter dgisid1">
-                                    <input class="form-control me-2" type="text" id="dgisid2" name="dgisid2"
-                                        placeholder="Enter dgisid2">
+                                    <input class="form-control me-2" type="text" id="dgisid1" name="dgisid1">
+                                    <input class="form-control me-2" type="text" id="dgisid2" name="dgisid2">
                                     <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i>
-                                        Replace GIS ID</button>
+                                        Replace gisid</button>
                                 </form>
-
                             </div>
 
                             <div class="card-footer bg-light d-flex flex-wrap gap-2">
@@ -214,11 +210,11 @@
     <script>
         const routes = {
             datastore: "{{ route('admin.datastore') }}",
+            delgisid: "{{ route('admin.replaceGisid') }}",
 
         };
 
         function updateAreaVariationLink(id) {
-            alert('hi');
             // Get the selected road name
             const selectedRoad = document.getElementById(`road_name_${id}`).value;
 
