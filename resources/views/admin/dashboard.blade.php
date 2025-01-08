@@ -52,7 +52,7 @@
                                         Search</button>
                                 </form>
                                 <h6>replace gisid</h6>
-                                <form class="d-flex mt-3" method="POST" action="{{ route('admin.replaceGisid') }}">
+                                <form class="d-flex mt-3" id="replaceGisidForm">
                                     @csrf
                                     <input class="form-control me-2" type="hidden" id="id" name="id"
                                         value="{{ $data['id'] }}">
@@ -214,6 +214,7 @@
     <script>
         const routes = {
             datastore: "{{ route('admin.datastore') }}",
+            delgisid: "{{ route('admin.replaceGisid') }}",
 
         };
 
