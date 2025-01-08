@@ -52,19 +52,17 @@
                                         Search</button>
                                 </form>
                                 <h6>replace gisid</h6>
-                                <form id="replaceGisidForm" class="d-flex mt-3" method="POST">
+                                <form class="d-flex mt-3" method="POST" action="{{ route('admin.replaceGisid') }}">
                                     @csrf
                                     <input class="form-control me-2" type="hidden" id="id" name="id"
                                         value="{{ $data['id'] }}">
                                     <input class="form-control me-2" type="text" id="dgisid1" name="dgisid1"
-                                        placeholder="Enter new">
+                                        placeholder="Enter dgisid1">
                                     <input class="form-control me-2" type="text" id="dgisid2" name="dgisid2"
-                                        placeholder="Enter old">
+                                        placeholder="Enter dgisid2">
                                     <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i>
                                         Replace GIS ID</button>
                                 </form>
-
-
 
                             </div>
 
@@ -218,49 +216,6 @@
             datastore: "{{ route('admin.datastore') }}",
 
         };
-
-        $("#replaceGisidForm").on("submit", function(e) {
-            e.preventDefault(); // Prevent form from submitting normally
-
-            let formData = $(this).serialize(); // Serialize form data
-            alert("hi");
-            $.ajax({
-                url: "{{ route('admin.replaceGisid') }}",
-                type: "POST",
-                data: formData,
-                headers: {
-                    "X-CSRF-TOKEN": $('input[name="_token"]').val(), // Include CSRF token
-                },
-                success: function(response) {
-                    if (response.message) {
-                        showFlashMessage(response.message, "success"); // Use actual message
-                    } else {
-                        showFlashMessage(
-                            "Polygon deleted successfully.",
-                            "success"
-                        );
-                    }
-                },
-                error: function(xhr, status, error) {
-                    if (xhr.status === 401) {
-                        const errorMessage =
-                            xhr.responseJSON?.error ||
-                            "Surveyor not authenticated.";
-                        showFlashMessage(errorMessage, "error");
-                    } else if (xhr.status === 404) {
-                        const errorMessage =
-                            xhr.responseJSON?.error || "Data not found.";
-                        showFlashMessage(errorMessage, "error");
-                    } else {
-                        showFlashMessage(
-                            "An error occurred. Please try again later.",
-                            "error"
-                        );
-                    }
-                    $("#addedFeature").val("none");
-                },
-            });
-        });
 
         function updateAreaVariationLink(id) {
             // Get the selected road name
