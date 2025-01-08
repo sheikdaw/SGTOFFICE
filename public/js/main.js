@@ -1285,8 +1285,7 @@ $(document).ready(function () {
             },
         });
     });
-
-    $("#replaceGisidForm").on("submit", function (e) {
+    $("#replaceGisidForm").submit(function (e) {
         e.preventDefault(); // Prevent form from submitting normally
 
         let formData = $(this).serialize(); // Serialize form data
