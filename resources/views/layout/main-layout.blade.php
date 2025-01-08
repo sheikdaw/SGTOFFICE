@@ -221,25 +221,26 @@
     </div>
 
     @yield('content')
-</body>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<Script>
-    document.addEventListener("contextmenu", function(e) {
-        e.preventDefault();
-    });
-
-    // Disable common inspect shortcuts
-    document.addEventListener("keydown", function(e) {
-        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
-        if (
-            e.key === "F12" ||
-            (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) ||
-            (e.ctrlKey && e.key === "U")
-        ) {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <Script>
+        document.addEventListener("contextmenu", function(e) {
             e.preventDefault();
-        }
-    });
-</Script>
-<script src="{{ asset('js/main.js') }}"></script>
+        });
+
+        // Disable common inspect shortcuts
+        document.addEventListener("keydown", function(e) {
+            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            if (
+                e.key === "F12" ||
+                (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) ||
+                (e.ctrlKey && e.key === "U")
+            ) {
+                e.preventDefault();
+            }
+        });
+    </Script>
+    <script src="{{ asset('js/main.js') }}"></script>
+</body>
+
 
 </html>
