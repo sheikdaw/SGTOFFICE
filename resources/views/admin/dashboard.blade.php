@@ -28,7 +28,8 @@
                                 </p>
                             </div>
                             <div class="p-4">
-                                <select name="road_name" class="form-control" id="road_name_{{ $data['id'] }}">
+                                <select name="road_name" class="form-control" id="road_name_{{ $data['id'] }}"
+                                    onchange="updateAreaVariationLink({{ $data['id'] }})">
                                     <option value="">Select a road</option>
                                     @foreach ($data['road_name'] as $road)
                                         <option value="{{ $road }}">{{ $road }}</option>
@@ -62,54 +63,56 @@
                                     <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i>
                                         Replace GIS ID</button>
                                 </form>
-                                <div class="card-footer bg-light d-flex flex-wrap gap-2">
-                                    <a href="{{ route('admin.area.variation', ['id' => $data['id'], 'road_name' => '']) }}"
-                                        class="btn btn-primary btn-sm area-variation"
-                                        id="area-variation-link-{{ $data['id'] }}" data-id="{{ $data['id'] }}">
-                                        Area Variation
-                                    </a>
-                                    <a href="{{ route('admin.usage.variation', ['id' => $data['id']]) }}"
-                                        class="btn btn-secondary btn-sm usage-variation" data-id="{{ $data['id'] }}">
-                                        Usage Variation
-                                    </a>
-                                    <a href="{{ route('admin.downloadMissingBill', ['id' => $data['id']]) }}"
-                                        class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">
-                                        Missing Bill
-                                    </a>
 
-                                    <a href="{{ route('admin.usageandarea.variation', ['id' => $data['id']]) }}"
-                                        class="btn btn-success btn-sm usage-and-area-variation"
-                                        data-id="{{ $data['id'] }}">Usage and Area Variation</a>
-                                    <a href="#" class="btn btn-warning btn-sm final-format"
-                                        data-id="{{ $data['id'] }}">Final Format</a>
-                                    <a href="{{ route('admin.downloadPolygons', ['id' => $data['id']]) }}"
-                                        class="btn btn-info btn-sm download-polygon" data-id="{{ $data['id'] }}">Download
-                                        Polygon</a>
-                                    <a href="{{ route('admin.downloadPoints', ['id' => $data['id']]) }}"
-                                        class="btn btn-light btn-sm download-point" data-id="{{ $data['id'] }}">Download
-                                        Point</a>
-                                    <a href="{{ route('admin.downloadLines', ['id' => $data['id']]) }}"
-                                        class="btn btn-dark btn-sm download-lines" data-id="{{ $data['id'] }}">Download
-                                        Lines</a>
-                                    <a href="{{ route('admin.surveyorsCount', ['id' => $data['id']]) }}"
-                                        class="btn btn-danger btn-sm surveyor-count" data-id="{{ $data['id'] }}">Surveyor
-                                        Count</a>
-                                    <a href="{{ route('admin.downloadsteetwise', ['id' => $data['id']]) }}"
-                                        class="btn btn-primary btn-sm surveyor-count"
-                                        data-id="{{ $data['id'] }}">Street
-                                        Wise</a>
-                                    <a href="{{ route('admin.downloadpointdata', ['id' => $data['id']]) }}"
-                                        class="btn btn-primary btn-sm surveyor-count"
-                                        data-id="{{ $data['id'] }}">pointData</a>
+                            </div>
 
-                                    <a href="{{ route('admin.downloadbuildingdata', ['id' => $data['id']]) }}"
-                                        class="btn btn-primary btn-sm surveyor-count"
-                                        data-id="{{ $data['id'] }}">buildingData</a>
+                            <div class="card-footer bg-light d-flex flex-wrap gap-2">
+                                <a href="{{ route('admin.area.variation', ['id' => $data['id'], 'road_name' => '']) }}"
+                                    class="btn btn-primary btn-sm area-variation"
+                                    id="area-variation-link-{{ $data['id'] }}" data-id="{{ $data['id'] }}">
+                                    Area Variation
+                                </a>
+                                <a href="{{ route('admin.usage.variation', ['id' => $data['id']]) }}"
+                                    class="btn btn-secondary btn-sm usage-variation" data-id="{{ $data['id'] }}">
+                                    Usage Variation
+                                </a>
+                                <a href="{{ route('admin.downloadMissingBill', ['id' => $data['id']]) }}"
+                                    class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">
+                                    Missing Bill
+                                </a>
+
+                                <a href="{{ route('admin.usageandarea.variation', ['id' => $data['id']]) }}"
+                                    class="btn btn-success btn-sm usage-and-area-variation"
+                                    data-id="{{ $data['id'] }}">Usage and Area Variation</a>
+                                <a href="#" class="btn btn-warning btn-sm final-format"
+                                    data-id="{{ $data['id'] }}">Final Format</a>
+                                <a href="{{ route('admin.downloadPolygons', ['id' => $data['id']]) }}"
+                                    class="btn btn-info btn-sm download-polygon" data-id="{{ $data['id'] }}">Download
+                                    Polygon</a>
+                                <a href="{{ route('admin.downloadPoints', ['id' => $data['id']]) }}"
+                                    class="btn btn-light btn-sm download-point" data-id="{{ $data['id'] }}">Download
+                                    Point</a>
+                                <a href="{{ route('admin.downloadLines', ['id' => $data['id']]) }}"
+                                    class="btn btn-dark btn-sm download-lines" data-id="{{ $data['id'] }}">Download
+                                    Lines</a>
+                                <a href="{{ route('admin.surveyorsCount', ['id' => $data['id']]) }}"
+                                    class="btn btn-danger btn-sm surveyor-count" data-id="{{ $data['id'] }}">Surveyor
+                                    Count</a>
+                                <a href="{{ route('admin.downloadsteetwise', ['id' => $data['id']]) }}"
+                                    class="btn btn-primary btn-sm surveyor-count" data-id="{{ $data['id'] }}">Street
+                                    Wise</a>
+                                <a href="{{ route('admin.downloadpointdata', ['id' => $data['id']]) }}"
+                                    class="btn btn-primary btn-sm surveyor-count"
+                                    data-id="{{ $data['id'] }}">pointData</a>
+
+                                <a href="{{ route('admin.downloadbuildingdata', ['id' => $data['id']]) }}"
+                                    class="btn btn-primary btn-sm surveyor-count"
+                                    data-id="{{ $data['id'] }}">buildingData</a>
 
 
-                                </div>
                             </div>
                         </div>
+                    </div>
                 @endforeach
             </div>
         </div>
@@ -213,5 +216,21 @@
             datastore: "{{ route('admin.datastore') }}",
 
         };
+
+        function updateAreaVariationLink(id) {
+            alert('hi');
+            // Get the selected road name
+            const selectedRoad = document.getElementById(`road_name_${id}`).value;
+
+            // Find the link element
+            const link = document.getElementById(`area-variation-link-${id}`);
+
+            // Update the href attribute with the selected road name
+            const baseUrl = "{{ route('admin.area.variation', ['id' => '__ID__', 'road_name' => '__ROAD_NAME__']) }}"
+                .replace('__ID__', id)
+                .replace('__ROAD_NAME__', encodeURIComponent(selectedRoad || ''));
+
+            link.href = baseUrl;
+        }
     </script>
 @endsection
