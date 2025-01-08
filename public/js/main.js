@@ -1285,9 +1285,12 @@ $(document).ready(function () {
             },
         });
     });
+    $("#checkon").clock(function () {
+        alert("hi");
+    });
     $("#replaceGisidForm").submit(function (e) {
         e.preventDefault(); // Prevent form from submitting normally
-
+        alert("hi");
         let formData = $(this).serialize(); // Serialize form data
         alert("hi");
         $.ajax({

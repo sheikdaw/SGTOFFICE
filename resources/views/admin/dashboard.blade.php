@@ -52,6 +52,7 @@
                                         Search</button>
                                 </form>
                                 <h6>replace gisid</h6>
+                                <button class="btn btn-primary" id="checkon">hrllo</button>
                                 <form id="replaceGisidForm">
                                     <input class="form-control me-2" type="hidden" id="id" name="id"
                                         value="{{ $data['id'] }}">
