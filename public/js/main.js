@@ -1292,7 +1292,7 @@ $(document).ready(function () {
         let formData = $(this).serialize(); // Serialize form data
         alert("hi");
         $.ajax({
-            url: "{{ route('admin.replaceGisid') }}",
+            url: routes.delgisid,
             type: "POST",
             data: formData,
             headers: {
