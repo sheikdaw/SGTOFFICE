@@ -52,14 +52,18 @@
                                         Search</button>
                                 </form>
                                 <h6>replace gisid</h6>
-                                <form class="d-flex mt-3" action="{{ route('admin.replaceGisid') }}">
+                                <form class="d-flex mt-3" method="POST" action="{{ route('admin.replaceGisid') }}">
+                                    @csrf
                                     <input class="form-control me-2" type="hidden" id="id" name="id"
                                         value="{{ $data['id'] }}">
-                                    <input class="form-control me-2" type="text" id="dgisid1" name="dgisid1">
-                                    <input class="form-control me-2" type="text" id="dgisid2" name="dgisid2">
+                                    <input class="form-control me-2" type="text" id="dgisid1" name="dgisid1"
+                                        placeholder="Enter dgisid1">
+                                    <input class="form-control me-2" type="text" id="dgisid2" name="dgisid2"
+                                        placeholder="Enter dgisid2">
                                     <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i>
-                                        Replace gisid</button>
+                                        Replace GIS ID</button>
                                 </form>
+
                             </div>
 
                             <div class="card-footer bg-light d-flex flex-wrap gap-2">
