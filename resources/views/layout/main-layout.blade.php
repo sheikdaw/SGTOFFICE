@@ -222,7 +222,7 @@
 
     @yield('content')
 </body>
-{{-- <Script>
+<Script>
     // Disable right-click
     document.addEventListener("contextmenu", function(e) {
         e.preventDefault();
@@ -239,7 +239,7 @@
             e.preventDefault();
         }
     });
-</Script> --}}
+</Script>
 <script src="{{ asset('js/main.js') }}"></script>
 
 </html>
