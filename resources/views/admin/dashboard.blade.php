@@ -218,6 +218,74 @@
 
         };
 
+
+        $(document).ready(function() {
+            function showFlashMessage(message, type) {
+                let flashId =
+                    type === "success" ?
+                    "#flash-message-success" :
+                    "#flash-message-error";
+                let flashContentId =
+                    type === "success" ?
+                    "#flash-message-success-content" :
+                    "#flash-message-error-content";
+
+                // Clear previous messages
+                $(flashContentId).text(message);
+
+                // Fade in the flash message
+                $(flashId).fadeIn();
+
+                // Auto-hide the message after 3 seconds
+                setTimeout(function() {
+                    $(flashId).fadeOut();
+                }, 3000);
+            }
+            $("#replaceGisidForm").on("submit", function(e) {
+                e.preventDefault(); // Prevent form from submitting normally
+
+                let formData = $(this).serialize(); // Serialize form data
+                alert("hi");
+                $.ajax({
+                    url: routes.delgisid,
+                    type: "POST",
+                    data: formData,
+                    headers: {
+                        "X-CSRF-TOKEN": $('input[name="_token"]').val(), // Include CSRF token
+                    },
+                    success: function(response) {
+                        if (response.message) {
+                            showFlashMessage(response.message, "success"); // Use actual message
+                        } else {
+                            showFlashMessage(
+                                "Polygon deleted successfully.",
+                                "success"
+                            );
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        if (xhr.status === 401) {
+                            const errorMessage =
+                                xhr.responseJSON?.error ||
+                                "Surveyor not authenticated.";
+                            showFlashMessage(errorMessage, "error");
+                        } else if (xhr.status === 404) {
+                            const errorMessage =
+                                xhr.responseJSON?.error || "Data not found.";
+                            showFlashMessage(errorMessage, "error");
+                        } else {
+                            showFlashMessage(
+                                "An error occurred. Please try again later.",
+                                "error"
+                            );
+                        }
+                        $("#addedFeature").val("none");
+                    },
+                });
+            });
+        })
+
+
         function updateAreaVariationLink(id) {
             // Get the selected road name
             const selectedRoad = document.getElementById(`road_name_${id}`).value;
