@@ -1285,7 +1285,7 @@ $(document).ready(function () {
             },
         });
     });
-    $("#checkon").clock(function () {
+    $("#checkon").click(function () {
         alert("hi");
     });
     $("#replaceGisidForm").submit(function (e) {
