@@ -62,7 +62,7 @@
                                     <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i>
                                         Replace GIS ID</button>
                                 </form>
-
+                                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                             </div> <button id="alertButton">Click Me</button>
                             <script>
                                 $(document).ready(function() {
