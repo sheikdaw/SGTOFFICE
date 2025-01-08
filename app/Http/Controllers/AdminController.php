@@ -1413,4 +1413,47 @@ class AdminController extends Controller
         $pdf = PDF::loadView('pdf.your_model_export', compact('data'));
         return $pdf->download('data_export.pdf');
     }
+
+    public function replaceGisid(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'id' => 'required|integer',
+            'dgisid1' => 'required|string',
+            'dgisid2' => 'required|string',
+        ]);
+
+        // Retrieve the input data
+        $id = $request->input('id');
+        $dgisid1 = $request->input('dgisid1');
+        $dgisid2 = $request->input('dgisid2');
+
+        try {
+            // Find the corresponding data record
+            $data = Data::findOrFail($id);
+
+            // Check if the GIS IDs exist in both the polygon and point tables
+            $polygonTable = DB::table($data->polygon);
+            $pointTable = DB::table($data->point);
+
+            $polygonExists = $polygonTable->where('gisid', $dgisid2)->exists();
+            $pointExists = $pointTable->where('gisid', $dgisid2)->exists();
+
+            if (!$polygonExists && !$pointExists) {
+                return response()->json(['error' => true, 'message' => "Data Not Found"], 404);
+            }
+            // Delete `dgisid2` from both tables
+            $polygonTable->where('gisid', $dgisid2)->delete();
+            $pointTable->where('gisid', $dgisid2)->delete();
+            // Update `dgisid1` to the value of `dgisid2` in both tables
+            $polygonTable->where('gisid', $dgisid1)->update(['gisid' => $dgisid2]);
+            $pointTable->where('gisid', $dgisid1)->update(['gisid' => $dgisid2]);
+
+
+
+            return response()->json(['success' => true, 'message' => "GIS ID updated and deleted successfully."]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => true, 'message' => $e->getMessage()], 500);
+        }
+    }
 }

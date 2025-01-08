@@ -61,6 +61,7 @@ Route::middleware('admin')->group(function () {
     Route::post('/admin/update-buildingdata', [AdminController::class, 'updatebuildingdata'])->name('admin.updatebuildingdata');
     Route::post('/admin/delete-assessment', [AdminController::class, 'deleteAssessment'])->name('admin.deleteAssessment');
     Route::post('/admin/delete-buildingData', [AdminController::class, 'deleteBuildingData'])->name('admin.deleteBuildingData');
+    Route::post('/admin/replaceGisid', [AdminController::class, 'replaceGisid'])->name('admin.replaceGisid');
 });
 Route::post('/processImage', [AdminController::class, 'processImage'])->name('process.image');
 
