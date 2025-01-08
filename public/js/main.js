@@ -1300,6 +1300,11 @@ $(document).ready(function () {
                 url: routes.delgisid, // Action URL of the form
                 method: "POST", // You can change the method if needed
                 data: form.serialize(), // Serialize the form data
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ),
+                },
                 success: function (response) {
                     // Handle the response (e.g., display a success message)
                     alert("GIS ID replaced successfully for " + formId);
