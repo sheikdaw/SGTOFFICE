@@ -1287,12 +1287,33 @@ $(document).ready(function () {
     });
 });
 $(document).ready(function () {
+    function showFlashMessage(message, type) {
+        let flashId =
+            type === "success"
+                ? "#flash-message-success"
+                : "#flash-message-error";
+        let flashContentId =
+            type === "success"
+                ? "#flash-message-success-content"
+                : "#flash-message-error-content";
+
+        // Clear previous messages
+        $(flashContentId).text(message);
+
+        // Fade in the flash message
+        $(flashId).fadeIn();
+
+        // Auto-hide the message after 3 seconds
+        setTimeout(function () {
+            $(flashId).fadeOut();
+        }, 3000);
+    }
     // Loop through each form with the class "replaceGisidForm"
     $(".replaceGisidForm").each(function () {
         // Handle form submission
         $(this).on("submit", function (event) {
             event.preventDefault(); // Prevent the default form submission
-
+            alert("success");
             var form = $(this); // The current form being submitted
             var formId = form.attr("id"); // Get the dynamic ID of the form
 
@@ -1306,9 +1327,7 @@ $(document).ready(function () {
                     ),
                 },
                 success: function (response) {
-                    // Handle the response (e.g., display a success message)
                     showFlashMessage(response.message, "success");
-                    alert("success");
                 },
                 error: function (xhr, status, error) {
                     let errorMsg =
