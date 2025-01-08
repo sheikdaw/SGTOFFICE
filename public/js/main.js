@@ -1308,6 +1308,7 @@ $(document).ready(function () {
                 success: function (response) {
                     // Handle the response (e.g., display a success message)
                     showFlashMessage(response.message, "success");
+                    alert("success");
                 },
                 error: function (xhr, status, error) {
                     let errorMsg =
