@@ -1,20 +1,3 @@
-// // Disable right-click
-// document.addEventListener("contextmenu", function (e) {
-//     e.preventDefault();
-// });
-
-// // Disable common inspect shortcuts
-// document.addEventListener("keydown", function (e) {
-//     // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
-//     if (
-//         e.key === "F12" ||
-//         (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) ||
-//         (e.ctrlKey && e.key === "U")
-//     ) {
-//         e.preventDefault();
-//     }
-// });
-
 $(document).ready(function () {
     function showFlashMessage(message, type) {
         let flashId =
@@ -285,10 +268,6 @@ $(document).ready(function () {
         // Remove invalid classes and clear error messages
         $("#addSurveyorForm .form-control").removeClass("is-invalid"); // Target form controls in this form only
         $("#addSurveyorForm .invalid-feedback").text(""); // Clear error messages
-    });
-    //surveyors attandence
-    $(document).on("click", "#in-time", function () {
-        alert("attendence");
     });
 
     // Edit Surveyor

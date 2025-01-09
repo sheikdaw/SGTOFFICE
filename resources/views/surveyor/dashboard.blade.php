@@ -483,5 +483,9 @@
             updateRoadName: "{{ route('surveyor.updateRoadName') }}",
         };
         // Parse extentData and create a float array
+        //surveyors attandence
+        $(document).on("click", "#in-time", function() {
+            alert("attendence");
+        });
     </script>
 @endsection
