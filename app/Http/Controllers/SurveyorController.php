@@ -284,7 +284,7 @@ class SurveyorController extends Controller
             'worker_name' => $surveyor->name,
             // 'eb' => $validatedData['eb'],
             'old_assessment' => $validatedData['old_assessment'],
-            'assessment' => $validatedData['assessment'] ?? $request->type,
+            'assessment' => $validatedData['assessment'],
             'floor' => $validatedData['floor'],
             'bill_usage' => $validatedData['bill_usage'],
             'phone_number' => $validatedData['phone_number'],
@@ -627,15 +627,20 @@ class SurveyorController extends Controller
         $latitude = $validated['latitude'];
         $longitude = $validated['longitude'];
 
-        // Create a new attendence record and store the current date (without time)
-        $attendence = new Attendence();
-        $attendence->name = $surveyor->name;
-        $attendence->ward = $data->ward;
-        $attendence->Data = Carbon::today(); // Store only the current date (YYYY-MM-DD)
-        $attendence->in_time = now(); // Store the current time (in_time)
-        $attendence->location = json_encode(['latitude' => $latitude, 'longitude' => $longitude]);
-        $attendence->save();
-
+        // Create a new attendence record and store the current date (without time
+        $check = Attendence::where('email', $surveyor->email)->where('Data', Carbon::today());
+        if (!$check) {
+            $attendence = new Attendence();
+            $attendence->name = $surveyor->name;
+            $attendence->email = $surveyor->email;
+            $attendence->ward = $data->ward;
+            $attendence->Data = Carbon::today(); // Store only the current date (YYYY-MM-DD)
+            $attendence->in_time = Carbon::time(); // Store the current time (in_time)
+            $attendence->inlocation = json_encode(['latitude' => $latitude, 'longitude' => $longitude]);
+            // $attendence->outlocation = json_encode(['latitude' => $latitude, 'longitude' => $longitude]);
+            $attendence->save();
+        } else {
+        }
         // Return a success message with the coordinates
         return response()->json([
             'latitude' => $latitude,

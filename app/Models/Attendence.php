@@ -12,11 +12,13 @@ class Attendence extends Model
     // Define which columns are mass assignable
     protected $fillable = [
         'name',
+        'email',
         'data',
         'in_time',
         'out_time',
         'ward',
-        'location',
+        'inlocation',
+        'outlocation',
     ];
 
     // If you're using a date or time format for some fields
@@ -28,6 +30,7 @@ class Attendence extends Model
 
     // If location is a JSON column, you can access it as an array.
     protected $casts = [
-        'location' => 'array',
+        'inlocation' => 'array',
+        'outlocation' => 'array',
     ];
 }

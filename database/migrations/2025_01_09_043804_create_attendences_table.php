@@ -14,11 +14,13 @@ return new class extends Migration
         Schema::create('attendences', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('email');
             $table->Date('Data');
             $table->time('in_time');
             $table->time('out_time')->nullable();
             $table->string('ward');
-            $table->json('location')->nullable();
+            $table->json('inlocation')->nullable();
+            $table->json('outlocation')->nullable();
             $table->timestamps();
         });
     }
