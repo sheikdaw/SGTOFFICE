@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->Date('Data');
             $table->time('in_time');
-            $table->time('out_time');
+            $table->time('out_time')->nullable();
             $table->string('ward');
             $table->json('location')->nullable();
             $table->timestamps();

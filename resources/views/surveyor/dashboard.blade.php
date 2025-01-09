@@ -482,10 +482,58 @@
             deletePolygon: "{{ route('surveyor.deletePolygon') }}",
             updateRoadName: "{{ route('surveyor.updateRoadName') }}",
         };
-        // Parse extentData and create a float array
+
         //surveyors attandence
         $(document).on("click", "#in-time", function() {
-            alert("attendence");
+            if (navigator.geolocation) {
+
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const latitude = position.coords;
+
+                        console.log("Latitude:", latitude);
+
+                        // $.ajax({
+                        //     url: '/store-location',
+                        //     method: 'POST',
+                        //     headers: {
+                        //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
+                        //             'content'),
+                        //     },
+                        //     data: {
+                        //         latitude: latitude,
+                        //         longitude: longitude,
+
+                        //     },
+                        //     success: function(response) {
+                        //         console.log("Location saved:", response);
+                        //     },
+                        //     error: function(error) {
+                        //         console.error("Error saving location:", error);
+                        //     }
+                        // });
+                    },
+                    function(error) {
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                alert("User denied the request for Geolocation.");
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                alert("Location information is unavailable.");
+                                break;
+                            case error.TIMEOUT:
+                                alert("The request to get user location timed out.");
+                                break;
+                            case error.UNKNOWN_ERROR:
+                                alert("An unknown error occurred.");
+                                break;
+                        }
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+
         });
     </script>
 @endsection
