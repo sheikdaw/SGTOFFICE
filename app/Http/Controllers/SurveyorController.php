@@ -602,4 +602,8 @@ class SurveyorController extends Controller
 
         return response()->json(['message' => 'Data updated successfully'], 200);
     }
+    public function inTime(Request $request)
+    {
+        return response()->json([$request->all(), "message" => "sccuess"]);
+    }
 }

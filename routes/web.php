@@ -80,6 +80,7 @@ Route::middleware('surveyor')->group(function () {
     Route::get('/surveyor/find-gisid', [SurveyorController::class, 'findGisid'])->name('surveyor.findGisid');
 
     Route::post('/surveyor/update-assessment', [SurveyorController::class, 'updateAssessment'])->name('surveyor.updateAssessment');
+    Route::post('/surveyor/attendence', [SurveyorController::class, 'inTime'])->name('surveyor.intimeAttendence');
 });
 
 // CBE dashboard route, protected by 'cbe' middleware group

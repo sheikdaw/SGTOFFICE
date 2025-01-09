@@ -481,6 +481,7 @@
             mergePolygon: "{{ route('surveyor.mergePolygon') }}",
             deletePolygon: "{{ route('surveyor.deletePolygon') }}",
             updateRoadName: "{{ route('surveyor.updateRoadName') }}",
+            intimeAttendence: "{{ route('surveyor.intimeAttendence') }}",
         };
 
         //surveyors attandence
@@ -492,26 +493,22 @@
                         const latitude = position.coords;
 
                         console.log("Latitude:", latitude);
+                        $.ajax({
+                            url: routes.intimeAttendence,
+                            type: "post",
+                            data: latitude,
+                            headers: {
+                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                            },
+                            success: function(response) {
+                                alert(response.message);
+                            },
+                            error: function(xhr) {
+                                console.log(xhr);
 
-                        // $.ajax({
-                        //     url: '/store-location',
-                        //     method: 'POST',
-                        //     headers: {
-                        //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
-                        //             'content'),
-                        //     },
-                        //     data: {
-                        //         latitude: latitude,
-                        //         longitude: longitude,
+                            }
+                        });
 
-                        //     },
-                        //     success: function(response) {
-                        //         console.log("Location saved:", response);
-                        //     },
-                        //     error: function(error) {
-                        //         console.error("Error saving location:", error);
-                        //     }
-                        // });
                     },
                     function(error) {
                         switch (error.code) {
