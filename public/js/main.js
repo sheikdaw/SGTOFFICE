@@ -1333,4 +1333,9 @@ $(document).ready(function () {
             });
         });
     });
+
+    //surveyors attandence
+    $("#in-time").click(function () {
+        alert("attendence");
+    });
 });
