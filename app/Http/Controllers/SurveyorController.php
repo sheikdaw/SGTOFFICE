@@ -655,4 +655,55 @@ class SurveyorController extends Controller
             'message' => 'Attendance marked successfully.',
         ]);
     }
+    public function outTime(Request $request)
+    {
+        // Ensure the surveyor is authenticated
+        $surveyor = auth()->guard('surveyor')->user();
+        if (!$surveyor) {
+            return response()->json(['error' => 'Surveyor not authenticated.'], 401);
+        }
+
+        // Fetch associated data for the surveyor
+        $data = Data::find($surveyor->data_id);
+        if (!$data) {
+            return response()->json(['error' => 'Data not found.'], 404);
+        }
+
+        // Validate latitude and longitude
+        $validated = $request->validate([
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+        ]);
+
+        $latitude = $validated['latitude'];
+        $longitude = $validated['longitude'];
+
+        // Check if attendance already exists for the given email and today's date
+        $attendence = Attendence::where('email', $surveyor->email)
+            ->where('Data', Carbon::today())
+            ->first();  // Use first() to fetch the actual record
+
+        if (!$attendence) {
+            // Attendance does not exist, create a new one
+            $attendence = new Attendence();
+            $attendence->name = $surveyor->name;
+            $attendence->email = $surveyor->email;
+            $attendence->ward = $data->ward;
+            $attendence->Data = Carbon::today(); // Store only the current date (YYYY-MM-DD)
+            $attendence->out_time = Carbon::now(); // Store the current time (in_time)
+            $attendence->outlocation = json_encode(['latitude' => $latitude, 'longitude' => $longitude]);
+            $attendence->save();  // Save the new record
+        } else {
+            // Attendance exists, update the existing record
+            $attendence->out_time = Carbon::now(); // Update the in_time to the current time
+            $attendence->outlocation = json_encode(['latitude' => $latitude, 'longitude' => $longitude]);
+            $attendence->save();  // Save the updated record
+        }
+
+        return response()->json([
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'message' => 'Attendance marked successfully.',
+        ]);
+    }
 }

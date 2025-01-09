@@ -82,6 +82,7 @@ Route::middleware('surveyor')->group(function () {
 
     Route::post('/surveyor/update-assessment', [SurveyorController::class, 'updateAssessment'])->name('surveyor.updateAssessment');
     Route::post('/surveyor/attendence', [SurveyorController::class, 'inTime'])->name('surveyor.intimeAttendence');
+    Route::post('/surveyor/attendenceout', [SurveyorController::class, 'outTime'])->name('surveyor.outtimeAttendence');
 });
 
 // CBE dashboard route, protected by 'cbe' middleware group

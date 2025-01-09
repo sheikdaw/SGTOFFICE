@@ -482,6 +482,7 @@
             deletePolygon: "{{ route('surveyor.deletePolygon') }}",
             updateRoadName: "{{ route('surveyor.updateRoadName') }}",
             intimeAttendence: "{{ route('surveyor.intimeAttendence') }}",
+            outtimeAttendence: "{{ route('surveyor.outtimeAttendence') }}",
         };
 
         //surveyors attandence
@@ -497,6 +498,55 @@
 
                         $.ajax({
                             url: routes.intimeAttendence,
+                            type: "post",
+                            data: {
+                                latitude: latitude,
+                                longitude: longitude
+                            },
+                            headers: {
+                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                            },
+                            success: function(response) {
+                                alert(response.message);
+                            },
+                            error: function(xhr) {
+                                console.log(xhr);
+                            }
+                        });
+                    },
+                    function(error) {
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                alert("User denied the request for Geolocation.");
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                alert("Location information is unavailable.");
+                                break;
+                            case error.TIMEOUT:
+                                alert("The request to get user location timed out.");
+                                break;
+                            case error.UNKNOWN_ERROR:
+                                alert("An unknown error occurred.");
+                                break;
+                        }
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        });
+        $(document).on("click", "#out-time", function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+
+                        console.log("Latitude:", latitude);
+                        console.log("Longitude:", longitude);
+
+                        $.ajax({
+                            url: routes.outtimeAttendence,
                             type: "post",
                             data: {
                                 latitude: latitude,
