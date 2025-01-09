@@ -286,6 +286,10 @@ $(document).ready(function () {
         $("#addSurveyorForm .form-control").removeClass("is-invalid"); // Target form controls in this form only
         $("#addSurveyorForm .invalid-feedback").text(""); // Clear error messages
     });
+    //surveyors attandence
+    $(document).on("click", "#in-time", function () {
+        alert("attendence");
+    });
 
     // Edit Surveyor
     $(document).on("click", ".editSurveyor", function () {
@@ -1332,10 +1336,5 @@ $(document).ready(function () {
                 },
             });
         });
-    });
-
-    //surveyors attandence
-    $("#in-time").click(function () {
-        alert("attendence");
     });
 });
