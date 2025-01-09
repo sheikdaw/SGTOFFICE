@@ -486,6 +486,7 @@
 
         //surveyors attandence
         $(document).on("click", "#in-time", function() {
+            alert("hi");
             if (navigator.geolocation) {
 
                 navigator.geolocation.getCurrentPosition(
