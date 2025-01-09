@@ -197,6 +197,9 @@
                     <p>Welcome, {{ Auth::guard('surveyor')->user()->name }}!</p>
                     <h3>Total Count : <span id="surveycount">{{ $pointCount ?? null }}<spam>
                     </h3>
+
+                    <button class="btn btn-success in-time" id="in-time">In-Time</button>
+                    <button class="btn btn-danger out-time" id="out-time">Out-Time</button>
                     <form class="d-flex mt-3" action="{{ route('surveyor.findGisid') }}">
                         <input class="form-control me-2" type="text" id="sgisid" name="sgisid">
                         <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i>
