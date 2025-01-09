@@ -627,9 +627,13 @@ class SurveyorController extends Controller
         $latitude = $validated['latitude'];
         $longitude = $validated['longitude'];
 
-        // Create a new attendence record and store the current date (without time
-        $attendence = Attendence::where('email', $surveyor->email)->where('Data', Carbon::today());
+        // Check if attendance already exists for the given email and today's date
+        $attendence = Attendence::where('email', $surveyor->email)
+            ->where('Data', Carbon::today())
+            ->first();  // Use first() to fetch the actual record
+
         if (!$attendence) {
+            // Attendance does not exist, create a new one
             $attendence = new Attendence();
             $attendence->name = $surveyor->name;
             $attendence->email = $surveyor->email;
@@ -637,12 +641,12 @@ class SurveyorController extends Controller
             $attendence->Data = Carbon::today(); // Store only the current date (YYYY-MM-DD)
             $attendence->in_time = Carbon::now(); // Store the current time (in_time)
             $attendence->inlocation = json_encode(['latitude' => $latitude, 'longitude' => $longitude]);
-            // $attendence->outlocation = json_encode(['latitude' => $latitude, 'longitude' => $longitude]);
-            $attendence->save();
+            $attendence->save();  // Save the new record
         } else {
-            $attendence->Data = Carbon::today(); // Store only the current date (YYYY-MM-DD)
-            $attendence->in_time = Carbon::now(); // Store the current time (in_time)
-            $attendence->save();
+            // Attendance exists, update the existing record
+            $attendence->in_time = Carbon::now(); // Update the in_time to the current time
+            $attendence->inlocation = json_encode(['latitude' => $latitude, 'longitude' => $longitude]);
+            $attendence->save();  // Save the updated record
         }
 
         return response()->json([
