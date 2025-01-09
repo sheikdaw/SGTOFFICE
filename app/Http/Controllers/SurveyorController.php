@@ -604,6 +604,14 @@ class SurveyorController extends Controller
     }
     public function inTime(Request $request)
     {
-        return response()->json([$request->all(), "message" => "sccuess"]);
+        $latitude = $request->latitude;
+        $longitude = $request->longitude;
+
+        // You can now use $latitude and $longitude for your logic
+        return response()->json([
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'message' => 'success'
+        ]);
     }
 }

@@ -486,18 +486,22 @@
 
         //surveyors attandence
         $(document).on("click", "#in-time", function() {
-            alert("hi");
             if (navigator.geolocation) {
-
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
-                        const latitude = position.coords;
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
 
                         console.log("Latitude:", latitude);
+                        console.log("Longitude:", longitude);
+
                         $.ajax({
                             url: routes.intimeAttendence,
                             type: "post",
-                            data: latitude,
+                            data: {
+                                latitude: latitude,
+                                longitude: longitude
+                            },
                             headers: {
                                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                             },
@@ -506,10 +510,8 @@
                             },
                             error: function(xhr) {
                                 console.log(xhr);
-
                             }
                         });
-
                     },
                     function(error) {
                         switch (error.code) {
@@ -531,7 +533,6 @@
             } else {
                 alert("Geolocation is not supported by this browser.");
             }
-
         });
     </script>
 @endsection
