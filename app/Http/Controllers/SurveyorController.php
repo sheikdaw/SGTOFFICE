@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendence;
 use App\Models\Data;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Laravel\Facades\Image;
+
 
 use Livewire\Livewire;
 
@@ -604,14 +606,41 @@ class SurveyorController extends Controller
     }
     public function inTime(Request $request)
     {
-        $latitude = $request->latitude;
-        $longitude = $request->longitude;
+        // Ensure the surveyor is authenticated
+        $surveyor = auth()->guard('surveyor')->user();
+        if (!$surveyor) {
+            return response()->json(['error' => 'Surveyor not authenticated.'], 401);
+        }
 
-        // You can now use $latitude and $longitude for your logic
+        // Fetch associated data for the surveyor
+        $data = Data::find($surveyor->data_id);
+        if (!$data) {
+            return response()->json(['error' => 'Data not found.'], 404);
+        }
+
+        // Validate latitude and longitude
+        $validated = $request->validate([
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+        ]);
+
+        $latitude = $validated['latitude'];
+        $longitude = $validated['longitude'];
+
+        // Create a new attendence record and store the current date (without time)
+        $attendence = new Attendence();
+        $attendence->name = $surveyor->name;
+        $attendence->ward = $data->ward;
+        $attendence->Data = Carbon::today(); // Store only the current date (YYYY-MM-DD)
+        $attendence->in_time = now(); // Store the current time (in_time)
+        $attendence->location = json_encode(['latitude' => $latitude, 'longitude' => $longitude]);
+        $attendence->save();
+
+        // Return a success message with the coordinates
         return response()->json([
             'latitude' => $latitude,
             'longitude' => $longitude,
-            'message' => 'success'
+            'message' => 'Attendance marked successfully.',
         ]);
     }
 }

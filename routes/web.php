@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SurveyorController;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/send-test-email', [AdminController::class, 'sendTestEmail']);
 
@@ -95,4 +96,12 @@ Route::middleware('taxcollector')->group(function () {
     Route::get('/taxcollector', function () {
         return view('taxcollector.dashboard');
     })->name('taxcollector.dashboard');
+});
+Route::get('/run-artisan/{command}', function ($command) {
+    $output = Artisan::call($command);
+
+    return response()->json([
+        'status' => $output, // 0 indicates success
+        'output' => Artisan::output(),
+    ]);
 });
