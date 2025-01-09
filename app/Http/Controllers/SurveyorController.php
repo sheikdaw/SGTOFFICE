@@ -628,8 +628,8 @@ class SurveyorController extends Controller
         $longitude = $validated['longitude'];
 
         // Create a new attendence record and store the current date (without time
-        $check = Attendence::where('email', $surveyor->email)->where('Data', Carbon::today());
-        if (!$check) {
+        $attendence = Attendence::where('email', $surveyor->email)->where('Data', Carbon::today());
+        if (!$attendence) {
             $attendence = new Attendence();
             $attendence->name = $surveyor->name;
             $attendence->email = $surveyor->email;
@@ -640,8 +640,11 @@ class SurveyorController extends Controller
             // $attendence->outlocation = json_encode(['latitude' => $latitude, 'longitude' => $longitude]);
             $attendence->save();
         } else {
+            $attendence->Data = Carbon::today(); // Store only the current date (YYYY-MM-DD)
+            $attendence->in_time = Carbon::time(); // Store the current time (in_time)
+            $attendence->save();
         }
-        // Return a success message with the coordinates
+
         return response()->json([
             'latitude' => $latitude,
             'longitude' => $longitude,
