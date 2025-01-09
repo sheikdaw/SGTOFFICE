@@ -635,13 +635,13 @@ class SurveyorController extends Controller
             $attendence->email = $surveyor->email;
             $attendence->ward = $data->ward;
             $attendence->Data = Carbon::today(); // Store only the current date (YYYY-MM-DD)
-            $attendence->in_time = Carbon::time(); // Store the current time (in_time)
+            $attendence->in_time = Carbon::now(); // Store the current time (in_time)
             $attendence->inlocation = json_encode(['latitude' => $latitude, 'longitude' => $longitude]);
             // $attendence->outlocation = json_encode(['latitude' => $latitude, 'longitude' => $longitude]);
             $attendence->save();
         } else {
             $attendence->Data = Carbon::today(); // Store only the current date (YYYY-MM-DD)
-            $attendence->in_time = Carbon::time(); // Store the current time (in_time)
+            $attendence->in_time = Carbon::now(); // Store the current time (in_time)
             $attendence->save();
         }
 
