@@ -18,11 +18,13 @@ class AreaVariationExport implements FromArray, WithHeadings, WithCustomStartCel
 
     public function __construct(array $data, $roadname)
     {
-        $this->data = $data;
+        $this->data = array_values($data); // Ensure indexed array
+        $firstItem = reset($this->data);
         $this->roadname = $roadname ?? '';
-        $this->ward = $data[0]->ward ?? 'Unknown Ward';
-        $this->zone = $data[0]->zone ?? 'Unknown Zone';
+        $this->ward = $firstItem->ward ?? 'Unknown Ward';
+        $this->zone = $firstItem->zone ?? 'Unknown Zone';
     }
+
 
     /**
      * Specify the start cell for the export.
