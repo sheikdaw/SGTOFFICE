@@ -723,7 +723,7 @@ class AdminController extends Controller
             foreach ($misRoadNames as $misRoadName) {
                 $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
                 $filteredArea = array_filter($areaVariation, fn($item) => $item->road_name === $misRoadName);
-                return Excel::download(new AreaVariationExport($filteredArea, ''), 'Area_variation.xlsx');
+                // return Excel::download(new AreaVariationExport($filteredArea, ''), 'Area_variation.xlsx');
                 if (!empty($filteredUsage) || !empty($filteredArea)) {
                     $filePath = "exports/{$misRoadName}_UsageAreaVariation.xlsx";
                     Excel::store(new UsageAreaVariationExport($filteredUsage, $filteredArea, $misRoadName), $filePath, 'public');
