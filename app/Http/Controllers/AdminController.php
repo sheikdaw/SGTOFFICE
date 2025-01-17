@@ -729,7 +729,7 @@ class AdminController extends Controller
                     Excel::store(new UsageAreaVariationExport($filteredUsage, $filteredArea, $misRoadName), $filePath, 'public');
                 }
             }
-
+            return response()->json(['error' => 'Could not create zip file'], 200);
             $zip = new ZipArchive;
             if ($zip->open($exportDirZip, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
                 $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($exportDir), \RecursiveIteratorIterator::LEAVES_ONLY);
