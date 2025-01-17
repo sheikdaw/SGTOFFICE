@@ -19,9 +19,13 @@ class AreaVariationExport implements FromArray, WithHeadings, WithCustomStartCel
     public function __construct(array $data, $roadname)
     {
         $this->data = $data;
-        $this->roadname = $roadname ?? '';
-        $this->ward = $data[0]->ward ?? 'Unknown Ward';
-        $this->zone = $data[0]->zone ?? 'Unknown Zone';
+        $this->roadname = $roadname ?? 'N/A';
+
+        // Use collect() to avoid errors when accessing first element
+        $firstItem = collect($data)->first();
+
+        $this->ward = $firstItem->ward ?? 'Unknown Ward';
+        $this->zone = $firstItem->zone ?? 'Unknown Zone';
     }
 
     /**
@@ -69,8 +73,8 @@ class AreaVariationExport implements FromArray, WithHeadings, WithCustomStartCel
     public function headings(): array
     {
         return [
-            ["Zone: $this->zone - Ward: $this->ward"],
-            ["$this->roadname - AREA VARIATION"],
+            ["Zone: $this->zone - Ward: $this->ward"],  // Ensuring correct display of zone and ward
+            ["$this->roadname - AREA VARIATION"],  // Correct display of road name
             [
                 'S.NO',
                 'GIS ID',
@@ -99,10 +103,11 @@ class AreaVariationExport implements FromArray, WithHeadings, WithCustomStartCel
      */
     public function styles(Worksheet $sheet)
     {
-        // Main title
+        // Merge headers
         $sheet->mergeCells('A1:R1');
         $sheet->mergeCells('A2:R2');
 
+        // Style for Zone & Ward row
         $sheet->getStyle('A1')->applyFromArray([
             'font' => ['bold' => true, 'size' => 16, 'color' => ['argb' => 'FF000000']],
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
@@ -112,6 +117,7 @@ class AreaVariationExport implements FromArray, WithHeadings, WithCustomStartCel
             ],
         ]);
 
+        // Style for Road Name - Area Variation
         $sheet->getStyle('A2')->applyFromArray([
             'font' => ['bold' => true, 'size' => 14, 'color' => ['argb' => 'FF000000']],
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
@@ -121,6 +127,7 @@ class AreaVariationExport implements FromArray, WithHeadings, WithCustomStartCel
             ],
         ]);
 
+        // Style for column headings
         $sheet->getStyle('A3:R3')->applyFromArray([
             'font' => ['bold' => true, 'size' => 12, 'color' => ['argb' => 'FFFFFFFF']],
             'fill' => [
@@ -129,6 +136,7 @@ class AreaVariationExport implements FromArray, WithHeadings, WithCustomStartCel
             ],
         ]);
 
+        // Auto-size columns for better readability
         foreach (range('A', 'R') as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
