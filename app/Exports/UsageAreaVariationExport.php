@@ -12,7 +12,7 @@ class UsageAreaVariationExport implements WithMultipleSheets
     protected $AbstractExport;
     protected $rname;
 
-    public function __construct(array $areavariation, array $usageVariation, $rname)
+    public function __construct($areavariation, array $usageVariation, $rname)
     {
         // $this->AbstractExport = $AbstractExport;
         $this->areavariation = $areavariation;
