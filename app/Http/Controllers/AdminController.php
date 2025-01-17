@@ -703,82 +703,48 @@ class AdminController extends Controller
     public function usageAndAreaVariation($id)
     {
         try {
-            // Fetch data
             $data = Data::findOrFail($id);
-
-            // Validate table names
             if (empty($data->mis) || empty($data->pointdata) || empty($data->polygon)) {
                 return response()->json(['error' => 'Invalid table names'], 400);
             }
 
-            // Fetch variations
             $areaVariation = $this->areaVariations($data);
             $usageVariation = $this->usageVariations($data)->toArray();
             $misRoadNames = DB::table($data->mis)->pluck('road_name');
 
-            // Prepare export directory
             $exportDir = storage_path('app/public/exports');
             $exportDirZip = storage_path('app/public/exports.zip');
 
-            // Remove old export directory if it exists
             if (File::exists($exportDir)) {
                 File::deleteDirectory($exportDir);
             }
-
-            // Create export directory
             File::makeDirectory($exportDir, 0755, true);
 
-            $exportCount = 0;
-
             foreach ($misRoadNames as $misRoadName) {
-                // Filter variations
                 $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
                 $filteredArea = array_filter($areaVariation, fn($item) => $item->road_name === $misRoadName);
-                // return response()->json(['error' => $filteredArea], 200);
-                // Only export if there is data to be exported
+                return Excel::download(new AreaVariationExport($filteredArea, ''), 'Area_variation.xlsx');
                 if (!empty($filteredUsage) || !empty($filteredArea)) {
                     $filePath = "exports/{$misRoadName}_UsageAreaVariation.xlsx";
                     Excel::store(new UsageAreaVariationExport($filteredUsage, $filteredArea, $misRoadName), $filePath, 'public');
-                    $exportCount++;
                 }
             }
 
-            // If no files were exported, return early with an appropriate response
-            if ($exportCount === 0) {
-                return response()->json(['error' => 'No data to export'], 404);
-            }
-
-            // Create ZIP archive of exported files
             $zip = new ZipArchive;
-            if (file_exists($exportDirZip)) {
-                unlink($exportDirZip); // Delete existing zip file if it exists
-            }
-
             if ($zip->open($exportDirZip, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
-                $exportPath = storage_path('app/public/exports');
-                $files = new \RecursiveIteratorIterator(
-                    new \RecursiveDirectoryIterator($exportPath),
-                    \RecursiveIteratorIterator::LEAVES_ONLY
-                );
-
-                // Add files to the ZIP archive
+                $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($exportDir), \RecursiveIteratorIterator::LEAVES_ONLY);
                 foreach ($files as $file) {
                     if (!$file->isDir()) {
-                        $zip->addFile($file->getRealPath(), 'exports/' . substr($file->getRealPath(), strlen($exportPath) + 1));
+                        $zip->addFile($file->getRealPath(), 'exports/' . substr($file->getRealPath(), strlen($exportDir) + 1));
                     }
                 }
-
                 $zip->close();
-
-                // Clean up the exported files
-                File::deleteDirectory($exportPath);
-
+                File::deleteDirectory($exportDir);
                 return response()->download($exportDirZip)->deleteFileAfterSend(true);
             } else {
                 return response()->json(['error' => 'Could not create zip file'], 500);
             }
         } catch (\Exception $e) {
-            // Log the error and return a user-friendly message
             Log::error("Error exporting usage and area variations: " . $e->getMessage());
             return response()->json(['error' => 'An error occurred during export.'], 500);
         }
