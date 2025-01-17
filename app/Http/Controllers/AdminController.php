@@ -734,13 +734,13 @@ class AdminController extends Controller
                 // Filter variations
                 $filteredUsage = array_filter($usageVariation, fn($item) => $item->road_name === $misRoadName);
                 $filteredArea = array_filter($areaVariation, fn($item) => $item->road_name === $misRoadName);
-
-                // Only export if there is data to be exported
-                if (!empty($filteredUsage) || !empty($filteredArea)) {
-                    $filePath = "exports/{$misRoadName}_UsageAreaVariation.xlsx";
-                    Excel::store(new UsageAreaVariationExport($filteredUsage, $filteredArea, $misRoadName), $filePath, 'public');
-                    $exportCount++;
-                }
+                return response()->json(['error' => $filteredArea], 200);
+                // // Only export if there is data to be exported
+                // if (!empty($filteredUsage) || !empty($filteredArea)) {
+                //     $filePath = "exports/{$misRoadName}_UsageAreaVariation.xlsx";
+                //     Excel::store(new UsageAreaVariationExport($filteredUsage, $filteredArea, $misRoadName), $filePath, 'public');
+                //     $exportCount++;
+                // }
             }
 
             // If no files were exported, return early with an appropriate response

@@ -284,7 +284,7 @@ class SurveyorController extends Controller
             'worker_name' => $surveyor->name,
             // 'eb' => $validatedData['eb'],
             'old_assessment' => $validatedData['old_assessment'],
-            'assessment' => $validatedData['assessment'],
+            'assessment' => $validatedData['assessment'] ?? $request->assessment,
             'floor' => $validatedData['floor'],
             'bill_usage' => $validatedData['bill_usage'],
             'phone_number' => $validatedData['phone_number'],
